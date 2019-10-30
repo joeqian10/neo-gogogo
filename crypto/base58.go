@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/helper"
+
 	"math/big"
 	"strings"
 )
+
 const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const PREFIX rune = '1'
 
@@ -41,7 +43,7 @@ func Encode(input []byte) string {
 func Decode(input string) ([]byte, error) {
 	var (
 		startIndex = 0
-		zero = 0
+		zero       = 0
 	)
 	for i, c := range input {
 		if c == PREFIX {
@@ -56,7 +58,7 @@ func Decode(input string) ([]byte, error) {
 	for _, c := range input[startIndex:] {
 		index := strings.IndexRune(BASE58, c)
 		if index == -1 {
-			return  nil, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"Invalid character '%c' when decoding this base58 string: '%s'", c, input,
 			)
 		}
@@ -66,11 +68,11 @@ func Decode(input string) ([]byte, error) {
 	ba := bi.Bytes() // ba is big-endian
 	// add leading zeros
 	i := 0
-	for i < len(input) && input[i]=='1' {
+	for i < len(input) && input[i] == '1' {
 		i++
 	}
 	r := make([]byte, len(input)+i)
-	copy(r[i:],ba)
+	copy(r[i:], ba)
 	return r, nil
 }
 
@@ -85,7 +87,7 @@ func Base58CheckEncode(input []byte) string {
 func Base58CheckDecode(input string) ([]byte, error) {
 	ba, err := Decode(input)
 	if err != nil {
-		return  nil, err
+		return nil, err
 	}
 	if len(ba) < 4 {
 		return nil, fmt.Errorf("Invalid base58 check string: missing checksum.")

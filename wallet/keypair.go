@@ -10,11 +10,18 @@ type KeyPair struct {
 	PublicKey  ecc.ECPoint
 }
 
-func NewKeyPair(privateKey []byte) (*KeyPair, error) {
+func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
 	length := len(privateKey)
 	if length != 32 && length != 94 && length != 104 {
 		return nil, fmt.Errorf("argument length is wrong %v", length)
 	}
 
-	return nil, fmt.Errorf("not implemention")
+	key = &KeyPair{privateKey[:32], nil}
+	if length == 32 {
+		//key.PublicKey =  ecc.Secp256r1.G
+	} else {
+
+	}
+
+	return key, nil
 }
