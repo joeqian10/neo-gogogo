@@ -36,7 +36,7 @@ func (x *ECFieldElement) Equals(y *ECFieldElement) bool {
 	return false
 }
 
-func (x *ECFieldElement) Square() *ECFieldElement {
+func Square(x *ECFieldElement) *ECFieldElement {
 	return &ECFieldElement{
 		Value: hlp.Mod(hlp.Mtpl(x.Value, x.Value), x.curve.Q),
 		curve: x.curve,

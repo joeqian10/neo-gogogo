@@ -61,6 +61,13 @@ func TestBit(n *big.Int, index int) bool {
 	return b == 1
 }
 
+func IsEven(n *big.Int) bool {
+	if Mod(n, big.NewInt(2)).Cmp(big.NewInt(0)) == 0 {
+		return true
+	}
+	return false
+}
+
 func Negate(n *big.Int) *big.Int {
 	t := &big.Int{}
 	return t.Neg(n)

@@ -1,12 +1,12 @@
 package sc
 
-import "github.com/joeqian10/neo-gogogo/crypto"
+import (
+	"github.com/joeqian10/neo-gogogo/helper"
+)
 
 type Contract struct {
 	Script        []byte
 	ParameterList []ContractParameterType
-	ScriptHash crypto.HASH160
-	Address
+	ScriptHash    helper.UInt160
+	Address       string
 }
-
-
