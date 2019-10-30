@@ -1,226 +1,238 @@
-package tx
+package transaction
 
 import (
-	"bytes"
-	"encoding/hex"
+	"../helper"
+	"../helper/io"
 	"github.com/joeqian10/neo-gogogo/crypto"
-	"github.com/joeqian10/neo-gogogo/helper"
-)
-
-type TransactionAttribute struct {
-	Usage TransactionAttributeUsage
-	Data  []byte
-}
-
-// Transaction attribute usages
-type TransactionAttributeUsage byte
-
-const (
-	ContractHash TransactionAttributeUsage = 0x00
-
-	ECDH02 TransactionAttributeUsage = 0x02
-	ECDH03 TransactionAttributeUsage = 0x03
-
-	Script TransactionAttributeUsage = 0x20
-
-	Vote TransactionAttributeUsage = 0x30
-
-	DescriptionUrl TransactionAttributeUsage = 0x81
-	Description    TransactionAttributeUsage = 0x90
-
-	Hash1  TransactionAttributeUsage = 0xa1
-	Hash2  TransactionAttributeUsage = 0xa2
-	Hash3  TransactionAttributeUsage = 0xa3
-	Hash4  TransactionAttributeUsage = 0xa4
-	Hash5  TransactionAttributeUsage = 0xa5
-	Hash6  TransactionAttributeUsage = 0xa6
-	Hash7  TransactionAttributeUsage = 0xa7
-	Hash8  TransactionAttributeUsage = 0xa8
-	Hash9  TransactionAttributeUsage = 0xa9
-	Hash10 TransactionAttributeUsage = 0xaa
-	Hash11 TransactionAttributeUsage = 0xab
-	Hash12 TransactionAttributeUsage = 0xac
-	Hash13 TransactionAttributeUsage = 0xad
-	Hash14 TransactionAttributeUsage = 0xae
-	Hash15 TransactionAttributeUsage = 0xaf
-
-	Remark   TransactionAttributeUsage = 0xf0
-	Remark1  TransactionAttributeUsage = 0xf1
-	Remark2  TransactionAttributeUsage = 0xf2
-	Remark3  TransactionAttributeUsage = 0xf3
-	Remark4  TransactionAttributeUsage = 0xf4
-	Remark5  TransactionAttributeUsage = 0xf5
-	Remark6  TransactionAttributeUsage = 0xf6
-	Remark7  TransactionAttributeUsage = 0xf7
-	Remark8  TransactionAttributeUsage = 0xf8
-	Remark9  TransactionAttributeUsage = 0xf9
-	Remark10 TransactionAttributeUsage = 0xfa
-	Remark11 TransactionAttributeUsage = 0xfb
-	Remark12 TransactionAttributeUsage = 0xfc
-	Remark13 TransactionAttributeUsage = 0xfd
-	Remark14 TransactionAttributeUsage = 0xfe
-	Remark15 TransactionAttributeUsage = 0xff
-)
-
-// Transaction types
-type TransactionType byte
-
-const (
-	Miner_Transaction      TransactionType = 0x00
-	Issue_Transaction      TransactionType = 0x01
-	Claim_Transaction      TransactionType = 0x02
-	Enrollment_Transaction TransactionType = 0x20
-	Register_Transaction   TransactionType = 0x40
-	Contract_Transaction   TransactionType = 0x80
-	State_Transaction      TransactionType = 0x90
-	/// <summary>
-	/// Publish scripts to the blockchain for being invoked later.
-	/// </summary>
-	Publish_Transaction    TransactionType = 0xd0
-	Invocation_Transaction TransactionType = 0xd1
+	log "github.com/sirupsen/logrus"
 )
 
 const (
-	TransactionVersion byte = 1 // neo-2.x
+	// MaxTransactionSize is the upper limit size in bytes that a transaction can reach. It is
+	// set to be 102400.
+	MaxTransactionSize = 102400
 )
 
-// TransactionInput alias CoinReference
-type CoinReference struct {
-	PrevHash  helper.UInt256
-	PrevIndex uint16
-}
-
-// TransactionOutput
-type TransactionOutput struct {
-	AssetId    helper.UInt256
-	Value      helper.Fixed8
-	ScriptHash helper.UInt160
-}
-
-// Witness
-type Witness struct {
-	InvocationScript   []byte // signature
-	VerificationScript []byte // pub key
-}
-
+// Transaction is a process recorded in the NEO blockchain.
 type Transaction struct {
-	Type       TransactionType
-	Version    byte
-	Hash       helper.UInt256
-	Attributes []TransactionAttribute
-	Inputs     []CoinReference
-	Outputs    []TransactionOutput
-	Witnesses  []Witness
+	// The type of the transaction.
+	Type TXType `json:"type"`
+
+	// The trading version which is currently 0.
+	Version uint8 `json:"version"`
+
+	// Data specific to the type of the transaction.
+	// This is always a pointer to a <Type>Transaction.
+	Data TXer `json:"-"`
+
+	// Transaction attributes.
+	Attributes []*Attribute `json:"attributes"`
+
+	// The inputs of the transaction.
+	Inputs []*Input `json:"vin"`
+
+	// The outputs of the transaction.
+	Outputs []*Output `json:"vout"`
+
+	// The scripts that comes with this transaction.
+	// Scripts exist out of the verification script
+	// and invocation script.
+	Scripts []*Witness `json:"scripts"`
+
+	// Hash of the transaction (double SHA256).
+	hash helper.UInt256
+
+	// Hash of the transaction used to verify it (single SHA256).
+	verificationHash helper.UInt256
+
+	// Trimmed indicates this is a transaction from trimmed
+	// data.
+	Trimmed bool `json:"-"`
 }
 
-// CreateContractTransaction creates a contract transaction
-// TODO add contract transaction type
-func CreateContractTransaction() *Transaction {
-	tx := &Transaction{
-		Type:    Contract_Transaction,
-		Version: TransactionVersion,
+// NewTrimmedTX returns a trimmed transaction with only its hash
+// and Trimmed to true.
+func NewTrimmedTX(hash helper.UInt256) *Transaction {
+	return &Transaction{
+		hash:    hash,
+		Trimmed: true,
 	}
-	return tx
 }
 
-// UnsignedRawTransaction ...
-func (tx *Transaction) UnsignedRawTransaction() []byte {
-	buff := new(bytes.Buffer)
-	buff.Write(tx.UnsignedRawTransactionPart1())
-	buff.Write(tx.UnsignedRawTransactionPart2())
-	return buff.Bytes()
-}
-
-func (tx *Transaction) UnsignedRawTransactionPart1() []byte {
-	buff := new(bytes.Buffer)
-	buff.WriteByte(byte(tx.Type))
-	buff.WriteByte(tx.Version)
-	return buff.Bytes()
-}
-
-func (tx *Transaction) UnsignedRawTransactionPart2() []byte {
-	buff := new(bytes.Buffer)
-	buff.Write(tx.SerializeAttributes())
-	buff.Write(tx.SerializeInputs())
-
-	return buff.Bytes()
-}
-
-func (tx *Transaction) SerializeAttributes() []byte {
-	buff := new(bytes.Buffer)
-	attributeCount := helper.VarIntFromInt(len(tx.Attributes))
-	buff.Write(attributeCount.Bytes())
-	for _, attr := range tx.Attributes {
-		buff.WriteByte(byte(attr.Usage))
-		if attr.Usage == DescriptionUrl {
-			buff.WriteByte(byte(len(attr.Data)))
-		} else if attr.Usage == Description || attr.Usage >= Remark {
-			var dataLength helper.VarInt
-			dataLength.Value = uint64(len(attr.Data))
-			buff.Write(dataLength.Bytes())
+// Hash returns the hash of the transaction.
+func (t *Transaction) Hash() helper.UInt256 {
+	if t.hash.Equal(helper.UInt256{}) {
+		if t.createHash() != nil {
+			panic("failed to compute hash!")
 		}
-		if attr.Usage == ECDH02 || attr.Usage == ECDH03 {
-			data := attr.Data[1:33]
-			buff.Write(data)
+	}
+	return t.hash
+}
+
+// VerificationHash returns the hash of the transaction used to verify it.
+func (t *Transaction) VerificationHash() helper.UInt256 {
+	if t.verificationHash.Equal(helper.UInt256{}) {
+		if t.createHash() != nil {
+			panic("failed to compute hash!")
 		}
-		buff.Write(attr.Data)
 	}
-	return buff.Bytes()
+	return t.verificationHash
 }
 
-func (tx *Transaction) SerializeInputs() []byte {
-	buff := new(bytes.Buffer)
-	inputCount := helper.VarIntFromInt(len(tx.Inputs))
-	buff.Write(inputCount.Bytes())
-	for i := 0; i < len(tx.Inputs); i++ {
-		buff.Write(tx.Inputs[i].PrevHash.Data)
-		buff.Write(helper.VarIntFromUint64(uint64(tx.Inputs[i].PrevIndex)).Bytes())
+// AddOutput adds the given output to the transaction outputs.
+func (t *Transaction) AddOutput(out *Output) {
+	t.Outputs = append(t.Outputs, out)
+}
+
+// AddInput adds the given input to the transaction inputs.
+func (t *Transaction) AddInput(in *Input) {
+	t.Inputs = append(t.Inputs, in)
+}
+
+// DecodeBinary implements Serializable interface.
+func (t *Transaction) DecodeBinary(br *io.BinReader) {
+	br.ReadLE(&t.Type)
+	br.ReadLE(&t.Version)
+	t.decodeData(br)
+
+	lenAttrs := br.ReadVarUint()
+	t.Attributes = make([]*Attribute, lenAttrs)
+	for i := 0; i < int(lenAttrs); i++ {
+		t.Attributes[i] = &Attribute{}
+		t.Attributes[i].DecodeBinary(br)
 	}
-	return buff.Bytes()
-}
 
-func (tx *Transaction) SerializeOutputs() []byte {
-	buff := new(bytes.Buffer)
-	outputCount := helper.VarIntFromInt(len(tx.Outputs))
-	buff.Write(outputCount.Bytes())
-	for i := 0; i < len(tx.Outputs); i++ {
-		buff.Write(tx.Outputs[i].AssetId.Data)
-		buff.Write(helper.VarIntFromUint64(uint64(tx.Outputs[i].Value.Value)).Bytes())
-		buff.Write(tx.Outputs[i].ScriptHash.Data)
+	lenInputs := br.ReadVarUint()
+	t.Inputs = make([]*Input, lenInputs)
+	for i := 0; i < int(lenInputs); i++ {
+		t.Inputs[i] = &Input{}
+		t.Inputs[i].DecodeBinary(br)
 	}
-	return buff.Bytes()
-}
 
-// SerializeWitnesses returns serialized witness data
-func (tx *Transaction) SerializeWitnesses() []byte {
-	buff := new(bytes.Buffer)
-	var witnessCount helper.VarInt
-	witnessCount.Value = uint64(len(tx.Witnesses))
-	buff.Write(witnessCount.Bytes())
-	var invocationCount helper.VarInt
-	var verificationCount helper.VarInt
-	for i := 0; i < len(tx.Witnesses); i++ {
-		invocationCount = helper.VarIntFromInt(len(tx.Witnesses[i].InvocationScript))
-		buff.Write(invocationCount.Bytes())
-		buff.Write(tx.Witnesses[i].InvocationScript)
-		verificationCount = helper.VarIntFromInt(len(tx.Witnesses[i].VerificationScript))
-		buff.Write(verificationCount.Bytes())
-		buff.Write(tx.Witnesses[i].VerificationScript)
+	lenOutputs := br.ReadVarUint()
+	t.Outputs = make([]*Output, lenOutputs)
+	for i := 0; i < int(lenOutputs); i++ {
+		t.Outputs[i] = &Output{}
+		t.Outputs[i].DecodeBinary(br)
 	}
-	return buff.Bytes()
+
+	lenScripts := br.ReadVarUint()
+	t.Scripts = make([]*Witness, lenScripts)
+	for i := 0; i < int(lenScripts); i++ {
+		t.Scripts[i] = &Witness{}
+		t.Scripts[i].DecodeBinary(br)
+	}
+
+	// Create the hash of the transaction at decode, so we dont need
+	// to do it anymore.
+	if br.Err == nil {
+		br.Err = t.createHash()
+	}
 }
 
-// RawTransaction 返回签名后的完整二进制交易
-func (tx *Transaction) RawTransaction() []byte {
-	return append(tx.UnsignedRawTransaction(), tx.SerializeWitnesses()...)
+func (t *Transaction) decodeData(r *io.BinReader) {
+	switch t.Type {
+	case InvocationType:
+		t.Data = &InvocationTX{Version: t.Version}
+		t.Data.(*InvocationTX).DecodeBinary(r)
+	case MinerType:
+		t.Data = &MinerTX{}
+		t.Data.(*MinerTX).DecodeBinary(r)
+	case ClaimType:
+		t.Data = &ClaimTX{}
+		t.Data.(*ClaimTX).DecodeBinary(r)
+	case ContractType:
+		t.Data = &ContractTX{}
+		t.Data.(*ContractTX).DecodeBinary(r)
+	case IssueType:
+		t.Data = &IssueTX{}
+		t.Data.(*IssueTX).DecodeBinary(r)
+	case StateType:
+		t.Data = &StateTX{}
+		t.Data.(*StateTX).DecodeBinary(r)
+	default:
+		log.Warnf("invalid TX type %s", t.Type)
+	}
 }
 
-// RawTransactionString 返回完整交易的二进制字符串
-func (tx *Transaction) RawTransactionString() string {
-	return hex.EncodeToString(tx.RawTransaction())
+// EncodeBinary implements Serializable interface.
+func (t *Transaction) EncodeBinary(bw *io.BinWriter) {
+	t.encodeHashableFields(bw)
+	bw.WriteVarUint(uint64(len(t.Scripts)))
+	for _, s := range t.Scripts {
+		s.EncodeBinary(bw)
+	}
 }
 
-func (tx *Transaction) TXID() string {
-	txid := crypto.Sha256(tx.UnsignedRawTransaction())
-	return hex.EncodeToString(helper.ReverseBytes(txid))
+// encodeHashableFields encodes the fields that are not used for
+// signing the transaction, which are all fields except the scripts.
+func (t *Transaction) encodeHashableFields(bw *io.BinWriter) {
+	bw.WriteLE(t.Type)
+	bw.WriteLE(t.Version)
+
+	// Underlying TXer.
+	if t.Data != nil {
+		t.Data.EncodeBinary(bw)
+	}
+
+	// Attributes
+	bw.WriteVarUint(uint64(len(t.Attributes)))
+	for _, attr := range t.Attributes {
+		attr.EncodeBinary(bw)
+	}
+
+	// Inputs
+	bw.WriteVarUint(uint64(len(t.Inputs)))
+	for _, in := range t.Inputs {
+		in.EncodeBinary(bw)
+	}
+
+	// Outputs
+	bw.WriteVarUint(uint64(len(t.Outputs)))
+	for _, out := range t.Outputs {
+		out.EncodeBinary(bw)
+	}
+}
+
+// createHash creates the hash of the transaction.
+func (t *Transaction) createHash() error {
+	buf := io.NewBufBinWriter()
+	t.encodeHashableFields(buf.BinWriter)
+	if buf.Err != nil {
+		return buf.Err
+	}
+
+	b := buf.Bytes()
+	t.hash, _ = helper.NewUInt256(crypto.Sha256(crypto.Sha256(b)))
+	t.verificationHash, _ = helper.NewUInt256(crypto.Sha256(b))
+
+	return nil
+}
+
+// GroupInputsByPrevHash groups all TX inputs by their previous hash.
+//func (t *Transaction) GroupInputsByPrevHash() map[util.Uint256][]*Input {
+//	m := make(map[util.Uint256][]*Input)
+//	for _, in := range t.Inputs {
+//		m[in.PrevHash] = append(m[in.PrevHash], in)
+//	}
+//	return m
+//}
+
+// GroupOutputByAssetID groups all TX outputs by their assetID.
+//func (t Transaction) GroupOutputByAssetID() map[util.Uint256][]*Output {
+//	m := make(map[util.Uint256][]*Output)
+//	for _, out := range t.Outputs {
+//		m[out.AssetID] = append(m[out.AssetID], out)
+//	}
+//	return m
+//}
+
+// Bytes converts the transaction to []byte
+func (t *Transaction) Bytes() []byte {
+	buf := io.NewBufBinWriter()
+	t.EncodeBinary(buf.BinWriter)
+	if buf.Err != nil {
+		return nil
+	}
+	return buf.Bytes()
 }

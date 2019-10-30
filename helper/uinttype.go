@@ -1,6 +1,9 @@
 package helper
 
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+)
 
 // UInt256 is a type of hash value in neo. It's an uint256 big number with a length of 32 byte
 // PublicKey, BlockHash, TransactionHash and other hashes are in UInt256 format
@@ -17,6 +20,10 @@ func NewUInt256(b []byte) (UInt256, error) {
 		return UInt256{}, fmt.Errorf("Invalid data length.")
 	}
 	return UInt256{Data: b}, nil
+}
+
+func (value UInt256) Equal(other UInt256) bool {
+	return bytes.Equal(value.Data, other.Data)
 }
 
 // UInt160 is a type of script hash value in neo. Usually used as an account address.
