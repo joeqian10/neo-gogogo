@@ -3,8 +3,6 @@ package crypto
 import (
 	"bytes"
 	"fmt"
-	"github.com/joeqian10/neo-gogogo/helper"
-
 	"math/big"
 	"strings"
 )
@@ -15,8 +13,8 @@ const PREFIX rune = '1'
 // Encode ... ref: neo/Cryptography/Base58.cs
 func Encode(input []byte) string {
 	b := []byte{0}
-	tmp := helper.ConcatBytes(b, input) // input is big-endian
-	//tmp := append(b, input[:]...)
+	//tmp := helper.ConcatBytes(b, input) // input is big-endian
+	tmp := append(b, input[:]...)
 	x := new(big.Int).SetBytes(tmp)
 	r := new(big.Int)
 	m := big.NewInt(58)
@@ -71,8 +69,14 @@ func Decode(input string) ([]byte, error) {
 	for i < len(input) && input[i] == '1' {
 		i++
 	}
-	r := make([]byte, len(input)+i)
-	copy(r[i:], ba)
+	// strip Sign Byte
+	stripSignByte := 0
+	if len(ba) > 0 && ba[0] == 0 && ba[1] >= 0x80 {
+		stripSignByte = 1
+	}
+
+	r := make([]byte, len(ba)-stripSignByte+i)
+	copy(r[i:], ba[stripSignByte:])
 	return r, nil
 }
 
