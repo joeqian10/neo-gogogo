@@ -12,8 +12,8 @@ const uint160Size = 20
 // UInt160 is a 20 byte long unsigned integer.
 type UInt160 [uint160Size]uint8
 
-// UInt160DecodeString attempts to decode the given string into an UInt160.
-func UInt160DecodeString(s string) (UInt160, error) {
+// UInt160FromString attempts to decode the given string into an UInt160.
+func UInt160FromString(s string) (UInt160, error) {
 	var u UInt160
 	if len(s) != uint160Size*2 {
 		return u, fmt.Errorf("expected string size of %d got %d", uint160Size*2, len(s))
@@ -22,11 +22,11 @@ func UInt160DecodeString(s string) (UInt160, error) {
 	if err != nil {
 		return u, err
 	}
-	return UInt160DecodeBytes(b)
+	return UInt160FromBytes(b)
 }
 
-// UInt160DecodeBytes attempts to decode the given bytes into an UInt160.
-func UInt160DecodeBytes(b []byte) (u UInt160, err error) {
+// UInt160FromBytes attempts to decode the given bytes into an UInt160.
+func UInt160FromBytes(b []byte) (u UInt160, err error) {
 	if len(b) != uint160Size {
 		return u, fmt.Errorf("expected byte size of %d got %d", uint160Size, len(b))
 	}
@@ -39,8 +39,8 @@ func (u UInt160) Bytes() []byte {
 	return u[:]
 }
 
-// BytesReverse returns a reversed byte representation of u.
-func (u UInt160) BytesReverse() []byte {
+// BytesReversed returns a reversed byte representation of u.
+func (u UInt160) BytesReversed() []byte {
 	return ReverseBytes(u.Bytes())
 }
 
@@ -49,8 +49,8 @@ func (u UInt160) String() string {
 	return hex.EncodeToString(u.Bytes())
 }
 
-// ReverseString is the same as String, but returns a reversed representation.
-func (u UInt160) ReverseString() string {
+// StringReversed is the same as String, but returns a reversed representation.
+func (u UInt160) StringReversed() string {
 	return hex.EncodeToString(u.BytesReverse())
 }
 
