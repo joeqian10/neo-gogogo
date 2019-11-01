@@ -10,11 +10,11 @@ import (
 
 const uint256Size = 32
 
-// Uint256 is a 32 byte long unsigned integer.
-type Uint256 [uint256Size]uint8
+// UInt256 is a 32 byte long unsigned integer.
+type UInt256 [uint256Size]uint8
 
-// Uint256DecodeReverseString attempts to decode the given string (in LE representation) into an Uint256.
-func Uint256DecodeReverseString(s string) (u Uint256, err error) {
+// UInt256DecodeReverseString attempts to decode the given string (in LE representation) into an UInt256.
+func UInt256DecodeReverseString(s string) (u UInt256, err error) {
 	if len(s) != uint256Size*2 {
 		return u, fmt.Errorf("expected string size of %d got %d", uint256Size*2, len(s))
 	}
@@ -22,11 +22,11 @@ func Uint256DecodeReverseString(s string) (u Uint256, err error) {
 	if err != nil {
 		return u, err
 	}
-	return Uint256DecodeReverseBytes(b)
+	return UInt256DecodeReverseBytes(b)
 }
 
-// Uint256DecodeBytes attempts to decode the given string (in BE representation) into an Uint256.
-func Uint256DecodeBytes(b []byte) (u Uint256, err error) {
+// UInt256DecodeBytes attempts to decode the given string (in BE representation) into an UInt256.
+func UInt256DecodeBytes(b []byte) (u UInt256, err error) {
 	if len(b) != uint256Size {
 		return u, fmt.Errorf("expected []byte of size %d got %d", uint256Size, len(b))
 	}
@@ -34,61 +34,61 @@ func Uint256DecodeBytes(b []byte) (u Uint256, err error) {
 	return u, nil
 }
 
-// Uint256DecodeReverseBytes attempts to decode the given string (in LE representation) into an Uint256.
-func Uint256DecodeReverseBytes(b []byte) (u Uint256, err error) {
-	b = ArrayReverse(b)
-	return Uint256DecodeBytes(b)
+// UInt256DecodeReverseBytes attempts to decode the given string (in LE representation) into an UInt256.
+func UInt256DecodeReverseBytes(b []byte) (u UInt256, err error) {
+	b = ReverseBytes(b)
+	return UInt256DecodeBytes(b)
 }
 
 // Bytes returns a byte slice representation of u.
-func (u Uint256) Bytes() []byte {
+func (u UInt256) Bytes() []byte {
 	return u[:]
 }
 
-// Reverse reverses the Uint256 object
-func (u Uint256) Reverse() Uint256 {
-	res, _ := Uint256DecodeReverseBytes(u.Bytes())
+// Reverse reverses the UInt256 object
+func (u UInt256) Reverse() UInt256 {
+	res, _ := UInt256DecodeReverseBytes(u.Bytes())
 	return res
 }
 
 // BytesReverse return a reversed byte representation of u.
-func (u Uint256) BytesReverse() []byte {
-	return ArrayReverse(u.Bytes())
+func (u UInt256) BytesReverse() []byte {
+	return ReverseBytes(u.Bytes())
 }
 
-// Equals returns true if both Uint256 values are the same.
-func (u Uint256) Equals(other Uint256) bool {
+// Equals returns true if both UInt256 values are the same.
+func (u UInt256) Equals(other UInt256) bool {
 	return u == other
 }
 
 // String implements the stringer interface.
-func (u Uint256) String() string {
+func (u UInt256) String() string {
 	return hex.EncodeToString(u.Bytes())
 }
 
-// ReverseString produces string representation of Uint256 with LE byte order.
-func (u Uint256) ReverseString() string {
+// ReverseString produces string representation of UInt256 with LE byte order.
+func (u UInt256) ReverseString() string {
 	return hex.EncodeToString(u.BytesReverse())
 }
 
 // UnmarshalJSON implements the json unmarshaller interface.
-func (u *Uint256) UnmarshalJSON(data []byte) (err error) {
+func (u *UInt256) UnmarshalJSON(data []byte) (err error) {
 	var js string
 	if err = json.Unmarshal(data, &js); err != nil {
 		return err
 	}
 	js = strings.TrimPrefix(js, "0x")
-	*u, err = Uint256DecodeReverseString(js)
+	*u, err = UInt256DecodeReverseString(js)
 	return err
 }
 
 // MarshalJSON implements the json marshaller interface.
-func (u Uint256) MarshalJSON() ([]byte, error) {
+func (u UInt256) MarshalJSON() ([]byte, error) {
 	return []byte(`"0x` + u.ReverseString() + `"`), nil
 }
 
-// CompareTo compares two Uint256 with each other. Possible output: 1, -1, 0
+// CompareTo compares two UInt256 with each other. Possible output: 1, -1, 0
 //  1 implies u > other.
 // -1 implies u < other.
 //  0 implies  u = other.
-func (u Uint256) CompareTo(other Uint256) int { return bytes.Compare(u[:], other[:]) }
+func (u UInt256) CompareTo(other UInt256) int { return bytes.Compare(u[:], other[:]) }

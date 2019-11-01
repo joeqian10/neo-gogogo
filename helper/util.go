@@ -48,21 +48,21 @@ func BytesToScriptHash(ba []byte) string {
 
 func ScriptHashToAddress(scriptHash UInt256) string {
 	var addressVersion byte = 0x17
-	data := append([]byte{addressVersion}, scriptHash.Data...)
+	data := append([]byte{addressVersion}, scriptHash.Bytes()...)
 	return crypto.Base58CheckEncode(data)
 }
 
 func AddressToScriptHash(address string) (UInt160, error) {
 	data, err := crypto.Base58CheckDecode(address)
 	if err != nil {
-		u, _ := NewUInt160([]byte{})
+		u := UInt160{}
 		return u, err
 	}
 	if data == nil || len(data) != 21 || data[0] != 0x17 {
-		u, _ := NewUInt160([]byte{})
+		u := UInt160{}
 		return u, fmt.Errorf("Invalid address string.")
 	}
-	return NewUInt160(data[1:])
+	return UInt160DecodeBytes(data[1:])
 }
 
 // ReverseString
@@ -70,8 +70,8 @@ func ReverseString(input string) string {
 	return BytesToHex(ReverseBytes(HexTobytes(input)))
 }
 
-// Uint32ToBytes ...
-func Uint32ToBytes(n uint32) []byte {
+// UInt32ToBytes ...
+func UInt32ToBytes(n uint32) []byte {
 	var buff = make([]byte, 4)
 	binary.LittleEndian.PutUint32(buff, n)
 	return buff

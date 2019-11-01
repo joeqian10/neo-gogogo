@@ -174,7 +174,7 @@ func (tx *Transaction) SerializeInputs() []byte {
 	buff.Write(inputCount.Bytes())
 	for i := 0; i < len(tx.Inputs); i++ {
 		buff.Write(tx.Inputs[i].PrevHash.Data)
-		buff.Write(helper.VarIntFromUint64(uint64(tx.Inputs[i].PrevIndex)).Bytes())
+		buff.Write(helper.VarIntFromUInt64(uint64(tx.Inputs[i].PrevIndex)).Bytes())
 	}
 	return buff.Bytes()
 }
@@ -185,7 +185,7 @@ func (tx *Transaction) SerializeOutputs() []byte {
 	buff.Write(outputCount.Bytes())
 	for i := 0; i < len(tx.Outputs); i++ {
 		buff.Write(tx.Outputs[i].AssetId.Data)
-		buff.Write(helper.VarIntFromUint64(uint64(tx.Outputs[i].Value.Value)).Bytes())
+		buff.Write(helper.VarIntFromUInt64(uint64(tx.Outputs[i].Value.Value)).Bytes())
 		buff.Write(tx.Outputs[i].ScriptHash.Data)
 	}
 	return buff.Bytes()
