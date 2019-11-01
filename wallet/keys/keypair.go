@@ -1,16 +1,17 @@
-package wallet
+package keys
 
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/crypto"
+	"github.com/joeqian10/neo-gogogo/helper"
 	"math/big"
 )
 
 type KeyPair struct {
 	PrivateKey []byte
-	PublicKey  ecdsa.PublicKey
+	PublicKey  PublicKey
 }
 
 func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
@@ -19,7 +20,7 @@ func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
 		return nil, fmt.Errorf("argument length is wrong %v", length)
 	}
 	priv := ToEcdsa(privateKey)
-	key = &KeyPair{privateKey, priv.PublicKey}
+	key = &KeyPair{privateKey, PublicKey{priv.X, priv.Y}}
 	return key, nil
 }
 
@@ -37,6 +38,7 @@ func ToEcdsa(key []byte) *ecdsa.PrivateKey {
 	return priv
 }
 
+// export wif string
 func (p *KeyPair) ExportWIF() string {
 	data := make([]byte, 34)
 	data[0] = 0x80
@@ -44,4 +46,16 @@ func (p *KeyPair) ExportWIF() string {
 	data[33] = 0x01
 	wif := crypto.Base58CheckEncode(data)
 	return wif
+}
+
+// export nep2 key string
+func (p *KeyPair) ExportNep2(password string) string {
+	address := p.PublicKey.Address()
+
+	return address
+}
+
+// String implements the Stringer interface.
+func (p *KeyPair) String() string {
+	return helper.BytesToHex(p.PrivateKey)
 }
