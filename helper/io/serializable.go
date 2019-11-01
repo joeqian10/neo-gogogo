@@ -7,6 +7,6 @@ package io
 // caller should handle the error once and all the other code should just not
 // panic in presence of error.
 type Serializable interface {
-	DecodeBinary(*BinReader)
-	EncodeBinary(*BinWriter)
+	Deserialize(*BinReader)
+	Serialize(*BinWriter)
 }
