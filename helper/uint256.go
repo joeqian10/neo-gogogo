@@ -13,8 +13,8 @@ const uint256Size = 32
 // UInt256 is a 32 byte long unsigned integer.
 type UInt256 [uint256Size]uint8
 
-// UInt256DecodeReverseString attempts to decode the given string (in LE representation) into an UInt256.
-func UInt256DecodeReverseString(s string) (u UInt256, err error) {
+// UInt256FromReverseString attempts to decode the given string (in LE representation) into an UInt256.
+func UInt256FromReversedString(s string) (u UInt256, err error) {
 	if len(s) != uint256Size*2 {
 		return u, fmt.Errorf("expected string size of %d got %d", uint256Size*2, len(s))
 	}
@@ -22,11 +22,11 @@ func UInt256DecodeReverseString(s string) (u UInt256, err error) {
 	if err != nil {
 		return u, err
 	}
-	return UInt256DecodeReverseBytes(b)
+	return UInt256FromReversedBytes(b)
 }
 
-// UInt256DecodeBytes attempts to decode the given string (in BE representation) into an UInt256.
-func UInt256DecodeBytes(b []byte) (u UInt256, err error) {
+// UInt256FromBytes attempts to decode the given string (in BE representation) into an UInt256.
+func UInt256FromBytes(b []byte) (u UInt256, err error) {
 	if len(b) != uint256Size {
 		return u, fmt.Errorf("expected []byte of size %d got %d", uint256Size, len(b))
 	}
@@ -34,10 +34,10 @@ func UInt256DecodeBytes(b []byte) (u UInt256, err error) {
 	return u, nil
 }
 
-// UInt256DecodeReverseBytes attempts to decode the given string (in LE representation) into an UInt256.
-func UInt256DecodeReverseBytes(b []byte) (u UInt256, err error) {
+// UInt256FromReversedBytes attempts to decode the given string (in LE representation) into an UInt256.
+func UInt256FromReversedBytes(b []byte) (u UInt256, err error) {
 	b = ReverseBytes(b)
-	return UInt256DecodeBytes(b)
+	return UInt256FromBytes(b)
 }
 
 // Bytes returns a byte slice representation of u.
@@ -47,12 +47,12 @@ func (u UInt256) Bytes() []byte {
 
 // Reverse reverses the UInt256 object
 func (u UInt256) Reverse() UInt256 {
-	res, _ := UInt256DecodeReverseBytes(u.Bytes())
+	res, _ := UInt256FromReversedBytes(u.Bytes())
 	return res
 }
 
-// BytesReverse return a reversed byte representation of u.
-func (u UInt256) BytesReverse() []byte {
+// BytesReversed return a reversed byte representation of u.
+func (u UInt256) BytesReversed() []byte {
 	return ReverseBytes(u.Bytes())
 }
 
@@ -66,9 +66,9 @@ func (u UInt256) String() string {
 	return hex.EncodeToString(u.Bytes())
 }
 
-// ReverseString produces string representation of UInt256 with LE byte order.
-func (u UInt256) ReverseString() string {
-	return hex.EncodeToString(u.BytesReverse())
+// StringReversed produces string representation of UInt256 with LE byte order.
+func (u UInt256) StringReversed() string {
+	return hex.EncodeToString(u.BytesReversed())
 }
 
 // UnmarshalJSON implements the json unmarshaller interface.
@@ -78,7 +78,7 @@ func (u *UInt256) UnmarshalJSON(data []byte) (err error) {
 		return err
 	}
 	js = strings.TrimPrefix(js, "0x")
-	*u, err = UInt256DecodeReverseString(js)
+	*u, err = UInt256FromReversedString(js)
 	return err
 }
 
