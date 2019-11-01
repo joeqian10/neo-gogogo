@@ -62,7 +62,7 @@ func AddressToScriptHash(address string) (UInt160, error) {
 		u := UInt160{}
 		return u, fmt.Errorf("Invalid address string.")
 	}
-	return UInt160DecodeBytes(data[1:])
+	return UInt160FromBytes(data[1:])
 }
 
 // ReverseString
