@@ -58,7 +58,7 @@ func (sb *ScriptBuilder) EmitJump(op OpCode, offset int16) error {
 		return fmt.Errorf("Invalid OpCode.")
 	}
 	//b := make([]byte, 2)
-	//binary.LittleEndian.PutUint16(b, uint16(i))
+	//binary.LittleEndian.PutUInt16(b, uint16(i))
 	v := helper.VarIntFromInt16(offset)
 	return sb.Emit(op, v.Bytes())
 }
