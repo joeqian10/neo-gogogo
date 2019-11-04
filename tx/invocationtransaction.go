@@ -33,7 +33,7 @@ func (itx *InvocationTransaction) UnsignedRawTransaction() []byte {
 	scriptLength := helper.VarIntFromInt(len(itx.Script))
 	buff.Write(scriptLength.Bytes())
 	buff.Write(itx.Script)
-	buff.Write(helper.VarIntFromUint64(uint64(itx.Gas.Value)).Bytes())
+	buff.Write(helper.VarIntFromUInt64(uint64(itx.Gas.Value)).Bytes())
 	buff.Write(itx.UnsignedRawTransactionPart2())
 	return buff.Bytes()
 }

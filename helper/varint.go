@@ -83,16 +83,16 @@ func ParseVarInt(bytes []byte) (VarInt, error) {
 	return ret, nil
 }
 
-func VarIntFromUint64(input uint64) VarInt {
+func VarIntFromUInt64(input uint64) VarInt {
 	var data VarInt
 	data.Value = input
 	return data
 }
 
 func VarIntFromInt(input int) VarInt {
-	return VarIntFromUint64(uint64(input))
+	return VarIntFromUInt64(uint64(input))
 }
 
 func VarIntFromInt16(input int16) VarInt {
-	return VarIntFromUint64(uint64(input))
+	return VarIntFromUInt64(uint64(input))
 }
