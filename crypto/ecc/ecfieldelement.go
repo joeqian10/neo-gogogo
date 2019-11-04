@@ -81,7 +81,7 @@ func Divide(x, y *ECFieldElement) *ECFieldElement {
 func Sqrt(x *ECFieldElement) *ECFieldElement {
 	if hlp.TestBit(x.curve.Q, 1) {
 		z, _ := NewECFieldElement(hlp.ModPow(x.Value, hlp.Add(hlp.RightShift(x.curve.Q, 2), big.NewInt(1)), x.curve.Q), x.curve)
-		if z.Square().Equals(x) {
+		if Square(z).Equals(x) {
 			return z
 		}
 		return nil

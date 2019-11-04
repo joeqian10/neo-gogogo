@@ -51,7 +51,7 @@ func (u UInt160) String() string {
 
 // StringReversed is the same as String, but returns a reversed representation.
 func (u UInt160) StringReversed() string {
-	return hex.EncodeToString(u.BytesReverse())
+	return hex.EncodeToString(u.BytesReversed())
 }
 
 // Equals returns true if both UInt256 values are the same.
@@ -78,7 +78,7 @@ func (u *UInt160) UnmarshalJSON(data []byte) (err error) {
 		return err
 	}
 	js = strings.TrimPrefix(js, "0x")
-	*u, err = UInt160DecodeString(js)
+	*u, err = UInt160FromString(js)
 	return err
 }
 

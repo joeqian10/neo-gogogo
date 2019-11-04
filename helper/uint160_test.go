@@ -9,7 +9,7 @@ import (
 
 func TestUInt160UnmarshalJSON(t *testing.T) {
 	str := "2d3b96ae1bcc5a585e075e3b81920210dec16302"
-	expected, err := UInt160DecodeString(str)
+	expected, err := UInt160FromString(str)
 	if err != nil {
 		t.Fatal(err)
 	}

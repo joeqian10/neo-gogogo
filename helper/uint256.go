@@ -84,7 +84,7 @@ func (u *UInt256) UnmarshalJSON(data []byte) (err error) {
 
 // MarshalJSON implements the json marshaller interface.
 func (u UInt256) MarshalJSON() ([]byte, error) {
-	return []byte(`"0x` + u.ReverseString() + `"`), nil
+	return []byte(`"0x` + u.StringReversed() + `"`), nil
 }
 
 // CompareTo compares two UInt256 with each other. Possible output: 1, -1, 0
