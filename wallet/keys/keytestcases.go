@@ -7,33 +7,37 @@ type Ktype struct {
 	PublicKey,
 	Wif,
 	Passphrase,
-	EncryptedWif string
+	Nep2key,
+	Scripthash string
 }
 
 // Arr contains a set of known keys in Ktype format.
 var KeyCases = []Ktype{
 	{
-		Address:      "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-		PrivateKey:   "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
-		PublicKey:    "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-		Wif:          "L1QqQJnpBwbsPGAuutuzPTac8piqvbR1HRjrY5qHup48TBCBFe4g",
-		Passphrase:   "city of zion",
-		EncryptedWif: "6PYLHmDf6AjF4AsVtosmxHuPYeuyJL3SLuw7J1U8i7HxKAnYNsp61HYRfF",
+		Address:    "AJntkozhVgbc6irY9hRFtNUvuPZS4YcUyD",
+		PrivateKey: "831cb932167332a768f1c898d2cf4586a14aa606b7f078eba028c849c306cce6",
+		PublicKey:  "03b7a7f933199f28cc1c48d22a21c78ac3992cf7fceb038a9c670fe55444426619",
+		Wif:        "L1caMUAsHr2dKwhqbMpYRcCzmzvZTfYZSCBefgARhz9iimAFRn1z",
+		Passphrase: "neo-gogogo",
+		Nep2key:    "6PYRGTFTzMq5BTcZphryV8KEtyhGJCK7fRZr6etdAKrb2gowRvSjsSA5XZ",
+		Scripthash: "62d6035f671f46b1ab5715eef3a903910bb81921",
 	},
 	{
-		Address:      "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
-		PrivateKey:   "9ab7e154840daca3a2efadaf0df93cd3a5b51768c632f5433f86909d9b994a69",
-		PublicKey:    "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-		Wif:          "L2QTooFoDFyRFTxmtiVHt5CfsXfVnexdbENGDkkrrgTTryiLsPMG",
-		Passphrase:   "我的密码",
-		EncryptedWif: "6PYWVp3xfgvnuNKP7ZavSViYvvim2zuzx9Q33vuWZr8aURiKeJ6Zm7BfPQ",
+		Address:    "AHbwJGdhUy3d1BwhXQKc1VrNojjBTX6g87",
+		PrivateKey: "82a4ff38f5de304c2fae62d1a736c343816412f7e4fe3badaf5e1e940c8f07c3",
+		PublicKey:  "027d73c8b02e446340caceee7a517cddff72440e60c28cbb84884f307760ecad5b",
+		Wif:        "L1bfdDaFQErh7gGMz32zgBXZCN65AKeexKzxeEvS7d4Cq6zf2Rpf",
+		Passphrase: "",
+		Nep2key:    "6PYP4RrgZTU8zcb5RN2xzeV2ufddJRe2DKom3kW8AhxuLCtFYKAt3dGZ4G",
+		Scripthash: "80176d20bd72e6f8b16332fdfa75bd63cd230f14",
 	},
 	{
-		Address:      "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-		PrivateKey:   "3edee7036b8fd9cef91de47386b191dd76db2888a553e7736bb02808932a915b",
-		PublicKey:    "02232ce8d2e2063dce0451131851d47421bfc4fc1da4db116fca5302c0756462fa",
-		Wif:          "KyKvWLZsNwBJx5j9nurHYRwhYfdQUu9tTEDsLCUHDbYBL8cHxMiG",
-		Passphrase:   "MyL33tP@33w0rd",
-		EncryptedWif: "6PYNoc1EG5J38MTqGN9Anphfdd6UwbS4cpFCzHhrkSKBBbV1qkbJJZQnkn",
+		Address:    "AKeMGQcrN4Su5mEK7T1NgCCyBtY16vD16Y",
+		PrivateKey: "31ab808b68c25377b2068500e264f164d1d75eda748a8e0a98db4c74db181b66",
+		PublicKey:  "038a2151948a908cdf2d680eead6512217769e34b9db196574572cb98e273516a1",
+		Wif:        "KxtGC6QHFKSiHVLY1ANkwS78ebfhworv6LnkJH2MUxE8AbbgAHVW",
+		Passphrase: "密码@👍",
+		Nep2key:    "6PYUKxjoTp8CmbR4ZDLLdugviWzf7QuxikGir7mudeAcSo9dviT6x6MtPB",
+		Scripthash: "6ea9062064e43b49df964d13da0a413c113b742a",
 	},
 }

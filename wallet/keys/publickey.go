@@ -6,11 +6,14 @@ import (
 	"crypto/elliptic"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
+	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/pkg/errors"
 	"io"
 	"math/big"
+	"sort"
 )
 
 // PublicKeys is a list of public keys.
@@ -166,12 +169,8 @@ func (p *PublicKey) Serialize(w io.Writer) error {
 
 // Signature returns a NEO-specific hash of the key.
 func (p *PublicKey) Signature() []byte {
-	b := p.EncodeCompression()
-	b = append([]byte{0x21}, b...)
-	b = append(b, 0xAC)
-
+	b := CreateSignatureRedeemScript(p)
 	sig := crypto.Hash160(b)
-
 	return sig
 }
 
@@ -207,4 +206,30 @@ func (p *PublicKey) isInfinity() bool {
 // String implements the Stringer interface.
 func (p *PublicKey) String() string {
 	return helper.BytesToHex(p.EncodeCompression())
+}
+
+// create signature check script
+func CreateSignatureRedeemScript(p *PublicKey) []byte {
+	builder := sc.NewScriptBuilder()
+	builder.EmitPushBytes(p.EncodeCompression())
+	builder.Emit(sc.CHECKSIG)
+	return builder.ToArray()
+}
+
+// create multi-signature check script
+func CreateMultiSigRedeemScript(m int, ps ...*PublicKey) ([]byte, error) {
+	if !(m >= 1 && m < len(ps) && len(ps) <= 1024) {
+		return nil, fmt.Errorf("Argument exception %v,%v", m, len(ps))
+	}
+
+	builder := sc.NewScriptBuilder()
+	builder.EmitPushInt(m)
+	pubKeys := PublicKeys(ps)
+	sort.Sort(pubKeys)
+	for _, p := range pubKeys {
+		builder.EmitPushBytes(p.EncodeCompression())
+	}
+	builder.EmitPushInt(pubKeys.Len())
+	builder.Emit(sc.CHECKMULTISIG)
+	return builder.ToArray(), nil
 }

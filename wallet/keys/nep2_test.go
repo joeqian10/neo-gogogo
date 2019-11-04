@@ -17,14 +17,14 @@ func TestNEP2Encrypt(t *testing.T) {
 		encryptedWif, err := NEP2Encrypt(privKey, testCase.Passphrase)
 		assert.Nil(t, err)
 
-		assert.Equal(t, testCase.EncryptedWif, encryptedWif)
+		assert.Equal(t, testCase.Nep2key, encryptedWif)
 	}
 }
 
 func TestNEP2Decrypt(t *testing.T) {
 	for _, testCase := range KeyCases {
 
-		privKey, err := NEP2Decrypt(testCase.EncryptedWif, testCase.Passphrase)
+		privKey, err := NEP2Decrypt(testCase.Nep2key, testCase.Passphrase)
 		assert.Nil(t, err)
 
 		assert.Equal(t, testCase.PrivateKey, privKey.String())

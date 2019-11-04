@@ -49,10 +49,12 @@ func (p *KeyPair) ExportWIF() string {
 }
 
 // export nep2 key string
-func (p *KeyPair) ExportNep2(password string) string {
-	address := p.PublicKey.Address()
-
-	return address
+func (p *KeyPair) ExportNep2(password string) (string, error) {
+	nep2, err := NEP2Encrypt(p, password)
+	if err != nil {
+		return "", err
+	}
+	return nep2, nil
 }
 
 // String implements the Stringer interface.
