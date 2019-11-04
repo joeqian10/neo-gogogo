@@ -157,7 +157,7 @@ func (p *ECPoint) Minus(a, b *ECPoint) (result *ECPoint) {
 	if b.IsInfinity() {
 		return a
 	}
-	return ECPoint{}.Add(a, b.Negate())
+	return new(ECPoint).Add(a, b.Negate())
 }
 
 func (p *ECPoint) Multiply(k *big.Int) (result *ECPoint) {
@@ -199,7 +199,7 @@ func (p *ECPoint) Multiply(k *big.Int) (result *ECPoint) {
 		preComp = make([]*ECPoint, reqPreCompLen)
 		copy(preComp, oldPreComp)
 		for i := preCompLen; i < reqPreCompLen; i++ {
-			preComp[i] = ECPoint{}.Add(twiceP, preComp[i-1])
+			preComp[i] = new(ECPoint).Add(twiceP, preComp[i-1])
 		}
 	}
 	// Compute the Window NAF of the desired width
@@ -211,9 +211,9 @@ func (p *ECPoint) Multiply(k *big.Int) (result *ECPoint) {
 		q = q.Twice()
 		if wnaf[i] != 0 {
 			if wnaf[i] > 0 {
-				q = ECPoint{}.Add(q, preComp[(wnaf[i]-1)/2])
+				q = new(ECPoint).Add(q, preComp[(wnaf[i]-1)/2])
 			} else {
-				q = ECPoint{}.Minus(q, preComp[(wnaf[i]-1)/2])
+				q = new(ECPoint).Minus(q, preComp[(wnaf[i]-1)/2])
 			}
 		}
 	}
@@ -242,9 +242,9 @@ func windowNaf(width uint8, k *big.Int) []int8 {
 	i, length := 0, 0
 	for k.Sign() > 0 {
 		if !hlp.IsEven(k) {
-			remainder := big.Int{}.Mod(k, pow2wB)
+			remainder := new(big.Int).Mod(k, pow2wB)
 			if hlp.TestBit(remainder, int(width-1)) {
-				wnaf[i] = int8(big.Int{}.Sub(remainder, pow2wB).Int64())
+				wnaf[i] = int8(new(big.Int).Sub(remainder, pow2wB).Int64())
 			} else {
 				wnaf[i] = int8(remainder.Int64())
 			}

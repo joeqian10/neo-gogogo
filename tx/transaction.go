@@ -173,7 +173,7 @@ func (tx *Transaction) SerializeInputs() []byte {
 	inputCount := helper.VarIntFromInt(len(tx.Inputs))
 	buff.Write(inputCount.Bytes())
 	for i := 0; i < len(tx.Inputs); i++ {
-		buff.Write(tx.Inputs[i].PrevHash.Data)
+		buff.Write(tx.Inputs[i].PrevHash.Bytes())
 		buff.Write(helper.VarIntFromUInt64(uint64(tx.Inputs[i].PrevIndex)).Bytes())
 	}
 	return buff.Bytes()
@@ -184,9 +184,9 @@ func (tx *Transaction) SerializeOutputs() []byte {
 	outputCount := helper.VarIntFromInt(len(tx.Outputs))
 	buff.Write(outputCount.Bytes())
 	for i := 0; i < len(tx.Outputs); i++ {
-		buff.Write(tx.Outputs[i].AssetId.Data)
+		buff.Write(tx.Outputs[i].AssetId.Bytes())
 		buff.Write(helper.VarIntFromUInt64(uint64(tx.Outputs[i].Value.Value)).Bytes())
-		buff.Write(tx.Outputs[i].ScriptHash.Data)
+		buff.Write(tx.Outputs[i].ScriptHash.Bytes())
 	}
 	return buff.Bytes()
 }
