@@ -2,7 +2,7 @@ package models
 
 type RpcBlockHeader struct {
 	Hash              string `json:"hash"`
-	Size              int    `json:"size"`
+	Size              uint32    `json:"size"`
 	Version           uint32 `json:"version"`
 	Previousblockhash string `json:"previousblockhash"`
 	Merkleroot        string `json:"merkleroot"`
