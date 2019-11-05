@@ -12,5 +12,8 @@ func TestString(t *testing.T) {
 
 		address := p.Address()
 		assert.Equal(t, testCase.Address, address)
+
+		scripthash := p.ScriptHash()
+		assert.Equal(t, testCase.Scripthash, scripthash.StringReversed())
 	}
 }
