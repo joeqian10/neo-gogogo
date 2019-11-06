@@ -1,9 +1,40 @@
 package keys
 
 import (
+	"encoding/hex"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestExportWIF(t *testing.T) {
+	for _, testCase := range KeyCases {
+		privKey, err := NewKeyPairFromWIF(testCase.Wif)
+		privateKey := privKey.String()
+		publicKey := privKey.PublicKey.String()
+		wif := privKey.ExportWIF()
+		nep2, err := privKey.ExportNep2(testCase.Passphrase)
+
+		assert.Nil(t, err)
+		assert.Equal(t, testCase.PrivateKey, privateKey)
+		assert.Equal(t, testCase.PublicKey, publicKey)
+		assert.Equal(t, testCase.Wif, wif)
+		assert.Equal(t, testCase.Nep2key, nep2)
+	}
+}
+
+func TestExportNEP2(t *testing.T) {
+	for _, testCase := range KeyCases {
+		b, _ := hex.DecodeString(testCase.PrivateKey)
+
+		privKey, err := NewKeyPair(b)
+		assert.Nil(t, err)
+
+		encryptedWif, err := NEP2Encrypt(privKey, testCase.Passphrase)
+		assert.Nil(t, err)
+
+		assert.Equal(t, testCase.Nep2key, encryptedWif)
+	}
+}
 
 func TestPubKeyVerify(t *testing.T) {
 	var data = []byte("sample")

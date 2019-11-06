@@ -26,6 +26,28 @@ func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
 	return key, nil
 }
 
+func NewKeyPairFromWIF(wif string) (key *KeyPair, err error) {
+	decodedWif, err := crypto.Base58CheckDecode(wif)
+	if err != nil {
+		return nil, err
+	}
+	length := len(decodedWif)
+	if length != 34 || decodedWif[0] != 0x80 || decodedWif[33] != 0x01 {
+		return nil, fmt.Errorf("argument length is wrong %v", length)
+	}
+	priv := ToEcdsa(decodedWif[1:33])
+	key = &KeyPair{priv.D.Bytes(), PublicKey{priv.X, priv.Y}}
+	return key, nil
+}
+
+func NewKeyPairFromNEP2(nep2 string, password string) (key *KeyPair, err error) {
+	key, err = NEP2Decrypt(nep2, password)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
 func GenerateKeyPair() (key *KeyPair, err error) {
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
@@ -36,12 +58,12 @@ func GenerateKeyPair() (key *KeyPair, err error) {
 	return key, nil
 }
 
-// ecsda converts the key to a usable ecsda.PrivateKey for signing data.
+// ecdsa converts the key to a usable ecsda.PrivateKey for signing data.
 func (p *KeyPair) ToEcdsa() *ecdsa.PrivateKey {
 	return ToEcdsa(p.PrivateKey)
 }
 
-// ecsda converts the private key byte[] to a usable ecsda.PrivateKey for signing data.
+// ecdsa converts the private key byte[] to a usable ecsda.PrivateKey for signing data.
 func ToEcdsa(key []byte) *ecdsa.PrivateKey {
 	priv := new(ecdsa.PrivateKey)
 	priv.PublicKey.Curve = elliptic.P256()

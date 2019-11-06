@@ -13,13 +13,11 @@ import (
 
 // NEP-2 specified parameters used for cryptography.
 const (
-	n       = 16384
-	r       = 8
-	p       = 8
 	keyLen  = 64
 	nepFlag = 0xe0
 )
 
+var N, R, P = 16384, 8, 8
 var nepHeader = []byte{0x01, 0x42}
 
 // NEP2Encrypt encrypts a the PrivateKey using a given passphrase
@@ -29,7 +27,7 @@ func NEP2Encrypt(priv *KeyPair, passphrase string) (s string, err error) {
 	addrHash := Hash256([]byte(address))[:4]
 	// Normalize the passphrase according to the NFC standard.
 	phraseNorm := norm.NFC.Bytes([]byte(passphrase))
-	derivedKey, err := scrypt.Key(phraseNorm, addrHash, n, r, p, keyLen)
+	derivedKey, err := scrypt.Key(phraseNorm, addrHash, N, R, P, keyLen)
 	if err != nil {
 		return s, err
 	}
@@ -70,7 +68,7 @@ func NEP2Decrypt(key, passphrase string) (s *KeyPair, err error) {
 	addrHash := b[3:7]
 	// Normalize the passphrase according to the NFC standard.
 	phraseNorm := norm.NFC.Bytes([]byte(passphrase))
-	derivedKey, err := scrypt.Key(phraseNorm, addrHash, n, r, p, keyLen)
+	derivedKey, err := scrypt.Key(phraseNorm, addrHash, N, R, P, keyLen)
 	if err != nil {
 		return s, err
 	}
