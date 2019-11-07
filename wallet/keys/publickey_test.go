@@ -14,6 +14,6 @@ func TestString(t *testing.T) {
 		assert.Equal(t, testCase.Address, address)
 
 		scripthash := p.ScriptHash()
-		assert.Equal(t, testCase.ScriptHash, scripthash.StringReversed())
+		assert.Equal(t, testCase.ScriptHash, scripthash.String())
 	}
 }

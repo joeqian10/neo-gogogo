@@ -28,9 +28,6 @@ func (keys PublicKeys) Less(i, j int) bool {
 	if keys[i].X.Cmp(keys[j].X) == 1 {
 		return false
 	}
-	if keys[i].X.Cmp(keys[j].X) == 0 {
-		return false
-	}
 
 	return keys[i].Y.Cmp(keys[j].Y) == -1
 }

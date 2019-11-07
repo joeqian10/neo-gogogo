@@ -1,7 +1,6 @@
 package wallet
 
 import (
-	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
 )
 
@@ -9,7 +8,7 @@ import (
 // along with some metadata.
 type Account struct {
 	// NEO  KeyPair.
-	KeyPair *keys.KeyPair
+	KeyPair *keys.KeyPair `json:"-"`
 
 	// Account import file.
 	wif string
@@ -39,7 +38,7 @@ type Account struct {
 // Account so it's NEP-6 compliant.
 type Contract struct {
 	// Script hash of the contract deployed on the blockchain.
-	Script helper.UInt160 `json:"script"`
+	Script string `json:"script"`
 
 	// A list of parameters used deploying this contract.
 	Parameters []interface{} `json:"parameters"`

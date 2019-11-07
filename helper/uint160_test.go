@@ -49,7 +49,7 @@ func TestUInt160FromBytes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	val, err := UInt160FromBytes(b)
+	val, err := UInt160FromBytes(ReverseBytes(b))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,11 +93,9 @@ func TestUInt160Less(t *testing.T) {
 
 func TestUInt160String(t *testing.T) {
 	hexStr := "b28427088a3729b2536d10122960394e8be6721f"
-	hexRevStr := "1f72e68b4e39602912106d53b229378a082784b2"
 
 	val, err := UInt160FromString(hexStr)
 	assert.Nil(t, err)
 
 	assert.Equal(t, hexStr, val.String())
-	assert.Equal(t, hexRevStr, val.StringReversed())
 }
