@@ -2,41 +2,36 @@ package wallet
 
 import (
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"testing"
 )
 
-func TestNewWallet(t *testing.T) {
+func TestNewWalletFromFile(t *testing.T) {
 	path := "test.json"
 	testWallet, err := NewWalletFromFile(path)
-
 	assert.Nil(t, err)
 	assert.Equal(t, len(testWallet.Accounts), 5)
-}
 
-func TestWallet_AddAccount(t *testing.T) {
+	jsonBytes, err := testWallet.JSON()
+	assert.Nil(t, err)
 
-}
+	data, err := ioutil.ReadFile(path)
+	assert.Nil(t, err)
 
-func TestWallet_Close(t *testing.T) {
-
-}
-
-func TestWallet_CreateAccount(t *testing.T) {
-
-}
-
-func TestWallet_JSON(t *testing.T) {
-
-}
-
-func TestWallet_Path(t *testing.T) {
+	jsonString := string(jsonBytes)
+	assert.Equal(t, string(data), jsonString)
 
 }
 
 func TestWallet_Save(t *testing.T) {
+	path := "test.json"
+	testWallet, err := NewWalletFromFile(path)
+	assert.Nil(t, err)
 
-}
+	err = testWallet.Save("testWrite.json")
+	assert.Nil(t, err)
+	testWrite, err := NewWalletFromFile("testWrite.json")
 
-func Test_newWallet(t *testing.T) {
-
+	assert.Nil(t, err)
+	assert.Equal(t, testWallet, testWrite)
 }

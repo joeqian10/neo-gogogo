@@ -16,22 +16,25 @@ type Account struct {
 	// NEO public address.
 	Address string `json:"address"`
 
-	// Encrypted WIF of the account also known as the key.
-	EncryptedWIF string `json:"key"`
+	// Label is a label the user had made for this account. string
+	Label interface{} `json:"label"`
 
-	// Label is a label the user had made for this account.
-	Label string `json:"label"`
-
-	// contract is a Contract object which describes the details of the contract.
-	// This field can be null (for watch-only address).
-	Contract *Contract `json:"contract"`
+	// Indicates whether the account is the default change account.
+	Default bool `json:"isDefault"`
 
 	// Indicates whether the account is locked by the user.
 	// the client shouldn't spend the funds in a locked account.
 	Locked bool `json:"lock"`
 
-	// Indicates whether the account is the default change account.
-	Default bool `json:"isDefault"`
+	// Encrypted WIF of the account also known as the key. string
+	EncryptedWIF interface{} `json:"key"`
+
+	// contract is a Contract object which describes the details of the contract.
+	// This field can be null (for watch-only address).
+	Contract *Contract `json:"contract"`
+
+	// This field can be empty.
+	Extra interface{} `json:"extra"`
 }
 
 // Contract represents a subset of the smartcontract to embed in the

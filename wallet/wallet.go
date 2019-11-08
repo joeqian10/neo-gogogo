@@ -3,7 +3,6 @@ package wallet
 import (
 	"encoding/json"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"io"
 	"os"
 )
 
@@ -14,24 +13,21 @@ const (
 
 // Wallet represents a NEO (NEP-2, NEP-6) compliant wallet.
 type Wallet struct {
+	// string type
+	Name interface{} `json:"name"`
+
 	// Version of the wallet, used for later upgrades.
 	Version string `json:"version"`
+
+	Scrypt ScryptParams `json:"scrypt"`
 
 	// A list of accounts which describes the details of each account
 	// in the wallet.
 	Accounts []*Account `json:"accounts"`
 
-	Scrypt ScryptParams `json:"scrypt"`
-
 	// Extra metadata can be used for storing arbitrary data.
 	// This field can be empty.
 	Extra interface{} `json:"extra"`
-
-	// Path where the wallet file is located..
-	path string
-
-	// ReadWriter for reading and writing wallet data.
-	rw io.ReadWriter
 }
 
 // ScryptParams is a json-serializable container for scrypt KDF parameters.
@@ -41,13 +37,13 @@ type ScryptParams struct {
 	P int `json:"p"`
 }
 
-// NewWallet creates a new NEO wallet at the given location.
-func NewWallet(location string) (*Wallet, error) {
-	file, err := os.Create(location)
-	if err != nil {
-		return nil, err
+// NewWallet creates a NEO wallet.
+func NewWallet() *Wallet {
+	return &Wallet{
+		Version:  walletVersion,
+		Accounts: []*Account{},
+		Scrypt:   ScryptParams{keys.N, keys.R, keys.P},
 	}
-	return newWallet(file), nil
 }
 
 // NewWalletFromFile creates a Wallet from the given wallet file path
@@ -56,33 +52,16 @@ func NewWalletFromFile(path string) (*Wallet, error) {
 	if err != nil {
 		return nil, err
 	}
-	wall := &Wallet{
-		rw:   file,
-		path: file.Name(),
-	}
+	wall := &Wallet{}
 	if err := json.NewDecoder(file).Decode(wall); err != nil {
 		return nil, err
 	}
 	return wall, nil
 }
 
-func newWallet(rw io.ReadWriter) *Wallet {
-	var path string
-	if f, ok := rw.(*os.File); ok {
-		path = f.Name()
-	}
-	return &Wallet{
-		Version:  walletVersion,
-		Accounts: []*Account{},
-		Scrypt:   ScryptParams{keys.N, keys.R, keys.P},
-		rw:       rw,
-		path:     path,
-	}
-}
-
 // CreateAccount generates a new account for the end user and encrypts
 // the private key with the given passphrase.
-func (w *Wallet) CreateAccount(name, passphrase string) error {
+func (w *Wallet) CreateNewAccount(name, passphrase string) error {
 	acc, err := NewAccount()
 	if err != nil {
 		return err
@@ -92,7 +71,7 @@ func (w *Wallet) CreateAccount(name, passphrase string) error {
 		return err
 	}
 	w.AddAccount(acc)
-	return w.Save()
+	return nil
 }
 
 // AddAccount adds an existing Account to the wallet.
@@ -100,26 +79,22 @@ func (w *Wallet) AddAccount(acc *Account) {
 	w.Accounts = append(w.Accounts, acc)
 }
 
-// Path returns the location of the wallet on the filesystem.
-func (w *Wallet) Path() string {
-	return w.path
-}
-
 // Save saves the wallet data. It's the internal io.ReadWriter
 // that is responsible for saving the data. This can
 // be a buffer, file, etc..
-func (w *Wallet) Save() error {
-	return json.NewEncoder(w.rw).Encode(w)
+func (w *Wallet) Save(path string) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	err = json.NewEncoder(file).Encode(w)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }
 
 // JSON outputs a pretty JSON representation of the wallet.
 func (w *Wallet) JSON() ([]byte, error) {
-	return json.MarshalIndent(w, " ", "	")
-}
-
-// Close closes the internal rw if its an io.ReadCloser.
-func (w *Wallet) Close() {
-	if rc, ok := w.rw.(io.ReadCloser); ok {
-		rc.Close()
-	}
+	return json.Marshal(w)
 }
