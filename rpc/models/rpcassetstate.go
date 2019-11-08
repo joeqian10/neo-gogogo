@@ -1,17 +1,17 @@
 package models
 
 type RpcAssetState struct {
-	Version    uint32      `json:"version"`
+	Version    int      `json:"version"`
 	Id         string      `json:"id"`
 	Type       string      `json:"type"`
 	Name       []AssetName `json:"name"`
 	Amount     string      `json:"amount"`
 	Available  string      `json:"available"`
-	Precision  uint32      `json:"precision"`
+	Precision  int      `json:"precision"`
 	Owner      string      `json:"owner"`
 	Admin      string      `json:"admin"`
 	Issuer     string      `json:"issuer"`
-	Expiration uint32      `json:"expiration"`
+	Expiration int      `json:"expiration"`
 	Frozen     bool        `json:"frozen"`
 }
 
