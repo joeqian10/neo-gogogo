@@ -1,7 +1,7 @@
 package models
 
 type AccountState struct {
-	Version    int                   `json:"version"`
+	Version    uint32                `json:"version"`
 	ScriptHash string                `json:"script_hash"`
 	Frozen     bool                  `json:"frozen"`
 	Votes      []interface{}         `json:"votes"`
