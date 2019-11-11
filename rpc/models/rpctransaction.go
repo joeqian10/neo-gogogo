@@ -2,19 +2,19 @@ package models
 
 type RpcTransaction struct {
 	Txid          string                    `json:"txid"`
-	Size          uint32                    `json:"size"`
+	Size          int                    `json:"size"`
 	Type          string                    `json:"type"`
-	Version       uint32                    `json:"version"`
+	Version       int                    `json:"version"`
 	Attributes    []RpcTransactionAttribute `json:"attributes"`
 	Vin           []RpcTransactionInput     `json:"vin"`
 	Vout          []RpcTransactionOutput    `json:"vout"`
 	SysFee        string                    `json:"sys_fee"`
 	NetFee        string                    `json:"net_fee"`
 	Scripts       []RpcWitness              `json:"scripts"`
-	Nonce         uint32                    `json:"nonce"`
+	Nonce         int                    `json:"nonce"`
 	BlockHash     string                    `json:"blockhash"`
-	Confirmations uint32                    `json:"confirmations"`
-	Blocktime     uint32                    `json:"blocktime"`
+	Confirmations int                    `json:"confirmations"`
+	Blocktime     int                    `json:"blocktime"`
 	Script        string                    `json:"script"`
 	Gas           string                    `json:"gas"`
 	Claims        []RpcClaim                `json:"claims"`

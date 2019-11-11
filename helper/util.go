@@ -46,7 +46,7 @@ func BytesToScriptHash(ba []byte) string {
 	return BytesToHex(ReverseBytes(ba))
 }
 
-func ScriptHashToAddress(scriptHash UInt256) string {
+func ScriptHashToAddress(scriptHash UInt160) string {
 	var addressVersion byte = 0x17
 	data := append([]byte{addressVersion}, scriptHash.Bytes()...)
 	return crypto.Base58CheckEncode(data)
