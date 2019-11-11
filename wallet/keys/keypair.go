@@ -13,7 +13,7 @@ import (
 
 type KeyPair struct {
 	PrivateKey []byte
-	PublicKey  PublicKey
+	PublicKey  *PublicKey
 }
 
 func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
@@ -21,8 +21,8 @@ func NewKeyPair(privateKey []byte) (key *KeyPair, err error) {
 	if length != 32 {
 		return nil, fmt.Errorf("argument length is wrong %v", length)
 	}
-	priv := ToEcdsa(privateKey)
-	key = &KeyPair{privateKey, PublicKey{priv.X, priv.Y}}
+	ecdsaKey := ToEcdsa(privateKey)
+	key = &KeyPair{privateKey, &PublicKey{ecdsaKey.X, ecdsaKey.Y}}
 	return key, nil
 }
 
@@ -35,8 +35,8 @@ func NewKeyPairFromWIF(wif string) (key *KeyPair, err error) {
 	if length != 34 || decodedWif[0] != 0x80 || decodedWif[33] != 0x01 {
 		return nil, fmt.Errorf("argument length is wrong %v", length)
 	}
-	priv := ToEcdsa(decodedWif[1:33])
-	key = &KeyPair{priv.D.Bytes(), PublicKey{priv.X, priv.Y}}
+	ecdsaKey := ToEcdsa(decodedWif[1:33])
+	key = &KeyPair{ecdsaKey.D.Bytes(), &PublicKey{ecdsaKey.X, ecdsaKey.Y}}
 	return key, nil
 }
 
@@ -49,27 +49,27 @@ func NewKeyPairFromNEP2(nep2 string, password string) (key *KeyPair, err error) 
 }
 
 func GenerateKeyPair() (key *KeyPair, err error) {
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	ecdsaKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return nil, err
 	}
 
-	key = &KeyPair{priv.D.Bytes(), PublicKey{priv.X, priv.Y}}
+	key = &KeyPair{ecdsaKey.D.Bytes(), &PublicKey{ecdsaKey.X, ecdsaKey.Y}}
 	return key, nil
 }
 
-// ecdsa converts the key to a usable ecsda.PrivateKey for signing data.
+// ecdsa converts the key to a usable ecdsa.PrivateKey for signing data.
 func (p *KeyPair) ToEcdsa() *ecdsa.PrivateKey {
 	return ToEcdsa(p.PrivateKey)
 }
 
-// ecdsa converts the private key byte[] to a usable ecsda.PrivateKey for signing data.
+// ecdsa converts the private key byte[] to a usable ecdsa.PrivateKey for signing data.
 func ToEcdsa(key []byte) *ecdsa.PrivateKey {
-	priv := new(ecdsa.PrivateKey)
-	priv.PublicKey.Curve = elliptic.P256()
-	priv.D = new(big.Int).SetBytes(key)
-	priv.PublicKey.X, priv.PublicKey.Y = priv.PublicKey.Curve.ScalarBaseMult(key)
-	return priv
+	ecdsaKey := new(ecdsa.PrivateKey)
+	ecdsaKey.PublicKey.Curve = elliptic.P256()
+	ecdsaKey.D = new(big.Int).SetBytes(key)
+	ecdsaKey.PublicKey.X, ecdsaKey.PublicKey.Y = ecdsaKey.PublicKey.Curve.ScalarBaseMult(key)
+	return ecdsaKey
 }
 
 // export wif string
@@ -118,12 +118,10 @@ func (p *KeyPair) Sign(message []byte) ([]byte, error) {
 
 // Verify returns true if the signature is valid and corresponds
 // to the hash and public key
-func VerifySignature(message []byte, signature []byte, p PublicKey) bool {
+func VerifySignature(message []byte, signature []byte, p *PublicKey) bool {
 	hash := sha256.Sum256(message)
-	publicKey := &ecdsa.PublicKey{}
-	publicKey.Curve = elliptic.P256()
-	publicKey.X = p.X
-	publicKey.Y = p.Y
+	publicKey := p.ecdsa()
+
 	if p.X == nil || p.Y == nil {
 		return false
 	}

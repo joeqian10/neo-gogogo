@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
 	"os"
 )
@@ -14,12 +15,12 @@ const (
 // Wallet represents a NEO (NEP-2, NEP-6) compliant wallet.
 type Wallet struct {
 	// string type
-	Name interface{} `json:"name"`
+	Name string `json:"name"`
 
 	// Version of the wallet, used for later upgrades.
 	Version string `json:"version"`
 
-	Scrypt ScryptParams `json:"scrypt"`
+	Scrypt *ScryptParams `json:"scrypt"`
 
 	// A list of accounts which describes the details of each account
 	// in the wallet.
@@ -42,8 +43,97 @@ func NewWallet() *Wallet {
 	return &Wallet{
 		Version:  walletVersion,
 		Accounts: []*Account{},
-		Scrypt:   ScryptParams{keys.N, keys.R, keys.P},
+		Scrypt:   &ScryptParams{keys.N, keys.R, keys.P},
 	}
+}
+
+// CreateAccount generates a new account for the end user and encrypts
+// the private key with the given passphrase.
+func (w *Wallet) AddNewAccount() error {
+	acc, err := NewAccount()
+	if err != nil {
+		return err
+	}
+	w.AddAccount(acc)
+	return nil
+}
+
+// Import account from WIF
+func (w *Wallet) ImportFromWIF(wif string) error {
+	acc, err := NewAccountFromWIF(wif)
+	if err != nil {
+		return err
+	}
+	w.AddAccount(acc)
+	return nil
+}
+
+// Import account from WIF
+func (w *Wallet) ImportFromNep2Key(nep2Key, passphare string) error {
+	acc, err := NewAccountFromNep2(nep2Key, passphare)
+	if err != nil {
+		return err
+	}
+	w.AddAccount(acc)
+	return nil
+}
+
+// AddAccount adds an existing Account to the wallet if the account is not in wallet
+func (w *Wallet) AddAccount(acc *Account) {
+	for _, account := range w.Accounts {
+		if account.Address == acc.Address {
+			account = acc
+			return
+		}
+	}
+	w.Accounts = append(w.Accounts, acc)
+}
+
+// encrypt all the accounts in wallet, save the nep2Key
+func (w *Wallet) EncryptAll(password string) error {
+	for _, acc := range w.Accounts {
+		if acc.KeyPair != nil {
+			err := acc.Encrypt(password)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// decrypt all the accounts in wallet, save the nep2Key
+func (w *Wallet) DecryptAll(password string) error {
+	for _, acc := range w.Accounts {
+		if acc.KeyPair == nil && acc.Nep2Key != "" {
+			err := acc.Decrypt(password)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Save saves the wallet data. It's the internal io.ReadWriter
+// that is responsible for saving the data. This can
+// be a buffer, file, etc..
+func (w *Wallet) Save(path string) error {
+	for _, acc := range w.Accounts {
+		if acc.KeyPair != nil && acc.Nep2Key == "" {
+			return fmt.Errorf("please encrypt the accounts before save wallet")
+		}
+	}
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	err = json.NewEncoder(file).Encode(w)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }
 
 // NewWalletFromFile creates a Wallet from the given wallet file path
@@ -57,41 +147,6 @@ func NewWalletFromFile(path string) (*Wallet, error) {
 		return nil, err
 	}
 	return wall, nil
-}
-
-// CreateAccount generates a new account for the end user and encrypts
-// the private key with the given passphrase.
-func (w *Wallet) CreateNewAccount(name, passphrase string) error {
-	acc, err := NewAccount()
-	if err != nil {
-		return err
-	}
-	acc.Label = name
-	if err := acc.Encrypt(passphrase); err != nil {
-		return err
-	}
-	w.AddAccount(acc)
-	return nil
-}
-
-// AddAccount adds an existing Account to the wallet.
-func (w *Wallet) AddAccount(acc *Account) {
-	w.Accounts = append(w.Accounts, acc)
-}
-
-// Save saves the wallet data. It's the internal io.ReadWriter
-// that is responsible for saving the data. This can
-// be a buffer, file, etc..
-func (w *Wallet) Save(path string) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	err = json.NewEncoder(file).Encode(w)
-	if err != nil {
-		return err
-	}
-	return file.Close()
 }
 
 // JSON outputs a pretty JSON representation of the wallet.

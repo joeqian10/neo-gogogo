@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestNewAccount(t *testing.T) {
 
 func TestDecryptAccount(t *testing.T) {
 	for _, testCase := range keys.KeyCases {
-		acc, err := DecryptAccount(testCase.Nep2key, testCase.Passphrase)
+		acc, err := NewAccountFromNep2(testCase.Nep2key, testCase.Passphrase)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -35,11 +36,31 @@ func TestNewFromWif(t *testing.T) {
 	}
 }
 
+func TestEncryptAccount(t *testing.T) {
+	acc, err := NewAccount()
+	if err != nil {
+		t.Fatal(err)
+	}
+	password := "AAA123456789"
+	err = acc.Encrypt(password)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nep2Key := acc.Nep2Key
+	account := Account{Nep2Key: nep2Key}
+	err = account.Decrypt(password)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, acc.KeyPair, account.KeyPair)
+}
+
 func compareFields(t *testing.T, tk keys.Ktype, acc *Account) {
 	if want, have := tk.Address, acc.Address; want != have {
 		t.Fatalf("expected %s got %s", want, have)
 	}
-	if want, have := tk.Wif, acc.wif; want != have {
+	if want, have := tk.Wif, acc.KeyPair.ExportWIF(); want != have {
 		t.Fatalf("expected %s got %s", want, have)
 	}
 	if want, have := tk.PublicKey, acc.KeyPair.PublicKey.String(); want != have {

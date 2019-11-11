@@ -41,14 +41,14 @@ func (sb *ScriptBuilder) Emit(op OpCode, arg ...byte) error {
 	}
 
 	if arg != nil {
-		sb.buff.Write(arg)
+		_, err = sb.buff.Write(arg)
 	}
-	return nil
+	return err
 }
 
 func (sb *ScriptBuilder) EmitAppCall(scriptHah []byte, useTailCall bool) error {
 	if len(scriptHah) != 20 {
-		return fmt.Errorf("The length of scripthash should be 20.")
+		return fmt.Errorf("the length of scripthash should be 20")
 	}
 	if useTailCall {
 		return sb.Emit(TAILCALL, scriptHah...)

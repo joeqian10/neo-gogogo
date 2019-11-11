@@ -1,6 +1,6 @@
 package keys
 
-// Ktype represents key testcase values (different encodings of the key).
+// Ktype represents key test case values (different encodings of the key).
 type Ktype struct {
 	Address,
 	PrivateKey,

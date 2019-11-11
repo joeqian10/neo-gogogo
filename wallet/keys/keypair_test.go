@@ -7,11 +7,13 @@ import (
 
 func TestExportWIF(t *testing.T) {
 	for _, testCase := range KeyCases {
-		privKey, err := NewKeyPairFromWIF(testCase.Wif)
-		privateKey := privKey.String()
-		publicKey := privKey.PublicKey.String()
-		wif := privKey.ExportWIF()
-		nep2, err := privKey.ExportNep2(testCase.Passphrase)
+		keyPair, err := NewKeyPairFromWIF(testCase.Wif)
+		assert.Nil(t, err)
+
+		privateKey := keyPair.String()
+		publicKey := keyPair.PublicKey.String()
+		wif := keyPair.ExportWIF()
+		nep2, err := keyPair.ExportNep2(testCase.Passphrase)
 
 		assert.Nil(t, err)
 		assert.Equal(t, testCase.PrivateKey, privateKey)
@@ -23,11 +25,13 @@ func TestExportWIF(t *testing.T) {
 
 func TestExportNEP2(t *testing.T) {
 	for _, testCase := range KeyCases {
-		privKey, err := NewKeyPairFromNEP2(testCase.Nep2key, testCase.Passphrase)
-		privateKey := privKey.String()
-		publicKey := privKey.PublicKey.String()
-		wif := privKey.ExportWIF()
-		nep2, err := privKey.ExportNep2(testCase.Passphrase)
+		keyPair, err := NewKeyPairFromNEP2(testCase.Nep2key, testCase.Passphrase)
+		assert.Nil(t, err)
+
+		privateKey := keyPair.String()
+		publicKey := keyPair.PublicKey.String()
+		wif := keyPair.ExportWIF()
+		nep2, err := keyPair.ExportNep2(testCase.Passphrase)
 
 		assert.Nil(t, err)
 		assert.Equal(t, testCase.PrivateKey, privateKey)
@@ -39,25 +43,23 @@ func TestExportNEP2(t *testing.T) {
 
 func TestPubKeyVerify(t *testing.T) {
 	var data = []byte("sample")
-	privKey, err := GenerateKeyPair()
+	keyPair, err := GenerateKeyPair()
 	assert.Nil(t, err)
-	signedData, err := privKey.Sign(data)
+	signedData, err := keyPair.Sign(data)
 	assert.Nil(t, err)
-	pubKey := privKey.PublicKey
+	pubKey := keyPair.PublicKey
 	result := VerifySignature(data, signedData, pubKey)
-	expected := true
-	assert.Equal(t, expected, result)
+	assert.Equal(t, true, result)
 }
 
 func TestWrongPubKey(t *testing.T) {
-	privKey, _ := GenerateKeyPair()
+	keyPair, _ := GenerateKeyPair()
 	sample := []byte("sample")
-	signedData, _ := privKey.Sign(sample)
+	signedData, _ := keyPair.Sign(sample)
 
-	secondPrivKey, _ := GenerateKeyPair()
-	wrongPubKey := secondPrivKey.PublicKey
+	secondKeyPair, _ := GenerateKeyPair()
+	wrongPubKey := secondKeyPair.PublicKey
 
 	actual := VerifySignature(sample, signedData, wrongPubKey)
-	expcted := false
-	assert.Equal(t, expcted, actual)
+	assert.Equal(t, false, actual)
 }
