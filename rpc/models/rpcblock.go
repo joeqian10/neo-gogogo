@@ -3,11 +3,11 @@ package models
 type RpcBlockHeader struct {
 	Hash              string `json:"hash"`
 	Size              int    `json:"size"`
-	Version           uint32 `json:"version"`
+	Version           int `json:"version"`
 	Previousblockhash string `json:"previousblockhash"`
 	Merkleroot        string `json:"merkleroot"`
-	Time              uint32 `json:"time"`
-	Index             uint32 `json:"index"`
+	Time              int `json:"time"`
+	Index             int `json:"index"`
 	Nonce             string `json:"nonce"`         //ulong = uint64
 	Nextconsensus     string `json:"nextconsensus"` //address
 	CrossStatesRoot   string `json:"crossstatesroot"`

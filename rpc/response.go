@@ -14,6 +14,12 @@ type ErrorResponse struct {
 	} `json:"error"`
 }
 
+type ClaimGasResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcTransaction `json:"result"`
+}
+
 type GetAccountStateResponse struct {
 	RpcResponse
 	ErrorResponse
@@ -26,10 +32,22 @@ type GetApplicationLogResponse struct {
 	Result models.RpcApplicationLog `json:"result"`
 }
 
-type GetBlockHeaderResponse struct {
+type GetAssetStateResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result models.RpcBlockHeader `json:"result"`
+	Result models.RpcAssetState `json:"result"`
+}
+
+type GetBalanceResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.AssetBalance `json:"result"`
+}
+
+type GetBestBlockHashResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result string `json:"result"`
 }
 
 type GetBlockResponse struct {
@@ -43,6 +61,29 @@ type GetBlockCountResponse struct {
 	ErrorResponse
 	Result int `json:"result"`
 }
+type GetBlockHeaderResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcBlockHeader `json:"result"`
+}
+
+type GetBlockHashResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result string `json:"result"`
+}
+
+type GetClaimableResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcClaimable `json:"result"`
+}
+
+type GetConnectionCountResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result int `json:"result"`
+}
 
 type GetContractStateResponse struct {
 	RpcResponse
@@ -50,11 +91,102 @@ type GetContractStateResponse struct {
 	Result models.ContractState `json:"result"`
 }
 
+type GetNep5BalancesResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcNep5Balances `json:"result"`
+}
+
+type GetNep5TransfersResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcNep5Transfers `json:"result"`
+}
+
+type GetNewAddressResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result string `json:"result"`
+}
+
+type GetPeersResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcPeers `json:"result"`
+}
+
+type GetRawMemPoolResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result []string `json:"result"`
+}
+
 type GetRawTransactionResponse struct {
 	RpcResponse
 	ErrorResponse
 	Result models.RpcTransaction `json:"result"`
 }
+
+type GetStorageResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result string `json:"result"`
+}
+
+type GetTransactionHeightResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result int `json:"result"`
+}
+
+type GetTxOutResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcTransactionOutput `json:"result"`
+}
+
+type GetUnclaimedGasResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.UnclaimedGasInWallet `json:"result"`
+}
+
+type GetUnclaimedResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.UnclaimedGasInAddress `json:"result"`
+}
+
+type GetUnspentsResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcUnspent `json:"result"`
+}
+
+type GetValidatorsResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result []models.RpcValidator `json:"result"`
+}
+
+type GetVersionResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcVersion `json:"result"`
+}
+
+type GetWalletHeightResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result int `json:"result"`
+}
+
+type ImportPrivKeyResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcAddress `json:"result"`
+}
+
 type InvokeFunctionResponse struct {
 	RpcResponse
 	ErrorResponse
@@ -67,22 +199,46 @@ type InvokeScriptResponse struct {
 	Result models.InvokeResult `json:"result"`
 }
 
+type ListPluginsResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result []models.RpcListPlugin `json:"result"`
+}
+
+type ListAddressResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result []models.RpcAddress `json:"result"`
+}
+
+type SendFromResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.RpcTransaction `json:"result"`
+}
+
 type SendRawTransactionResponse struct {
 	RpcResponse
 	ErrorResponse
 	Result bool `json:"result"`
 }
 
-type GetStorageResponse struct {
+type SendToAddressResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result string `json:"result"`
+	Result models.RpcTransaction `json:"result"`
 }
 
-type GetUnspentsResponse struct {
+type SubmitBlockResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result models.RpcUnspent `json:"result"`
+	Result bool `json:"result"`
+}
+
+type ValidateAddressResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.ValidateAddress `json:"result"`
 }
 
 type GetCrosschainProofResponse struct {
