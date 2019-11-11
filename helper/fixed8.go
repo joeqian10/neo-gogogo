@@ -90,6 +90,28 @@ func Fixed8ToString(input Fixed8) string {
 	return buf.String()
 }
 
+// String implements the Stringer interface.
+func (f Fixed8) String() string {
+	buf := new(strings.Builder)
+	val := f.Value
+	if val < 0 {
+		buf.WriteRune('-')
+		val = -val
+	}
+	str := strconv.FormatInt(val/D, 10)
+	buf.WriteString(str)
+	val %= D
+	if val > 0 {
+		buf.WriteRune('.')
+		str = strconv.FormatInt(val, 10)
+		for i := len(str); i < 8; i++ {
+			buf.WriteRune('0')
+		}
+		buf.WriteString(strings.TrimRight(str, "0"))
+	}
+	return buf.String()
+}
+
 // Add implements Fixed8 addition operator.
 func (f Fixed8) Add(g Fixed8) Fixed8 {
 	return NewFixed8(f.Value + g.Value)

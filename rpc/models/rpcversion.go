@@ -1,7 +1,7 @@
 package models
 
 type RpcVersion struct {
-	Port      uint32 `json:"port"`
-	Nonce     uint32 `json:"nonce"`
+	Port      int `json:"port"`
+	Nonce     int `json:"nonce"`
 	Useragent string `json:"useragent"`
 }

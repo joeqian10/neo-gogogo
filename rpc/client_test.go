@@ -2,44 +2,63 @@ package rpc_test
 
 import (
 	"github.com/joeqian10/neo-gogogo/rpc"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
+/*
+If you want to run all the tests, you'd better have a private net prepared for testing,
+since a private net is more flexible and you will have plenty of neo and gas to spend.
+You need to change the LocalEndPoint to your node, and install all required plugins.
+*/
 
-var LocalEndPoint = "http://localhost:50003" // if you want to test, you need to change this endpoint to yours
+var LocalEndPoint = "http://localhost:50003"
 var TestNetEndPoint = "http://seed1.ngd.network:20332"
 
-var WalletAddress = "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR"
+var LocalClient = rpc.NewClient(LocalEndPoint)
+var TestNetClient  = rpc.NewClient(TestNetEndPoint)
+
+var LocalWalletAddress = "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR"
+var TestNetWalletAddress = "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY"
+
 var AssetIdNeo = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
-var Nep5ScriptHash = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26"
+var Nep5ScriptHash = "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263"
+
+
 
 func TestNewClient(t *testing.T) {
 	client := rpc.NewClient(TestNetEndPoint)
 	if client == nil {
 		t.Fail()
 	}
-	log.Printf("%v", client)
+	url := client.Endpoint
+	//log.Printf("%s", url.Fragment)
+	//log.Printf("%s", url.Host)
+	//log.Printf("%s", url.Opaque)
+	//log.Printf("%s", url.Path)
+	//log.Printf("%s", url.RawPath)
+	//log.Printf("%s", url.RawQuery)
+	//log.Printf("%s", url.Scheme)
+	//log.Printf("%v", client)
+	assert.Equal(t, "seed1.ngd.network:20332", url.Host)
+	assert.Equal(t, "http", url.Scheme)
 }
 
 // RpcWallet plugin required
 func TestRpcClient_ClaimGas(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint) // need to open wallet
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.ClaimGas(WalletAddress)
-	log.Printf("%+v", result)
+	response := LocalClient.ClaimGas(LocalWalletAddress)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "ClaimTransaction", r.Type)
+	assert.Equal(t, 0, r.Version)
 }
 
 func TestRpcClient_GetAccountState(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetAccountState(WalletAddress)
-	log.Printf("%+v", result)
+	response := LocalClient.GetAccountState(LocalWalletAddress)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t,0, r.Version)
+	assert.Equal(t, "0x758ec2715fbcaeadf1b2179b11a7d980f8eb9253", r.ScriptHash)
 }
 
 //=== RUN   TestRpcClient_GetAccountState
@@ -49,28 +68,35 @@ func TestRpcClient_GetAccountState(t *testing.T) {
 
 // ApplicationLogs plugin required
 func TestRpcClient_GetApplicationLog(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetApplicationLog("0x0f3009286f9e59ab7cd7a232c9580a145a02cccd155a90c805e90eb9bfed3e40")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetApplicationLog("0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a")
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a", r.TxId)
+	e := r.Executions[0]
+	assert.Equal(t, "Application", e.Trigger)
+	assert.Equal(t, "0x003bd113b3bc841657f3a84db8546daa6e4953c3", e.Contract)
+	assert.Equal(t, "HALT", e.VMState)
+	n := e.Notifications[0]
+	assert.Equal(t, "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263", n.Contract)
 }
 
 //=== RUN   TestRpcClient_GetApplicationLog
-//2019/11/04 15:40:04 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{TxId:0x0f3009286f9e59ab7cd7a232c9580a145a02cccd155a90c805e90eb9bfed3e40 Executions:[{Trigger:Application Contract:0x8f056218471dd6d253077eee22d51c9d018f90db VMState:HALT GasConsumed:3.005 Stack:[] Notifications:[{Contract:0x14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26 State:{Type:Array Value:[map[type:ByteArray value:7472616e73666572726564] map[type:ByteArray value:5392ebf880d9a7119b17b2f1adaebc5f71c28e75] map[type:ByteArray value:ed53b14908f15918abb6ba8790a80387f8a5fd89] map[type:ByteArray value:80969800]]}}]}]}}
-//--- PASS: TestRpcClient_GetApplicationLog (0.55s)
+//2019/11/07 18:48:32 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{TxId:0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a Executions:[{Trigger:Application Contract:0x003bd113b3bc841657f3a84db8546daa6e4953c3 VMState:HALT GasConsumed:2.855 Stack:[{Type:Integer Value:1}] Notifications:[{Contract:0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263 State:{Type:Array Value:[map[type:ByteArray value:7472616e73666572] map[type:ByteArray value:5c564ab204122ddce30eb9a6accbfa23b27cc3ac] map[type:ByteArray value:8f6c5be89c0cb6579e44a8bf9bfd2ecbcc11dfdc] map[type:ByteArray value:00203d88792d]]}}]}]}}
+//--- PASS: TestRpcClient_GetApplicationLog (0.54s)
 //PASS
 
 func TestRpcClient_GetAssetState(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetAssetState(AssetIdNeo)
-	log.Printf("%+v", result)
+	response := TestNetClient.GetAssetState(AssetIdNeo)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 0, r.Version)
+	assert.Equal(t, "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Id)
+	assert.Equal(t, "GoverningToken", r.Type)
+	assert.Equal(t, "AntShare", r.Name[1].Name)
+	assert.Equal(t, "100000000", r.Amount)
+	assert.Equal(t, 0, r.Precision)
+	assert.Equal(t, "Abf2qMs1pzQb8kYk9RuxtUb9jtRKJVuBJt", r.Admin)
+	assert.Equal(t, 4000000, r.Expiration)
 }
 
 //=== RUN   TestRpcClient_GetAssetState
@@ -80,13 +106,10 @@ func TestRpcClient_GetAssetState(t *testing.T) {
 
 // RpcWallet plugin required
 func TestRpcClient_GetBalance(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBalance(AssetIdNeo)
-	log.Printf("%+v", result)
+	response := LocalClient.GetBalance(AssetIdNeo)
+	//log.Printf("%+v", response)
+	r:= response.Result
+	assert.Equal(t, 100000000, r.Balance)
 }
 
 //=== RUN   TestRpcClient_GetBalance
@@ -94,14 +117,12 @@ func TestRpcClient_GetBalance(t *testing.T) {
 //--- PASS: TestRpcClient_GetBalance (0.36s)
 //PASS
 
+// BestBlockHash is changing, so you may stop the chain to test this API, and change the best block hash to yours
 func TestRpcClient_GetBestBlockHash(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBestBlockHash()
-	log.Printf("%+v", result)
+	response := LocalClient.GetBestBlockHash()
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0x2727ab449e02150fa66943cf6d8fcdf4af349480a558a0bdbb4eea550ffeb01f", r)
 }
 
 //=== RUN   TestRpcClient_GetBestBlockHash
@@ -110,43 +131,51 @@ func TestRpcClient_GetBestBlockHash(t *testing.T) {
 //PASS
 
 func TestRpcClient_GetBlockByHash(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBlockByHash("2727ab449e02150fa66943cf6d8fcdf4af349480a558a0bdbb4eea550ffeb01f")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetBlockByHash("035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179")
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
+	assert.Equal(t, 1521, r.Size)
+	assert.Equal(t, 0, r.Version)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, 1573123342, r.Time)
+	assert.Equal(t, 3386365, r.Index)
+	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
 }
 
 //=== RUN   TestRpcClient_GetBlockByHash
-//2019/11/04 15:51:15 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{RpcBlockHeader:{Hash:0x2727ab449e02150fa66943cf6d8fcdf4af349480a558a0bdbb4eea550ffeb01f Size:452 Version:0 Previousblockhash:0xbfe458b3bb7190070f76e4d09b9b677c62490970ad4673a8a6ae57350f99503b Merkleroot:0x30e1ad309fabb7dc6390074dfefe3fb375d2bdf9eb78ee4a9e7648dbd48cf9d4 Time:1572853450 Index:2022 Nonce:b1a375ca27a78e55 Nextconsensus:AKcMgU2hd9DVm7YTqbKHS1SprWS4ufMhKr CrossStatesRoot: ChainID: Script:{InvocationScript:404afc96d7f59d7c3459c6d5680eed9ff9f891ee28245219e38404318632bf08d8b5b2c13b1d8cfd92c444ec59609967cd5c0cc413261b4f608e125c083a5b214c40af65feb1e3450d4391b6bef3b7c3c9223e20183dc10529152253f0d773de0b11327868849b647f8083ab14e4b6cc2d3b11bfc645ef400e81a78d9b4ff35d311d4029dec98b568b14011f62c68d19d951645cececc5b2cee6c1e1e813d0714ce38217fbb673bc62b514a49ff0c96eda76065d1b5c4bb83d016d64f19951ffd2db48 VerificationScript:53210301f2f3c3122526f8e2330693c6256c4b325a0068bc9955713567e7a3c09498a52103460a483d65cb6139ae5b55d8a2e9f8bbf0bbfa10a407224e93b99481792d4db2210286b70fb44980dd13a54ece4b5f88ef491e501fef7fead5804a25e7e1bc5dcf732103dc31257e8f394989325d4f86f47587e405c52d1d0be9898f81991137d5a3e04b54ae} Confirmations:1 NextBlockHash:0x587ac1a5b048ed84535ebe781f5fc614f18853bcbc1a1d8da5bbb7ad51d41ab8} Tx:[{Txid:0x30e1ad309fabb7dc6390074dfefe3fb375d2bdf9eb78ee4a9e7648dbd48cf9d4 Size:10 Type:MinerTransaction Version:0 Attributes:[] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[] Nonce:665292373 BlockHash: Confirmations:0 Blocktime:0 Script: Gas: Claims:[]}]}}
-//--- PASS: TestRpcClient_GetBlockByHash (0.32s)
+//2019/11/08 11:14:42 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{RpcBlockHeader:{Hash:0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179 Size:1521 Version:0 Previousblockhash:0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840 Merkleroot:0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757 Time:1573123342 Index:3386365 Nonce:a6e6d82b50273b82 Nextconsensus:AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X CrossStatesRoot: ChainID: Script:{InvocationScript:40c5ad2bbbcbb76fa9bdb6bd19da2b37f6cf0c12fe2e1471da1c5a1af983c706fc8ecdfb90d031b26e89e6bf2159004c9bed89e435d4f672013c4f90d2d6ae026840d61a6fe68741138f3e65b762a0fd858ca46f8a8bcd433de08ef15a2272dd790eb3fb4f04ad55dcd07b58869dad2a43a48abca3b30f49325bc1d3a7673257dbb04055488c2bd94b99f479f0c42aa2bf167ece07484dce3a217c9f4246893168d6b40e20461f9115d9d7c5995271df4c472894af4b33fdc0116f1da63de21a378c32409b5b4216cfd7bc8442893971f33348ba63a231988de7379bd4c59fdb1bad783d3934e53cbd91f44e06c591354f9dd8825c30031ac2370c762a8e818ca24c6c1540d80ea89c01aed1e43ccc93be261613181d0130c2db5afb6b198d8d2655878a743b806c2d1f915e982b1dda8bf855a148051d05d9285ab0e9d6ba0c5b07a8eecd VerificationScript:552103028007d683ceb4dc9084300d0cf16fe6d47a726e586bf3d63559cec13305565221030ef96257401b803da5dd201233e2be828795672b775dd674d69df83f7aec1e3621025bdf3f181f53e9696227843950deb72dcd374ded17c057159513c3d0abe20b64210266b588e350ab63b850e55dbfed0feeda44410a30966341b371014b803a15af072103c089d7122b840a4935234e82e26ae5efd0c2acb627239dc9f207311337b6f2c12103fd95a9cb3098e6447d0de9f76cc97fd5e36830f9c7044457c15a0e81316bf28f2103fea219d4ccfd7641cebbb2439740bb4bd7c4730c1abd6ca1dc44386533816df957ae} Confirmations:3495 NextBlockHash:0x7f514b6d785b52adfeee56919d9deb12059516145aaae36f997cd79890c11bac} Tx:[{Txid:0x75f1de0f6aaab785138fb8a5183018d25465278eb38c44917db87b61a7f1c588 Size:10 Type:MinerTransaction Version:0 Attributes:[] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[] Nonce:1344748418 BlockHash: Confirmations:0 Blocktime:0 Script: Gas: Claims:[]} {Txid:0x18147d0916e1f2fbbcc26a3bb5fd593b90ea86c8a27be4496eebbccb8fe99de9 Size:247 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e45752e389b187108}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40f24367766e1fc0e1a40a9565d7395d5661d29f058668d1374077c4d8a217de9c8848509785f79eda1be3afb8881a29993aeb973963281638277e68ce64b822f7 Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:1410d46912932d6ebcd1d3c4a27a1a8ea77e68ac950020000101001a000010020000000056054b2042000019c5420830b10420500444bb53c11063726561746550726f6d6f437574696567f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x452d52a1e8963746e80ea92a45660d85aeb9d6cd04e0065439fc95270db1810d Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e457520059c8d6488}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40da7201b8a684d32a1c6d5a4665ef5f99ef50cfab2e6b42eb9972fa8edbeef8646eb46bb1d0caa74080d898f5affb3f6d67e445691e0aa5f0af71994f5976cebf Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:00029d0652c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x45ea381e940f0e089a72f07f1a05d4bfa2be85410e96eea472c55e7b11872d5a Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e45751f72959c1668}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40ae6931e6fa6398e0ccb448419debd96b2ce7ef76d4f4a172ada527f3da28d2fc77f2ea2aac04186c6ad575cd17d117820ee6d3395f1ebfb900b29972b69d20ac Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:0002460552c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x82ad53594683ca5fc44e658fc1ed265b86070e4466417df3f9eadf5e207b87b2 Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e457520981613af83}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:404e82e563c8a87155bcfa805e02f45f293d2568632a6aebb8eef6f4a4e51328b43aba45e363fac26461ac821bdc633e4ae9f5836b628820f8b382924c213b6a53 Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:0002800552c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]}]}}
+//--- PASS: TestRpcClient_GetBlockByHash (0.54s)
 //PASS
 
 func TestRpcClient_GetBlockByIndex(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBlockByIndex(1000)
-	log.Printf("%+v", result)
+	response := TestNetClient.GetBlockByIndex(3386365)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
+	assert.Equal(t, 1521, r.Size)
+	assert.Equal(t, 0, r.Version)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, 1573123342, r.Time)
+	assert.Equal(t, 3386365, r.Index)
+	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
 }
 
 //=== RUN   TestRpcClient_GetBlockByIndex
-//2019/11/04 15:53:04 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{RpcBlockHeader:{Hash:0x31c7521f4ac295deffb691689ecfffce687c77ac49704defa626024126b86de9 Size:452 Version:0 Previousblockhash:0xd1b1a123eb2b36161193955e5c84787917bdef8bceeae1ee77a719acbede38b9 Merkleroot:0x22b82e30630f480c7287193162d88e448aabab93eddfc42fee4dcc6b3ce9da1a Time:1570866717 Index:1000 Nonce:772f67c5bfd6b9bf Nextconsensus:AKcMgU2hd9DVm7YTqbKHS1SprWS4ufMhKr CrossStatesRoot: ChainID: Script:{InvocationScript:408201d61c3aaf87d059d7e8c4a884c022772a4d3751dedd0fe4f07d8f17bb7948bcc053ab0134441d256084c7ead4b409ff04b8614c75ab93b0ddcafad66b82e54036d46c32c36e128db1acd2f81b85c0505e1ea850aa8801ba03f6ad46d05becca99f949cd28324fc7402e88eadb49c206614618dd377fc8d53d74a2d562e5fe954060f1cfbf7f332857a7658dc8ce6c29a12b2d90925c7c2a10c2862329901c1ff16224f209fb5c7a2c22d8863feb0b531d24ab61cbe81769ed7168764ff398e382 VerificationScript:53210301f2f3c3122526f8e2330693c6256c4b325a0068bc9955713567e7a3c09498a52103460a483d65cb6139ae5b55d8a2e9f8bbf0bbfa10a407224e93b99481792d4db2210286b70fb44980dd13a54ece4b5f88ef491e501fef7fead5804a25e7e1bc5dcf732103dc31257e8f394989325d4f86f47587e405c52d1d0be9898f81991137d5a3e04b54ae} Confirmations:1023 NextBlockHash:0x6247a10d325ef423152dafcbd328b2db3ec8a68aae8d106fe82a58c4ac799825} Tx:[{Txid:0x22b82e30630f480c7287193162d88e448aabab93eddfc42fee4dcc6b3ce9da1a Size:10 Type:MinerTransaction Version:0 Attributes:[] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[] Nonce:3218520511 BlockHash: Confirmations:0 Blocktime:0 Script: Gas: Claims:[]}]}}
-//--- PASS: TestRpcClient_GetBlockByIndex (0.34s)
+//2019/11/08 11:16:03 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{RpcBlockHeader:{Hash:0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179 Size:1521 Version:0 Previousblockhash:0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840 Merkleroot:0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757 Time:1573123342 Index:3386365 Nonce:a6e6d82b50273b82 Nextconsensus:AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X CrossStatesRoot: ChainID: Script:{InvocationScript:40c5ad2bbbcbb76fa9bdb6bd19da2b37f6cf0c12fe2e1471da1c5a1af983c706fc8ecdfb90d031b26e89e6bf2159004c9bed89e435d4f672013c4f90d2d6ae026840d61a6fe68741138f3e65b762a0fd858ca46f8a8bcd433de08ef15a2272dd790eb3fb4f04ad55dcd07b58869dad2a43a48abca3b30f49325bc1d3a7673257dbb04055488c2bd94b99f479f0c42aa2bf167ece07484dce3a217c9f4246893168d6b40e20461f9115d9d7c5995271df4c472894af4b33fdc0116f1da63de21a378c32409b5b4216cfd7bc8442893971f33348ba63a231988de7379bd4c59fdb1bad783d3934e53cbd91f44e06c591354f9dd8825c30031ac2370c762a8e818ca24c6c1540d80ea89c01aed1e43ccc93be261613181d0130c2db5afb6b198d8d2655878a743b806c2d1f915e982b1dda8bf855a148051d05d9285ab0e9d6ba0c5b07a8eecd VerificationScript:552103028007d683ceb4dc9084300d0cf16fe6d47a726e586bf3d63559cec13305565221030ef96257401b803da5dd201233e2be828795672b775dd674d69df83f7aec1e3621025bdf3f181f53e9696227843950deb72dcd374ded17c057159513c3d0abe20b64210266b588e350ab63b850e55dbfed0feeda44410a30966341b371014b803a15af072103c089d7122b840a4935234e82e26ae5efd0c2acb627239dc9f207311337b6f2c12103fd95a9cb3098e6447d0de9f76cc97fd5e36830f9c7044457c15a0e81316bf28f2103fea219d4ccfd7641cebbb2439740bb4bd7c4730c1abd6ca1dc44386533816df957ae} Confirmations:3500 NextBlockHash:0x7f514b6d785b52adfeee56919d9deb12059516145aaae36f997cd79890c11bac} Tx:[{Txid:0x75f1de0f6aaab785138fb8a5183018d25465278eb38c44917db87b61a7f1c588 Size:10 Type:MinerTransaction Version:0 Attributes:[] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[] Nonce:1344748418 BlockHash: Confirmations:0 Blocktime:0 Script: Gas: Claims:[]} {Txid:0x18147d0916e1f2fbbcc26a3bb5fd593b90ea86c8a27be4496eebbccb8fe99de9 Size:247 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e45752e389b187108}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40f24367766e1fc0e1a40a9565d7395d5661d29f058668d1374077c4d8a217de9c8848509785f79eda1be3afb8881a29993aeb973963281638277e68ce64b822f7 Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:1410d46912932d6ebcd1d3c4a27a1a8ea77e68ac950020000101001a000010020000000056054b2042000019c5420830b10420500444bb53c11063726561746550726f6d6f437574696567f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x452d52a1e8963746e80ea92a45660d85aeb9d6cd04e0065439fc95270db1810d Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e457520059c8d6488}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40da7201b8a684d32a1c6d5a4665ef5f99ef50cfab2e6b42eb9972fa8edbeef8646eb46bb1d0caa74080d898f5affb3f6d67e445691e0aa5f0af71994f5976cebf Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:00029d0652c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x45ea381e940f0e089a72f07f1a05d4bfa2be85410e96eea472c55e7b11872d5a Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e45751f72959c1668}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:40ae6931e6fa6398e0ccb448419debd96b2ce7ef76d4f4a172ada527f3da28d2fc77f2ea2aac04186c6ad575cd17d117820ee6d3395f1ebfb900b29972b69d20ac Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:0002460552c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]} {Txid:0x82ad53594683ca5fc44e658fc1ed265b86070e4466417df3f9eadf5e207b87b2 Size:196 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:10d46912932d6ebcd1d3c4a27a1a8ea77e68ac95} {Usage:Remark Data:0000016e457520981613af83}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:404e82e563c8a87155bcfa805e02f45f293d2568632a6aebb8eef6f4a4e51328b43aba45e363fac26461ac821bdc633e4ae9f5836b628820f8b382924c213b6a53 Verification:2102b1ca89d1ac9006a795e35b92dc801f42eff7d05626ecfcf243e20aff4cb79a4aac}] Nonce:0 BlockHash: Confirmations:0 Blocktime:0 Script:0002800552c1106368616e676547656e65726174696f6e67f55b45d0235e1b009eb6cffc25a56d338d2c39d3 Gas:0 Claims:[]}]}}
+//--- PASS: TestRpcClient_GetBlockByIndex (0.52s)
 //PASS
 
+// You may stop the chain to test this API on your private net.
 func TestRpcClient_GetBlockCount(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBlockCount()
-	log.Printf("%+v", result)
+	response := LocalClient.GetBlockCount()
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 2023, r)
 }
 
 //=== RUN   TestRpcClient_GetBlockCount
@@ -155,44 +184,47 @@ func TestRpcClient_GetBlockCount(t *testing.T) {
 //PASS
 
 func TestRpcClient_GetBlockHeaderByHash(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBlockHeaderByHash("2727ab449e02150fa66943cf6d8fcdf4af349480a558a0bdbb4eea550ffeb01f")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetBlockHeaderByHash("035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179")
+	log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
+	assert.Equal(t, 676, r.Size)
+	assert.Equal(t, 0, r.Version)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, 1573123342, r.Time)
+	assert.Equal(t, 3386365, r.Index)
+	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
 }
 
 //=== RUN   TestRpcClient_GetBlockHeaderByHash
-//2019/11/04 16:16:55 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Hash:0x2727ab449e02150fa66943cf6d8fcdf4af349480a558a0bdbb4eea550ffeb01f Size:442 Version:0 Previousblockhash:0xbfe458b3bb7190070f76e4d09b9b677c62490970ad4673a8a6ae57350f99503b Merkleroot:0x30e1ad309fabb7dc6390074dfefe3fb375d2bdf9eb78ee4a9e7648dbd48cf9d4 Time:1572853450 Index:2022 Nonce:b1a375ca27a78e55 Nextconsensus:AKcMgU2hd9DVm7YTqbKHS1SprWS4ufMhKr CrossStatesRoot: ChainID: Script:{InvocationScript:404afc96d7f59d7c3459c6d5680eed9ff9f891ee28245219e38404318632bf08d8b5b2c13b1d8cfd92c444ec59609967cd5c0cc413261b4f608e125c083a5b214c40af65feb1e3450d4391b6bef3b7c3c9223e20183dc10529152253f0d773de0b11327868849b647f8083ab14e4b6cc2d3b11bfc645ef400e81a78d9b4ff35d311d4029dec98b568b14011f62c68d19d951645cececc5b2cee6c1e1e813d0714ce38217fbb673bc62b514a49ff0c96eda76065d1b5c4bb83d016d64f19951ffd2db48 VerificationScript:53210301f2f3c3122526f8e2330693c6256c4b325a0068bc9955713567e7a3c09498a52103460a483d65cb6139ae5b55d8a2e9f8bbf0bbfa10a407224e93b99481792d4db2210286b70fb44980dd13a54ece4b5f88ef491e501fef7fead5804a25e7e1bc5dcf732103dc31257e8f394989325d4f86f47587e405c52d1d0be9898f81991137d5a3e04b54ae} Confirmations:1 NextBlockHash:0x587ac1a5b048ed84535ebe781f5fc614f18853bcbc1a1d8da5bbb7ad51d41ab8}}
-//--- PASS: TestRpcClient_GetBlockHeaderByHash (0.32s)
+//2019/11/08 11:21:10 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Hash:0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179 Size:676 Version:0 Previousblockhash:0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840 Merkleroot:0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757 Time:1573123342 Index:3386365 Nonce:a6e6d82b50273b82 Nextconsensus:AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X CrossStatesRoot: ChainID: Script:{InvocationScript:40c5ad2bbbcbb76fa9bdb6bd19da2b37f6cf0c12fe2e1471da1c5a1af983c706fc8ecdfb90d031b26e89e6bf2159004c9bed89e435d4f672013c4f90d2d6ae026840d61a6fe68741138f3e65b762a0fd858ca46f8a8bcd433de08ef15a2272dd790eb3fb4f04ad55dcd07b58869dad2a43a48abca3b30f49325bc1d3a7673257dbb04055488c2bd94b99f479f0c42aa2bf167ece07484dce3a217c9f4246893168d6b40e20461f9115d9d7c5995271df4c472894af4b33fdc0116f1da63de21a378c32409b5b4216cfd7bc8442893971f33348ba63a231988de7379bd4c59fdb1bad783d3934e53cbd91f44e06c591354f9dd8825c30031ac2370c762a8e818ca24c6c1540d80ea89c01aed1e43ccc93be261613181d0130c2db5afb6b198d8d2655878a743b806c2d1f915e982b1dda8bf855a148051d05d9285ab0e9d6ba0c5b07a8eecd VerificationScript:552103028007d683ceb4dc9084300d0cf16fe6d47a726e586bf3d63559cec13305565221030ef96257401b803da5dd201233e2be828795672b775dd674d69df83f7aec1e3621025bdf3f181f53e9696227843950deb72dcd374ded17c057159513c3d0abe20b64210266b588e350ab63b850e55dbfed0feeda44410a30966341b371014b803a15af072103c089d7122b840a4935234e82e26ae5efd0c2acb627239dc9f207311337b6f2c12103fd95a9cb3098e6447d0de9f76cc97fd5e36830f9c7044457c15a0e81316bf28f2103fea219d4ccfd7641cebbb2439740bb4bd7c4730c1abd6ca1dc44386533816df957ae} Confirmations:3519 NextBlockHash:0x7f514b6d785b52adfeee56919d9deb12059516145aaae36f997cd79890c11bac}}
+//--- PASS: TestRpcClient_GetBlockHeaderByHash (0.53s)
 //PASS
 
 func TestRpcClient_GetBlockHash(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetBlockHash(1000)
-	log.Printf("%+v", result)
+	response := TestNetClient.GetBlockHash(3386365)
+	log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r)
 }
 
 //=== RUN   TestRpcClient_GetBlockHash
-//2019/11/04 16:16:32 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:0x31c7521f4ac295deffb691689ecfffce687c77ac49704defa626024126b86de9}
-//--- PASS: TestRpcClient_GetBlockHash (0.32s)
+//2019/11/08 11:22:25 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179}
+//--- PASS: TestRpcClient_GetBlockHash (0.53s)
 //PASS
 
-// RpcSystemAssetTracker plugin required
+// RpcSystemAssetTracker plugin required, better to use your private net
 func TestRpcClient_GetClaimable(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetClaimable("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
-	log.Printf("%+v", result)
+	response := LocalClient.GetClaimable("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
+	//log.Printf("%+v", response)
+	r := response.Result
+	c := r.Claimables[0]
+	assert.Equal(t, "bc0fda55480440dbd5492de670d0fc44ecd336a20d55caeb43eedbe239ea3c65", c.TxId)
+	assert.Equal(t, 0, c.N)
+	assert.Equal(t, "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR", r.Address)
+	assert.Equal(t, 4104, r.Unclaimed)
 }
 
 //=== RUN   TestRpcClient_GetClaimable
@@ -201,65 +233,56 @@ func TestRpcClient_GetClaimable(t *testing.T) {
 //PASS
 
 func TestRpcClient_GetConnectionCount(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetConnectionCount()
-	log.Printf("%+v", result)
+	response := TestNetClient.GetConnectionCount()
+	//log.Printf("%+v", response)
+	assert.Equal(t, 48, response.Result)
 }
 
 //=== RUN   TestRpcClient_GetConnectionCount
-//2019/11/04 16:25:18 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:3}
+//2019/11/04 16:25:18 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:48}
 //--- PASS: TestRpcClient_GetConnectionCount (0.35s)
 //PASS
 
-func TestRpcClient_GetContractState(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
 
-	result := client.GetContractState(Nep5ScriptHash)
-	log.Printf("%+v", result)
+func TestRpcClient_GetContractState(t *testing.T) {
+	response := TestNetClient.GetContractState(Nep5ScriptHash)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 0, r.Version)
+	assert.Equal(t, "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263", r.Hash)
+	assert.Equal(t, "QLC", r.Name)
 }
 
 //=== RUN   TestRpcClient_GetContractState
-//2019/11/04 16:27:15 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Version:0 Hash:0x14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26 Script:5ec56b6c766b00527ac46c766b51527ac46161680475c893e3009c6a52527ac46a52c36429006161145392ebf880d9a7119b17b2f1adaebc5f71c28e75616804efdfe6946a53527ac462920161680475c893e3609c6a54527ac46a54c36475016161680445995a5c6a55527ac46a00c30962616c616e63654f66876a56527ac46a56c36416006a51c300c361e0010154016a53527ac46245016a00c308646563696d616c73876a57527ac46a57c364110061e00100c0016a53527ac4621f016a00c3096d696e74546f6b656e876a58527ac46a58c364110061e00100de016a53527ac462f8006a00c3046e616d65876a59527ac46a59c364110061e00100c5026a53527ac462d6006a00c30673796d626f6c876a5a527ac46a5ac364110061e00100ad026a53527ac462b2006a00c312737570706f727465645374616e6461726473876a5b527ac46a5bc364110061e0010088026a53527ac46282006a00c30b746f74616c537570706c79876a5c527ac46a5cc364110061e0010084026a53527ac46259006a00c3087472616e73666572876a5d527ac46a5dc36437006a51c300c36a51c351c36a51c352c36a55c3615379517955727551727552795279547275527275e001049a026a53527ac4620d0061006a53527ac46203006a53c3616c756655c56b6c766b00527ac4616a00c36a51527ac46a51c3c001149c009c6a53527ac46a53c36439003254686520706172616d65746572206163636f756e742053484f554c442062652032302d62797465206164647265737365732e6175f06168048418d60d056173736574617ce001021e046a52527ac46a52c36a51c3617ce0010232046a54527ac46203006a54c3616c756600c56b58616c756653c56b6c766b00527ac4616a00c3616804a16ba92e6a51527ac46a51c36410006a51c361680477fd08c8620400516a52527ac46203006a52c3616c756655c56b616168048418d60d08636f6e7472616374617ce001029d036a00527ac46a00c30b746f74616c537570706c79617ce00102de036a51527ac46a51c3009e6a52527ac46a52c3640d0061006a53527ac462b000616a00c30b746f74616c537570706c79610400e1f505615272e00003d703616168048418d60d056173736574617ce0010230036a54527ac46a54c361145392ebf880d9a7119b17b2f1adaebc5f71c28e75610400e1f505615272e00003d70361610061145392ebf880d9a7119b17b2f1adaebc5f71c28e75610400e1f5056152720b7472616e7366657272656454c168124e656f2e52756e74696d652e4e6f7469667961516a53527ac46203006a53c3616c756600c56b044655434b616c756600c56b03575446616c756600c56b53c57600054e45502d35c47651054e45502d37c47652064e45502d3130c4616c756652c56b616168048418d60d08636f6e7472616374617ce0010258026a00527ac46a00c30b746f74616c537570706c79617ce0010299026a51527ac46203006a51c3616c756653c56b6c766b00527ac46c766b51527ac46c766b52527ac451616c75665fc56b6c766b00527ac46c766b51527ac46c766b52527ac46c766b53527ac4616a00c3c00114907c907c9e630f006a51c3c001149c009c620400516a57527ac46a57c3643e003754686520706172616d65746572732066726f6d20616e6420746f2053484f554c442062652032302d62797465206164647265737365732e6175f06a52c300a16a58527ac46a58c36433002c54686520706172616d6574657220616d6f756e74204d5553542062652067726561746572207468616e20302e6175f06a51c361e0010155fd009c6a59527ac46a59c3640c00006a5a527ac4622a016a00c3616804efdfe694630d006a00c36a53c39e620400006a5b527ac46a5bc3640c00006a5a527ac462fe006168048418d60d056173736574617ce00102f1006a54527ac46a54c36a00c3617ce0010205016a55527ac46a55c36a52c39f6a5c527ac46a5cc3640c00006a5a527ac462b8006a00c36a51c39c6a5d527ac46a5dc3640c00516a5a527ac4629d006a55c36a52c39c6a5e527ac46a5ec36414006a54c36a00c3617ce000029901616219006a54c36a00c36a55c36a52c394615272e000033f01616a54c36a51c3617ce0010284006a56527ac46a54c36a51c36a56c36a52c393615272e00003170161616a00c36a51c36a52c36152720b7472616e7366657272656454c168124e656f2e52756e74696d652e4e6f7469667961516a5a527ac46203006a5ac3616c756652c56b6c766b00527ac46c766b51527ac46152c5766a00c3007cc4766a51c3517cc4616c756653c56b6c766b00527ac46c766b51527ac46a00c351c301007e6a51c37e6a52527ac46a00c300c36a52c3617c68041f2e7b07616c756653c56b6c766b00527ac46c766b51527ac46a00c351c301007e6a51c37e6a52527ac46a00c300c36a52c3617c68041f2e7b07616c756654c56b6c766b00527ac46c766b51527ac46c766b52527ac46a00c351c301007e6a51c37e6a53527ac46a00c300c36a53c36a52c3615272680452a141f5616c756654c56b6c766b00527ac46c766b51527ac46c766b52527ac46a00c351c301007e6a51c37e6a53527ac46a00c300c36a53c36a52c3615272680452a141f5616c756653c56b6c766b00527ac46c766b51527ac46a00c351c301007e6a51c37e6a52527ac46a00c300c36a52c3617c6804ef7cef5d616c7566 Parameters:[String Array] Returntype:ByteArray Name:t CodeVersion:1 Author:j Email:z Description:1 Properties:{Storage:true DynamicInvoke:false}}}
-//--- PASS: TestRpcClient_GetContractState (0.33s)
+//2019/11/08 11:45:25 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Version:0 Hash:0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263 Script:011ac56b6c766b00527ac46c766b51527ac4616168164e656f2e52756e74696d652e47657454726967676572009c6c766b54527ac46c766b54c3643e0061145c564ab204122ddce30eb9a6accbfa23b27cc3ac6168184e656f2e52756e74696d652e436865636b5769746e6573736c766b55527ac46259036168164e656f2e52756e74696d652e47657454726967676572609c6c766b56527ac46c766b56c364b702616c766b00c304696e6974876c766b57527ac46c766b57c364110061654e036c766b55527ac46206036c766b00c30a6d696e74546f6b656e73876c766b58527ac46c766b58c36411006165df066c766b55527ac462d8026c766b00c30b746f74616c537570706c79876c766b59527ac46c766b59c3641100616537096c766b55527ac462a9026c766b00c3046e616d65876c766b5a527ac46c766b5ac3641100616594026c766b55527ac46281026c766b00c30673796d626f6c876c766b5b527ac46c766b5bc364110061657d026c766b55527ac46257026c766b00c30a746f74616c546f6b656e876c766b5c527ac46c766b5cc3641100616562026c766b55527ac46229026c766b00c30869636f546f6b656e876c766b5d527ac46c766b5dc364110061658f036c766b55527ac462fd016c766b00c30669636f4e656f876c766b5e527ac46c766b5ec36411006165ca036c766b55527ac462d3016c766b00c306656e6449636f876c766b5f527ac46c766b5fc364110061650c046c766b55527ac462a9016c766b00c3087472616e73666572876c766b60527ac46c766b60c3647900616c766b51c3c0539c009c6c766b0114527ac46c766b0114c3640e00006c766b55527ac46264016c766b51c300c36c766b0111527ac46c766b51c351c36c766b0112527ac46c766b51c352c36c766b0113527ac46c766b0111c36c766b0112c36c766b0113c361527265f2076c766b55527ac46215016c766b00c30962616c616e63654f66876c766b0115527ac46c766b0115c3644d00616c766b51c3c0519c009c6c766b0117527ac46c766b0117c3640e00006c766b55527ac462cd006c766b51c300c36c766b0116527ac46c766b0116c36165cb096c766b55527ac462aa006c766b00c308646563696d616c73876c766b0118527ac46c766b0118c36411006165ad006c766b55527ac4627c00616165990b6c766b52527ac461650d0d6c766b53527ac46c766b53c300907c907ca1630e006c766b52c3c000a0620400006c766b0119527ac46c766b0119c3642f00616c766b52c36c766b53c3617c06726566756e6453c168124e656f2e52756e74696d652e4e6f746966796161006c766b55527ac46203006c766b55c3616c756600c56b0b516c696e6b20546f6b656e616c756600c56b03514c43616c756600c56b58616c756600c56b07008048efefd801616c756653c56b616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b00527ac46c766b00c3c000a06c766b51527ac46c766b51c3640e00006c766b52527ac462df006168164e656f2e53746f726167652e476574436f6e74657874145c564ab204122ddce30eb9a6accbfa23b27cc3ac0800803dafbe50d300615272680f4e656f2e53746f726167652e507574616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c790800803dafbe50d300615272680f4e656f2e53746f726167652e5075746100145c564ab204122ddce30eb9a6accbfa23b27cc3ac0800803dafbe50d300615272087472616e7366657254c168124e656f2e52756e74696d652e4e6f7469667961516c766b52527ac46203006c766b52c3616c756652c56b616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b00527ac46c766b00c30800803dafbe50d300946c766b51527ac46203006c766b51c3616c756652c56b616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b00527ac46c766b00c30800803dafbe50d30094050008711b0c966c766b51527ac46203006c766b51c3616c756655c56b61145c564ab204122ddce30eb9a6accbfa23b27cc3ac6168184e656f2e52756e74696d652e436865636b5769746e657373009c6c766b52527ac46c766b52c3640e00006c766b53527ac4624e016168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b00527ac4080000869eae29d5006c766b00c3946c766b51527ac46c766b51c300a16c766b54527ac46c766b54c3640f0061006c766b53527ac462d7006168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79080000869eae29d500615272680f4e656f2e53746f726167652e507574616168164e656f2e53746f726167652e476574436f6e74657874145c564ab204122ddce30eb9a6accbfa23b27cc3ac6c766b51c3615272680f4e656f2e53746f726167652e5075746100145c564ab204122ddce30eb9a6accbfa23b27cc3ac6c766b51c3615272087472616e7366657254c168124e656f2e52756e74696d652e4e6f7469667961516c766b53527ac46203006c766b53c3616c75665cc56b61616520076c766b00527ac46c766b00c3c0009c6c766b58527ac46c766b58c3640f0061006c766b59527ac4624f026168184e656f2e426c6f636b636861696e2e4765744865696768746168184e656f2e426c6f636b636861696e2e4765744865616465726168174e656f2e4865616465722e47657454696d657374616d706c766b51527ac46c766b51c304d0013d5a946c766b52527ac46c766b52c36c766b00c3617c656e096c766b53527ac46c766b52c36165b2046c766b54527ac46c766b54c3009c6c766b5a527ac46c766b5ac3643900616c766b00c36c766b53c3617c06726566756e6453c168124e656f2e52756e74696d652e4e6f7469667961006c766b59527ac46274016c766b00c36c766b53c36c766b54c361527265b8046c766b55527ac46c766b55c3009c6c766b5b527ac46c766b5bc3640f0061006c766b59527ac46236016168164e656f2e53746f726167652e476574436f6e746578746c766b00c3617c680f4e656f2e53746f726167652e4765746c766b56527ac46168164e656f2e53746f726167652e476574436f6e746578746c766b00c36c766b55c36c766b56c393615272680f4e656f2e53746f726167652e507574616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b57527ac46168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c796c766b55c36c766b57c393615272680f4e656f2e53746f726167652e50757461006c766b00c36c766b55c3615272087472616e7366657254c168124e656f2e52756e74696d652e4e6f7469667961516c766b59527ac46203006c766b59c3616c756651c56b616168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b00527ac46203006c766b00c3616c75665bc56b6c766b00527ac46c766b51527ac46c766b52527ac4616c766b52c300a16c766b55527ac46c766b55c3640e00006c766b56527ac46204026c766b00c36168184e656f2e52756e74696d652e436865636b5769746e657373009c6c766b57527ac46c766b57c3640e00006c766b56527ac462c8016c766b00c36c766b51c39c6c766b58527ac46c766b58c3640e00516c766b56527ac462a3016168164e656f2e53746f726167652e476574436f6e746578746c766b00c3617c680f4e656f2e53746f726167652e4765746c766b53527ac46c766b53c36c766b52c39f6c766b59527ac46c766b59c3640e00006c766b56527ac46246016c766b53c36c766b52c39c6c766b5a527ac46c766b5ac3643b006168164e656f2e53746f726167652e476574436f6e746578746c766b00c3617c68124e656f2e53746f726167652e44656c657465616241006168164e656f2e53746f726167652e476574436f6e746578746c766b00c36c766b53c36c766b52c394615272680f4e656f2e53746f726167652e507574616168164e656f2e53746f726167652e476574436f6e746578746c766b51c3617c680f4e656f2e53746f726167652e4765746c766b54527ac46168164e656f2e53746f726167652e476574436f6e746578746c766b51c36c766b54c36c766b52c393615272680f4e656f2e53746f726167652e507574616c766b00c36c766b51c36c766b52c3615272087472616e7366657254c168124e656f2e52756e74696d652e4e6f7469667961516c766b56527ac46203006c766b56c3616c756652c56b6c766b00527ac4616168164e656f2e53746f726167652e476574436f6e746578746c766b00c3617c680f4e656f2e53746f726167652e4765746c766b51527ac46203006c766b51c3616c756654c56b6c766b00527ac4616c766b00c3009f6c766b51527ac46c766b51c3640f0061006c766b52527ac4623b006c766b00c30380de28a0009c6c766b53527ac46c766b53c364140061050008711b0c6c766b52527ac4620f0061006c766b52527ac46203006c766b52c3616c756659c56b6c766b00527ac46c766b51527ac46c766b52527ac4616c766b51c30400e1f505966c766b52c3956c766b53527ac46168164e656f2e53746f726167652e476574436f6e746578740b746f74616c537570706c79617c680f4e656f2e53746f726167652e4765746c766b54527ac4080000869eae29d5006c766b54c3946c766b55527ac46c766b55c300a16c766b56527ac46c766b56c3643900616c766b00c36c766b51c3617c06726566756e6453c168124e656f2e52756e74696d652e4e6f7469667961006c766b57527ac46276006c766b55c36c766b53c39f6c766b58527ac46c766b58c3644d00616c766b00c36c766b53c36c766b55c3946c766b52c3960400e1f50595617c06726566756e6453c168124e656f2e52756e74696d652e4e6f74696679616c766b55c36c766b53527ac4616c766b53c36c766b57527ac46203006c766b57c3616c756657c56b6161682953797374656d2e457865637574696f6e456e67696e652e476574536372697074436f6e7461696e65726c766b00527ac46c766b00c361681d4e656f2e5472616e73616374696f6e2e4765745265666572656e6365736c766b51527ac4616c766b51c36c766b52527ac4006c766b53527ac4629d006c766b52c36c766b53c3c36c766b54527ac4616c766b54c36168154e656f2e4f75747075742e47657441737365744964209b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc59c6c766b55527ac46c766b55c3642d006c766b54c36168184e656f2e4f75747075742e476574536372697074486173686c766b56527ac4622c00616c766b53c351936c766b53527ac46c766b53c36c766b52c3c09f635aff006c766b56527ac46203006c766b56c3616c756651c56b6161682d53797374656d2e457865637574696f6e456e67696e652e476574457865637574696e67536372697074486173686c766b00527ac46203006c766b00c3616c756658c56b6161682953797374656d2e457865637574696f6e456e67696e652e476574536372697074436f6e7461696e65726c766b00527ac46c766b00c361681a4e656f2e5472616e73616374696f6e2e4765744f7574707574736c766b51527ac4006c766b52527ac4616c766b51c36c766b53527ac4006c766b54527ac462cd006c766b53c36c766b54c3c36c766b55527ac4616c766b55c36168184e656f2e4f75747075742e47657453637269707448617368616505ff907c907c9e6345006c766b55c36168154e656f2e4f75747075742e47657441737365744964209b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc59c620400006c766b56527ac46c766b56c3642d00616c766b52c36c766b55c36168134e656f2e4f75747075742e47657456616c7565936c766b52527ac461616c766b54c351936c766b54527ac46c766b54c36c766b53c3c09f632aff6c766b52c36c766b57527ac46203006c766b57c3616c75665ac56b6c766b00527ac46c766b51527ac46161657cfe6c766b52527ac46c766b00c300a16311006c766b00c3026054a0009c620400006c766b53527ac46c766b53c364870161067072656669786c766b51c37e6c766b54527ac46168164e656f2e53746f726167652e476574436f6e746578746c766b54c3617c680f4e656f2e53746f726167652e4765746c766b55527ac404002f68596c766b55c3946c766b56527ac46c766b56c300a0009c6c766b57527ac46c766b57c3643900616c766b51c36c766b52c3617c06726566756e6453c168124e656f2e52756e74696d652e4e6f7469667961006c766b58527ac462e9006c766b56c36c766b52c39f6c766b59527ac46c766b59c3648100616168164e656f2e53746f726167652e476574436f6e746578746c766b54c36c766b56c36c766b55c393615272680f4e656f2e53746f726167652e507574616c766b51c36c766b52c36c766b56c394617c06726566756e6453c168124e656f2e52756e74696d652e4e6f74696679616c766b56c36c766b58527ac46251006168164e656f2e53746f726167652e476574436f6e746578746c766b54c36c766b52c36c766b55c393615272680f4e656f2e53746f726167652e50757461616c766b52c36c766b58527ac46203006c766b58c3616c7566 Parameters:[String Array] Returntype:ByteArray Name:QLC CodeVersion:1.0 Author:qlink Email:admin@qlink.mobi Description:qlink token		 Properties:{Storage:true DynamicInvoke:false}}}
+//--- PASS: TestRpcClient_GetContractState (2.25s)
 //PASS
 
-// RpcNep5Tracker plugin required
+// RpcNep5Tracker plugin required, better to use your private net
 func TestRpcClient_GetNep5Balances(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetNep5Balances("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetNep5Balances(TestNetWalletAddress)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "b9d7ea3062e6aeeb3e8ad9548220c4ba1361d263", r.Balances[0].AssetHash)
+	assert.Equal(t, "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY", r.Address)
 }
+
+//=== RUN   TestRpcClient_GetNep5Balances
+//2019/11/08 14:08:37 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Balances:[{AssetHash:b9d7ea3062e6aeeb3e8ad9548220c4ba1361d263 Amount:0 LastUpdatedBlock:3275044}] Address:AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY}}
+//--- PASS: TestRpcClient_GetNep5Balances (3.52s)
+//PASS
 
 func TestRpcClient_GetNep5Transfers(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetNep5Transfers("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetNep5Transfers(TestNetWalletAddress)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY", r.Address)
 }
 
-// RpcWallet
+// need RpcWallet
 func TestRpcClient_GetNewAddress(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetNewAddress()
-	log.Printf("%+v", result)
+	response := LocalClient.GetNewAddress()
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_GetNewAddress
@@ -268,119 +291,95 @@ func TestRpcClient_GetNewAddress(t *testing.T) {
 //PASS
 
 func TestRpcClient_GetPeers(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetPeers()
-	log.Printf("%+v", result)
+	response := TestNetClient.GetPeers()
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_GetPeers
-//2019/11/04 16:57:57 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Unconnected:[] Bad:[] Connected:[{Address:127.0.0.1 Port:20001} {Address:127.0.0.1 Port:30001} {Address:127.0.0.1 Port:10001}]}}
-//--- PASS: TestRpcClient_GetPeers (0.33s)
+//2019/11/08 15:07:30 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Unconnected:[{Address:47.97.73.20 Port:20333} {Address:222.209.173.254 Port:20333} {Address:113.118.234.48 Port:20333} {Address:47.254.44.88 Port:20333} {Address:18.222.168.189 Port:10333} {Address:54.65.248.144 Port:20333} {Address:52.197.205.193 Port:20333} {Address:52.76.214.252 Port:20333} {Address:47.99.240.126 Port:20336} {Address:47.99.240.126 Port:20333} {Address:139.99.148.127 Port:20333} {Address:35.243.96.213 Port:20333} {Address:47.254.43.76 Port:20333} {Address:168.61.184.237 Port:20333} {Address:72.141.22.201 Port:20333} {Address:47.101.221.169 Port:20333} {Address:18.222.161.128 Port:10333} {Address:13.228.7.48 Port:20333} {Address:164.128.165.13 Port:20333} {Address:147.135.129.22 Port:20333} {Address:40.121.153.64 Port:20333} {Address:47.254.83.14 Port:20333} {Address:47.244.44.20 Port:20333} {Address:168.61.166.110 Port:20333} {Address:168.61.16.30 Port:20333} {Address:47.111.100.0 Port:20333} {Address:104.215.248.10 Port:20333} {Address:47.91.225.117 Port:20333} {Address:183.6.164.18 Port:20333} {Address:183.17.228.223 Port:20333} {Address:121.43.179.239 Port:20333} {Address:54.169.199.240 Port:20333} {Address:207.180.219.24 Port:20333} {Address:47.244.144.79 Port:20333} {Address:18.136.142.79 Port:30333} {Address:18.136.142.79 Port:20333} {Address:168.61.148.37 Port:20333}] Bad:[] Connected:[{Address:147.135.129.22 Port:20333} {Address:113.29.236.150 Port:20333} {Address:139.99.148.127 Port:20333} {Address:82.201.63.117 Port:20333} {Address:168.61.16.30 Port:20333} {Address:18.222.161.128 Port:10333} {Address:183.6.164.18 Port:20333} {Address:18.179.119.79 Port:20333} {Address:18.176.58.0 Port:20333} {Address:47.75.146.164 Port:20333} {Address:35.192.172.11 Port:0} {Address:40.121.153.64 Port:20333} {Address:104.196.172.132 Port:20333} {Address:47.75.217.176 Port:20333} {Address:142.44.138.161 Port:20333} {Address:47.101.221.169 Port:20333} {Address:18.191.171.240 Port:10333} {Address:172.255.99.84 Port:20333} {Address:183.6.164.18 Port:20333} {Address:18.136.142.79 Port:20333} {Address:207.180.219.24 Port:20333} {Address:47.99.240.126 Port:20333} {Address:47.99.240.126 Port:20336} {Address:47.111.100.0 Port:20333} {Address:47.244.144.79 Port:20333} {Address:47.254.44.88 Port:20333} {Address:52.130.66.169 Port:20333} {Address:104.215.248.10 Port:20333} {Address:54.238.172.91 Port:20333} {Address:5.35.241.70 Port:20333} {Address:119.139.196.60 Port:20333} {Address:121.43.179.239 Port:20333} {Address:149.129.175.157 Port:20333} {Address:47.52.159.228 Port:20333} {Address:54.65.248.144 Port:20333} {Address:47.244.44.20 Port:20333} {Address:172.105.228.12 Port:20333} {Address:52.76.214.252 Port:20333} {Address:47.254.43.76 Port:20333} {Address:13.76.173.63 Port:20333} {Address:172.105.199.143 Port:20333} {Address:47.97.73.20 Port:20333} {Address:164.128.165.13 Port:20333} {Address:104.248.132.109 Port:20333} {Address:139.217.114.241 Port:20333} {Address:47.90.28.83 Port:20333} {Address:18.136.142.79 Port:30333} {Address:13.58.169.218 Port:10333}]}}
+//--- PASS: TestRpcClient_GetPeers (0.53s)
 //PASS
 
 func TestRpcClient_GetRawMemPool(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetRawMemPool()
-	log.Printf("%+v", result)
+	response := TestNetClient.GetRawMemPool()
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_GetRawMemPool
-//2019/11/04 16:59:37 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:[]}
-//--- PASS: TestRpcClient_GetRawMemPool (0.48s)
+//2019/11/08 15:22:47 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:[]}
+//--- PASS: TestRpcClient_GetRawMemPool (0.53s)
 //PASS
 
 func TestRpcClient_GetRawTransaction(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetRawTransaction("0x0f3009286f9e59ab7cd7a232c9580a145a02cccd155a90c805e90eb9bfed3e40")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetRawTransaction("0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a")
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a", r.Txid)
+	assert.Equal(t, 242, r.Size)
+	assert.Equal(t, "InvocationTransaction", r.Type)
+	assert.Equal(t, 1, r.Version)
 }
 
 //=== RUN   TestRpcClient_GetRawTransaction
-//2019/11/04 17:10:37 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Txid:0x0f3009286f9e59ab7cd7a232c9580a145a02cccd155a90c805e90eb9bfed3e40 Size:218 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:5392ebf880d9a7119b17b2f1adaebc5f71c28e75}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:4017a5a8de6c2fbd2c3f9a66bfdd40cde769e27fc2fe5fcabcf25a866a7e42bacc4619c02133284d3d67f7c889398b6b585dc60908b75ffa9d64d7bc333bc4de44 Verification:2103dc623d556a79437ffefa0133516ec91545f363b772149901ac589b5e927ad55fac}] Nonce:0 BlockHash:0x9d88c792a68f97e5fa4076adc5341c2e7efd8298386610cfc83e25ac35837b08 Confirmations:822 Blocktime:1572853150 Script:048096980014ed53b14908f15918abb6ba8790a80387f8a5fd89145392ebf880d9a7119b17b2f1adaebc5f71c28e7553c1087472616e7366657267269b3a746cc75fcedc8cab923e2da5f9025ddf14f1 Gas:0 Claims:[]}}
-//--- PASS: TestRpcClient_GetRawTransaction (0.33s)
+//2019/11/08 15:23:46 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Txid:0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a Size:242 Type:InvocationTransaction Version:1 Attributes:[{Usage:Script Data:5c564ab204122ddce30eb9a6accbfa23b27cc3ac} {Usage:Remark Data:313537313231383636323935373964363035643631}] Vin:[] Vout:[] SysFee:0 NetFee:0 Scripts:[{Invocation:4002a84056e9bf04ed47a6307c3030ac92704cb71a8c2fd46f45593c8ce57a403de47e19a4171114e7ec881d9f45d7851712e8eb922d11ce3a0de5ea64b8310025 Verification:2103f19ffa8acecb480ab727b0bf9ee934162f6e2a4308b59c80b732529ebce6f53dac}] Nonce:0 BlockHash:0x1a1d7b2f6d54e7c9084353372dd526301a456900827ce8478fcff1a7a00766f7 Confirmations:115691 Blocktime:1571218675 Script:0600203d88792d148f6c5be89c0cb6579e44a8bf9bfd2ecbcc11dfdc145c564ab204122ddce30eb9a6accbfa23b27cc3ac53c1087472616e736665726763d26113bac4208254d98a3eebaee66230ead7b9 Gas:0 Claims:[]}}
+//--- PASS: TestRpcClient_GetRawTransaction (0.77s)
 //PASS
 
 func TestRpcClient_GetStorage(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetStorage(Nep5ScriptHash, "636f6e747261637400746f74616c537570706c79") // key= "contract" + "00" + "totalSupply"
-	log.Printf("%+v", result)
+	response := TestNetClient.GetStorage("0x2fabf24313d69629fa56c51716f94cd5cbd36b88", "636f6e747261637400746f74616c537570706c79") // key = "contract" + "00" + "totalSupply"
+	//log.Printf("%+v", response)
+	assert.Equal(t, "00e1f505", response.Result)
 }
 
 //=== RUN   TestRpcClient_GetStorage
-//2019/11/04 17:43:23 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:00e1f505}
-//--- PASS: TestRpcClient_GetStorage (0.36s)
+//2019/11/08 15:37:17 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:00e1f505}
+//--- PASS: TestRpcClient_GetStorage (0.85s)
 //PASS
 
 func TestRpcClient_GetTransactionHeight(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetTransactionHeight("0x0f3009286f9e59ab7cd7a232c9580a145a02cccd155a90c805e90eb9bfed3e40")
-	log.Printf("%+v", result)
+	response := TestNetClient.GetTransactionHeight("0xca159430e3d72227c06a3880244111aea0368ecc09fa8c2eade001a1bbcc7d4a")
+	//log.Printf("%+v", response)
+	assert.Equal(t, 3275044, response.Result)
 }
 
 //=== RUN   TestRpcClient_GetTransactionHeight
-//2019/11/04 17:24:40 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:1978}
-//--- PASS: TestRpcClient_GetTransactionHeight (0.31s)
+//2019/11/08 15:44:53 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:3275044}
+//--- PASS: TestRpcClient_GetTransactionHeight (0.68s)
 //PASS
 
 func TestRpcClient_GetTxOut(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetTxOut("0x011863ed7e21e73eba017e1887ae3085771661ae624d631190e4457ef4202ad1", 0)
-	log.Printf("%+v", result)
+	response := TestNetClient.GetTxOut("0x300d3083620e31708e291dd0732fa0117c8e893b532ef3adc9e0f47b17e29254", 0)
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 0, r.N)
+	assert.Equal(t, "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Asset)
+	assert.Equal(t, 1000000, r.Value)
+	assert.Equal(t, "AazAnhssUfNyBC3rdBKseGuck7voaF5p68", r.Address)
 }
 
 //=== RUN   TestRpcClient_GetTxOut
-//2019/11/04 17:34:49 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{N:0 Asset:0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b Value:100000000 Address:APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR}}
-//--- PASS: TestRpcClient_GetTxOut (0.32s)
+//2019/11/08 15:49:13 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{N:0 Asset:0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b Value:1000000 Address:AazAnhssUfNyBC3rdBKseGuck7voaF5p68}}
+//--- PASS: TestRpcClient_GetTxOut (3.35s)
 //PASS
 
 // need RpcSystemAssetTracker
 func TestRpcClient_GetUnclaimed(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetUnclaimed(WalletAddress)
-	log.Printf("%+v", result)
+	response := TestNetClient.GetUnclaimed(TestNetWalletAddress)
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_GetUnclaimed
-//2019/11/04 17:47:51 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Available:4104 Unavailable:4088 Unclaimed:8192}}
-//--- PASS: TestRpcClient_GetUnclaimed (0.36s)
+//2019/11/08 15:57:44 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Available:0 Unavailable:0 Unclaimed:0}}
+//--- PASS: TestRpcClient_GetUnclaimed (3.97s)
 //PASS
 
+// Use your private net
 func TestRpcClient_GetUnclaimedGas(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetUnclaimedGas()
-	log.Printf("%+v", result)
+	response := LocalClient.GetUnclaimedGas()
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 4104, r.Available)
+	assert.Equal(t, 4096, r.Unavailable)
 }
 
 //=== RUN   TestRpcClient_GetUnclaimedGas
@@ -388,14 +387,15 @@ func TestRpcClient_GetUnclaimedGas(t *testing.T) {
 //--- PASS: TestRpcClient_GetUnclaimedGas (0.37s)
 //PASS
 
+// need RpcSystemAssetTracker, Use your private net
 func TestRpcClient_GetUnspents(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetUnspents(WalletAddress)
-	log.Printf("%+v", result)
+	response := LocalClient.GetUnspents(LocalWalletAddress)
+	log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7", r.Balance[0].AssetHash)
+	assert.Equal(t, "GAS", r.Balance[0].Asset)
+	assert.Equal(t, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Balance[1].AssetHash)
+	assert.Equal(t, "NEO", r.Balance[1].Asset)
 }
 
 //=== RUN   TestRpcClient_GetUnspents
@@ -404,38 +404,34 @@ func TestRpcClient_GetUnspents(t *testing.T) {
 //PASS
 
 func TestRpcClient_GetValidators(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetValidators()
-	log.Printf("%+v", result)
+	response := TestNetClient.GetValidators()
+	log.Printf("%+v", response)
 }
 
-func TestRpcClient_GetVersion(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
+//=== RUN   TestRpcClient_GetValidators
+//2019/11/08 16:26:07 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:[{PublicKey:02170376729a7c4c9d12c14d862fe6596a4eecebf4178a4d432b725d91b267f8e8 Votes:0 Active:false} {PublicKey:023cfe95a0301acfa831edc8ba10c55d9f3a985e43e1349dd79a2521629987ecf9 Votes:0 Active:false} {PublicKey:02494f3ff953e45ca4254375187004f17293f90a1aa4b1a89bc07065bc1da521f6 Votes:0 Active:false} {PublicKey:025bdf3f181f53e9696227843950deb72dcd374ded17c057159513c3d0abe20b64 Votes:90101602 Active:true} {PublicKey:0266b588e350ab63b850e55dbfed0feeda44410a30966341b371014b803a15af07 Votes:90101602 Active:true} {PublicKey:02e96b953cfc6b88c7490794dfa5b790c53be54154abb06a537338185c84843b3e Votes:0 Active:false} {PublicKey:02f9f6d63fd321879d8b387131b7b46c3a34fe090f4eac44276245ca86b6c69370 Votes:0 Active:false} {PublicKey:02ff8ac54687f36bbc31a91b730cc385da8af0b581f2d59d82b5cfef824fd271f6 Votes:0 Active:false} {PublicKey:03028007d683ceb4dc9084300d0cf16fe6d47a726e586bf3d63559cec133055652 Votes:90101602 Active:true} {PublicKey:030ef96257401b803da5dd201233e2be828795672b775dd674d69df83f7aec1e36 Votes:90100000 Active:true} {PublicKey:031c316e37d57006db9ac637c44169f0067fad4133f473fbd95d2d64605e7193af Votes:0 Active:false} {PublicKey:0344925b6126c8ae58a078b5b2ce98de8fff15a22dac6f57ffd3b108c72a0670d1 Votes:0 Active:false} {PublicKey:035e700a50b082b6c6986853bcd13340b3f636ae1ae39a5c201c0b0ce543569b6b Votes:0 Active:false} {PublicKey:036c27adb03c6da87236ecd1dc48d32e2626da084abdd72f759798e177b85d8dd6 Votes:0 Active:false} {PublicKey:036c5a11d322219d3386a37bdbf93fcf749f62c72e5898079bc73ff78ef6c1d2cf Votes:0 Active:false} {PublicKey:039271a57098559112648661f91c966a8d05775dff649d47a43817ba5de769c874 Votes:0 Active:false} {PublicKey:03b1521081dbf29df4828df3c12616bfb3a5600f4381dcb8ad92f99ba1e9a6c06a Votes:0 Active:false} {PublicKey:03b8bfe058dc404a2f9510606aee0de69e3d8b47e25d7b3af670577373640d51dc Votes:1000 Active:false} {PublicKey:03c089d7122b840a4935234e82e26ae5efd0c2acb627239dc9f207311337b6f2c1 Votes:90100000 Active:true} {PublicKey:03cdabe37ad8f2269ad39de0e8ee395358e38a2f654ba4918de8a5c2de80190ff9 Votes:0 Active:false} {PublicKey:03d3a870ee14a6f8f772b430f09dd65f5328e887e0d08d4e280730d20e2586198c Votes:0 Active:false} {PublicKey:03e88a1cf8c37b0b76858224905e126005a560487894309f2a3d69f7067df7d415 Votes:0 Active:false} {PublicKey:03fd95a9cb3098e6447d0de9f76cc97fd5e36830f9c7044457c15a0e81316bf28f Votes:90100000 Active:true} {PublicKey:03fea219d4ccfd7641cebbb2439740bb4bd7c4730c1abd6ca1dc44386533816df9 Votes:90100000 Active:true}]}
+//--- PASS: TestRpcClient_GetValidators (8.40s)
+//PASS
 
-	result := client.GetVersion()
-	log.Printf("%+v", result)
+func TestRpcClient_GetVersion(t *testing.T) {
+	response := TestNetClient.GetVersion()
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, 20333, r.Port)
+	assert.Equal(t, 1109366691, r.Nonce)
+	assert.Equal(t, "/Neo:2.10.3/", r.Useragent)
 }
 
 //=== RUN   TestRpcClient_GetVersion
-//2019/11/04 17:58:04 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Port:50001 Nonce:1717092459 Useragent:/Neo:2.10.3/}}
-//--- PASS: TestRpcClient_GetVersion (0.35s)
+//2019/11/08 16:27:26 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Port:20333 Nonce:1109366691 Useragent:/Neo:2.10.3/}}
+//--- PASS: TestRpcClient_GetVersion (0.50s)
 //PASS
 
+// need RpcWallet, use your onw private net
 func TestRpcClient_GetWalletHeight(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.GetWalletHeight()
-	log.Printf("%+v", result)
+	response := LocalClient.GetWalletHeight()
+	log.Printf("%+v", response)
+	assert.Equal(t, 2894, response.Result)
 }
 
 //=== RUN   TestRpcClient_GetWalletHeight
@@ -449,44 +445,37 @@ func TestRpcClient_ImportPrivKey(t *testing.T) {
 }
 
 func TestRpcClient_InvokeFunction(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.InvokeFunction(Nep5ScriptHash, "name")
-	log.Printf("%+v", result)
+	response := TestNetClient.InvokeFunction(Nep5ScriptHash, "name")
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9", r.Script)
+	assert.Equal(t, "HALT", r.State)
+	assert.Equal(t, "516c696e6b20546f6b656e", r.Stack[0].Value)
 }
 
 //=== RUN   TestRpcClient_InvokeFunction
-//2019/11/04 18:07:27 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Script:00c1046e616d6567269b3a746cc75fcedc8cab923e2da5f9025ddf14 State:HALT GasConsumed:0.094 Stack:[{Type:ByteArray Value:4655434b}]}}
-//--- PASS: TestRpcClient_InvokeFunction (0.38s)
+//2019/11/08 16:34:53 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Script:00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9 State:HALT GasConsumed:0.126 Stack:[{Type:ByteArray Value:516c696e6b20546f6b656e}]}}
+//--- PASS: TestRpcClient_InvokeFunction (0.55s)
 //PASS
 
 func TestRpcClient_InvokeScript(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.InvokeScript("00c1046e616d6567269b3a746cc75fcedc8cab923e2da5f9025ddf14")
-	log.Printf("%+v", result)
+	response := TestNetClient.InvokeScript("00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9")
+	//log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9", r.Script)
+	assert.Equal(t, "HALT", r.State)
+	assert.Equal(t, "516c696e6b20546f6b656e", r.Stack[0].Value)
 }
 
 //=== RUN   TestRpcClient_InvokeScript
-//2019/11/04 18:09:02 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Script:00c1046e616d6567269b3a746cc75fcedc8cab923e2da5f9025ddf14 State:HALT GasConsumed:0.094 Stack:[{Type:ByteArray Value:4655434b}]}}
-//--- PASS: TestRpcClient_InvokeScript (0.34s)
+//2019/11/08 16:41:13 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:{Script:00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9 State:HALT GasConsumed:0.126 Stack:[{Type:ByteArray Value:516c696e6b20546f6b656e}] Tx:}}
+//--- PASS: TestRpcClient_InvokeScript (0.51s)
 //PASS
 
-// RpcWallet
+// need RpcWallet, use your own private net
 func TestRpcClient_ListAddress(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.ListAddress()
-	log.Printf("%+v", result)
+	response := LocalClient.ListAddress()
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_ListAddress
@@ -494,29 +483,23 @@ func TestRpcClient_ListAddress(t *testing.T) {
 //--- PASS: TestRpcClient_ListAddress (0.35s)
 //PASS
 
-func TestRpcClient_ListPlugins(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
 
-	result := client.ListPlugins()
-	log.Printf("%+v", result)
+func TestRpcClient_ListPlugins(t *testing.T) {
+	response := TestNetClient.ListPlugins()
+	log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, "ApplicationLogs", r[0].Name)
 }
 
 //=== RUN   TestRpcClient_ListPlugins
-//2019/11/04 18:24:03 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:[{Name:ApplicationLogs Version:2.10.3.0 Interfaces:[IRpcPlugin IPersistencePlugin]} {Name:RpcNep5Tracker Version:2.10.3.0 Interfaces:[IPersistencePlugin IRpcPlugin]} {Name:RpcSystemAssetTrackerPlugin Version:2.10.3.0 Interfaces:[IPersistencePlugin IRpcPlugin]} {Name:RpcWallet Version:2.10.3.0 Interfaces:[IRpcPlugin]} {Name:SimplePolicyPlugin Version:2.10.3.0 Interfaces:[ILogPlugin IPolicyPlugin]}]}
-//--- PASS: TestRpcClient_ListPlugins (0.32s)
+//2019/11/08 16:43:25 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:[{Name:ApplicationLogs Version:2.10.3.0 Interfaces:[IRpcPlugin IPersistencePlugin]} {Name:ImportBlocks Version:2.10.3.0 Interfaces:[]} {Name:RpcNep5Tracker Version:2.10.3.0 Interfaces:[IPersistencePlugin IRpcPlugin]} {Name:RpcSecurity Version:2.10.3.0 Interfaces:[IRpcPlugin]} {Name:RpcSystemAssetTrackerPlugin Version:2.10.3.0 Interfaces:[IPersistencePlugin IRpcPlugin]} {Name:RpcWallet Version:2.10.3.0 Interfaces:[IRpcPlugin]} {Name:SimplePolicyPlugin Version:2.10.3.0 Interfaces:[ILogPlugin IPolicyPlugin]}]}
+//--- PASS: TestRpcClient_ListPlugins (3.99s)
 //PASS
 
+// use your own private net
 func TestRpcClient_SendFrom(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.SendFrom(AssetIdNeo, WalletAddress, WalletAddress, 100000000, 0, WalletAddress)
-	log.Printf("%+v", result)
+	response := LocalClient.SendFrom(AssetIdNeo, LocalWalletAddress, LocalWalletAddress, 100000000, 0, LocalWalletAddress)
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_SendFrom
@@ -525,18 +508,15 @@ func TestRpcClient_SendFrom(t *testing.T) {
 //PASS
 
 // TODO
+// use your own private net
 func TestRpcClient_SendRawTransaction(t *testing.T) {
 
 }
 
+// use your own private net
 func TestRpcClient_SendToAddress(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.SendToAddress(AssetIdNeo, WalletAddress, 100000000, 0, WalletAddress)
-	log.Printf("%+v", result)
+	response := LocalClient.SendToAddress(AssetIdNeo, LocalWalletAddress, 100000000, 0, LocalWalletAddress)
+	log.Printf("%+v", response)
 }
 
 //=== RUN   TestRpcClient_SendToAddress
@@ -549,13 +529,9 @@ func TestRpcClient_SubmitBlock(t *testing.T) {
 }
 
 func TestRpcClient_ValidateAddress(t *testing.T) {
-	client := rpc.NewClient(LocalEndPoint)
-	if client == nil {
-		t.Fail()
-	}
-
-	result := client.ValidateAddress(WalletAddress)
-	log.Printf("%+v", result)
+	response := TestNetClient.ValidateAddress(TestNetWalletAddress)
+	//log.Printf("%+v", response)
+	assert.Equal(t, true, response.Result.IsValid)
 }
 
 //=== RUN   TestRpcClient_ValidateAddress

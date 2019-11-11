@@ -136,7 +136,7 @@ type GetStorageResponse struct {
 type GetTransactionHeightResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result uint32 `json:"result"`
+	Result int `json:"result"`
 }
 
 type GetTxOutResponse struct {
@@ -178,7 +178,7 @@ type GetVersionResponse struct {
 type GetWalletHeightResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result uint32 `json:"result"`
+	Result int `json:"result"`
 }
 
 type ImportPrivKeyResponse struct {
