@@ -1,9 +1,15 @@
 package rpc_test
 
 import (
+	"github.com/joeqian10/neo-gogogo/crypto"
+	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
+	"github.com/joeqian10/neo-gogogo/sc"
+	"github.com/joeqian10/neo-gogogo/tx"
 	"github.com/stretchr/testify/assert"
 	"log"
+	//"math/rand"
+	"crypto/rand"
 	"testing"
 )
 /*
@@ -22,7 +28,8 @@ var LocalWalletAddress = "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR"
 var TestNetWalletAddress = "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY"
 
 var AssetIdNeo = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
-var Nep5ScriptHash = "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263"
+var Nep5ScriptHash = "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263" // Qlink Token
+var MyToken = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26" // change to yours when testing via private net
 
 
 
@@ -507,11 +514,43 @@ func TestRpcClient_SendFrom(t *testing.T) {
 //--- PASS: TestRpcClient_SendFrom (0.34s)
 //PASS
 
-// TODO
 // use your own private net
 func TestRpcClient_SendRawTransaction(t *testing.T) {
-
+	// try to create a raw invocation transaction
+	// build script
+	sb := sc.NewScriptBuilder()
+	scriptHash := helper.ReverseBytes(helper.HexTobytes(MyToken))
+	sb.MakeInvocationScript(scriptHash, "name", []sc.ContractParameter{})
+	script := sb.ToArray()
+	itx := tx.NewInvocationTransaction(script)
+	// add a random attribute for different hash
+	p := make([]byte, 32)
+	rand.Read(p)
+	log.Printf("%s", helper.BytesToHex(p))
+	attr := &tx.TransactionAttribute{
+		Usage: tx.Hash1,
+		Data:  crypto.Hash256(p),
+	}
+	itx.Attributes = []*tx.TransactionAttribute{attr}
+	// add an attribute for signature
+	//addr, _ := helper.AddressToScriptHash(LocalWalletAddress)
+	//attr2 := &tx.TransactionAttribute{
+	//	Usage: tx.Script,
+	//	Data:  addr.Bytes(),
+	//}
+	//itx.Attributes = []*tx.TransactionAttribute{attr, attr2}
+	rawTxString := itx.RawTransactionString()
+	log.Printf("%s", rawTxString)
+	response := LocalClient.SendRawTransaction(rawTxString)
+	log.Printf("%+v", response)
+	r := response.Result
+	assert.Equal(t, true, r)
 }
+
+//=== RUN   TestRpcClient_SendRawTransaction
+//2019/11/12 14:39:00 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:true}
+//--- PASS: TestRpcClient_SendRawTransaction (0.37s)
+//PASS
 
 // use your own private net
 func TestRpcClient_SendToAddress(t *testing.T) {
