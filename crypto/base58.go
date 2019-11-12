@@ -57,7 +57,7 @@ func Decode(input string) ([]byte, error) {
 		index := strings.IndexRune(BASE58, c)
 		if index == -1 {
 			return nil, fmt.Errorf(
-				"Invalid character '%c' when decoding this base58 string: '%s'", c, input,
+				"invalid character '%c' when decoding this base58 string: '%s'", c, input,
 			)
 		}
 		bi.Mul(bi, base)
@@ -94,12 +94,12 @@ func Base58CheckDecode(input string) ([]byte, error) {
 		return nil, err
 	}
 	if len(ba) < 4 {
-		return nil, fmt.Errorf("Invalid base58 check string: missing checksum.")
+		return nil, fmt.Errorf("invalid base58 check string: missing checksum")
 	}
 
 	checkSum := Hash256(ba[:len(ba)-4])
 	if bytes.Compare(checkSum[0:4], ba[len(ba)-4:]) != 0 {
-		return nil, fmt.Errorf("Invalid base58 check string: invalid checksum.")
+		return nil, fmt.Errorf("invalid base58 check string: invalid checksum")
 	}
 
 	return ba[:len(ba)-4], nil
