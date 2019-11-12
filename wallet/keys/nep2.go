@@ -13,30 +13,32 @@ import (
 
 // NEP-2 specified parameters used for cryptography.
 const (
-	n       = 16384
-	r       = 8
-	p       = 8
 	keyLen  = 64
 	nepFlag = 0xe0
 )
 
-var nepHeader = []byte{0x01, 0x42}
+var (
+	R         = 8
+	P         = 8
+	N         = 16384
+	nepHeader = []byte{0x01, 0x42}
+)
 
 // NEP2Encrypt encrypts a the PrivateKey using a given passphrase
 // under the NEP-2 standard.
-func NEP2Encrypt(priv *KeyPair, passphrase string) (s string, err error) {
-	address := priv.PublicKey.Address()
+func NEP2Encrypt(keyPair *KeyPair, passphrase string) (s string, err error) {
+	address := keyPair.PublicKey.Address()
 	addrHash := Hash256([]byte(address))[:4]
 	// Normalize the passphrase according to the NFC standard.
 	phraseNorm := norm.NFC.Bytes([]byte(passphrase))
-	derivedKey, err := scrypt.Key(phraseNorm, addrHash, n, r, p, keyLen)
+	derivedKey, err := scrypt.Key(phraseNorm, addrHash, N, R, P, keyLen)
 	if err != nil {
 		return s, err
 	}
 
 	derivedKey1 := derivedKey[:32]
 	derivedKey2 := derivedKey[32:]
-	xr := xor(priv.PrivateKey, derivedKey1)
+	xr := xor(keyPair.PrivateKey, derivedKey1)
 
 	encrypted, err := AESEncrypt(xr, derivedKey2)
 	if err != nil {
@@ -70,7 +72,7 @@ func NEP2Decrypt(key, passphrase string) (s *KeyPair, err error) {
 	addrHash := b[3:7]
 	// Normalize the passphrase according to the NFC standard.
 	phraseNorm := norm.NFC.Bytes([]byte(passphrase))
-	derivedKey, err := scrypt.Key(phraseNorm, addrHash, n, r, p, keyLen)
+	derivedKey, err := scrypt.Key(phraseNorm, addrHash, N, R, P, keyLen)
 	if err != nil {
 		return s, err
 	}
@@ -84,25 +86,25 @@ func NEP2Decrypt(key, passphrase string) (s *KeyPair, err error) {
 		return s, err
 	}
 
-	privBytes := xor(decrypted, derivedKey1)
+	privateBytes := xor(decrypted, derivedKey1)
 
 	// Rebuild the private key.
-	privKey, err := NewKeyPair(privBytes)
+	privateKey, err := NewKeyPair(privateBytes)
 	if err != nil {
 		return s, err
 	}
 
-	if !compareAddressHash(privKey, addrHash) {
+	if !compareAddressHash(privateKey, addrHash) {
 		return s, errors.New("password mismatch")
 	}
 
-	return privKey, nil
+	return privateKey, nil
 }
 
-func compareAddressHash(priv *KeyPair, inhash []byte) bool {
-	address := priv.PublicKey.Address()
+func compareAddressHash(keyPair *KeyPair, hash []byte) bool {
+	address := keyPair.PublicKey.Address()
 	addrHash := Hash256([]byte(address))[:4]
-	return bytes.Equal(addrHash, inhash)
+	return bytes.Equal(addrHash, hash)
 }
 
 func validateNEP2Format(b []byte) error {

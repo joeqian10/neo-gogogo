@@ -35,16 +35,20 @@ func (sb *ScriptBuilder) MakeInvocationScript(scriptHash []byte, operation strin
 }
 
 func (sb *ScriptBuilder) Emit(op OpCode, arg ...byte) error {
-	sb.buff.WriteByte(byte(op))
-	if arg != nil {
-		sb.buff.Write(arg)
+	err := sb.buff.WriteByte(byte(op))
+	if err != nil {
+		return err
 	}
-	return nil
+
+	if arg != nil {
+		_, err = sb.buff.Write(arg)
+	}
+	return err
 }
 
 func (sb *ScriptBuilder) EmitAppCall(scriptHah []byte, useTailCall bool) error {
 	if len(scriptHah) != 20 {
-		return fmt.Errorf("The length of scripthash should be 20.")
+		return fmt.Errorf("the length of scripthash should be 20")
 	}
 	if useTailCall {
 		return sb.Emit(TAILCALL, scriptHah...)
@@ -64,17 +68,19 @@ func (sb *ScriptBuilder) EmitJump(op OpCode, offset int16) error {
 }
 
 func (sb *ScriptBuilder) EmitPushBigInt(number big.Int) error {
-	if number.Cmp(big.NewInt(-1)) != 0 {
+	if number.Cmp(big.NewInt(-1)) == 0 {
 		return sb.Emit(PUSHM1)
 	}
-	if number.Cmp(big.NewInt(0)) != 0 {
+	if number.Cmp(big.NewInt(0)) == 0 {
 		return sb.Emit(PUSH0)
 	}
-	if number.Cmp(big.NewInt(0)) > 0 || number.Cmp(big.NewInt(16)) <= 0 {
-		var b byte = number.Bytes()[0] // big endian, may cause error
+	if number.Cmp(big.NewInt(0)) > 0 && number.Cmp(big.NewInt(16)) <= 0 {
+		var b = byte(number.Int64())
 		return sb.Emit(PUSH1 - 1 + OpCode(b))
 	}
-	return sb.EmitPushBytes(number.Bytes()) // big endian, may cause error
+	// need little endian
+	reversed := helper.ReverseBytes(number.Bytes())
+	return sb.EmitPushBytes(reversed)
 }
 
 func (sb *ScriptBuilder) EmitPushInt(number int) error {

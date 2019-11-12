@@ -1,6 +1,6 @@
 package keys
 
-// Ktype represents key testcase values (different encodings of the key).
+// Ktype represents key test case values (different encodings of the key).
 type Ktype struct {
 	Address,
 	PrivateKey,
@@ -8,7 +8,7 @@ type Ktype struct {
 	Wif,
 	Passphrase,
 	Nep2key,
-	Scripthash string
+	ScriptHash string
 }
 
 // Arr contains a set of known keys in Ktype format.
@@ -20,7 +20,7 @@ var KeyCases = []Ktype{
 		Wif:        "L1caMUAsHr2dKwhqbMpYRcCzmzvZTfYZSCBefgARhz9iimAFRn1z",
 		Passphrase: "neo-gogogo",
 		Nep2key:    "6PYRGTFTzMq5BTcZphryV8KEtyhGJCK7fRZr6etdAKrb2gowRvSjsSA5XZ",
-		Scripthash: "62d6035f671f46b1ab5715eef3a903910bb81921",
+		ScriptHash: "62d6035f671f46b1ab5715eef3a903910bb81921",
 	},
 	{
 		Address:    "AHbwJGdhUy3d1BwhXQKc1VrNojjBTX6g87",
@@ -29,7 +29,7 @@ var KeyCases = []Ktype{
 		Wif:        "L1bfdDaFQErh7gGMz32zgBXZCN65AKeexKzxeEvS7d4Cq6zf2Rpf",
 		Passphrase: "",
 		Nep2key:    "6PYP4RrgZTU8zcb5RN2xzeV2ufddJRe2DKom3kW8AhxuLCtFYKAt3dGZ4G",
-		Scripthash: "80176d20bd72e6f8b16332fdfa75bd63cd230f14",
+		ScriptHash: "80176d20bd72e6f8b16332fdfa75bd63cd230f14",
 	},
 	{
 		Address:    "AKeMGQcrN4Su5mEK7T1NgCCyBtY16vD16Y",
@@ -38,6 +38,6 @@ var KeyCases = []Ktype{
 		Wif:        "KxtGC6QHFKSiHVLY1ANkwS78ebfhworv6LnkJH2MUxE8AbbgAHVW",
 		Passphrase: "密码@👍",
 		Nep2key:    "6PYUKxjoTp8CmbR4ZDLLdugviWzf7QuxikGir7mudeAcSo9dviT6x6MtPB",
-		Scripthash: "6ea9062064e43b49df964d13da0a413c113b742a",
+		ScriptHash: "6ea9062064e43b49df964d13da0a413c113b742a",
 	},
 }

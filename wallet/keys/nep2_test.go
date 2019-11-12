@@ -11,28 +11,28 @@ func TestNEP2Encrypt(t *testing.T) {
 	for _, testCase := range KeyCases {
 		b, _ := hex.DecodeString(testCase.PrivateKey)
 
-		privKey, err := NewKeyPair(b)
+		keyPair, err := NewKeyPair(b)
 		assert.Nil(t, err)
 
-		encryptedWif, err := NEP2Encrypt(privKey, testCase.Passphrase)
+		nep2Key, err := NEP2Encrypt(keyPair, testCase.Passphrase)
 		assert.Nil(t, err)
 
-		assert.Equal(t, testCase.Nep2key, encryptedWif)
+		assert.Equal(t, testCase.Nep2key, nep2Key)
 	}
 }
 
 func TestNEP2Decrypt(t *testing.T) {
 	for _, testCase := range KeyCases {
 
-		privKey, err := NEP2Decrypt(testCase.Nep2key, testCase.Passphrase)
+		keyPair, err := NEP2Decrypt(testCase.Nep2key, testCase.Passphrase)
 		assert.Nil(t, err)
 
-		assert.Equal(t, testCase.PrivateKey, privKey.String())
+		assert.Equal(t, testCase.PrivateKey, keyPair.String())
 
-		wif := privKey.ExportWIF()
+		wif := keyPair.ExportWIF()
 		assert.Equal(t, testCase.Wif, wif)
 
-		address := privKey.PublicKey.Address()
+		address := keyPair.PublicKey.Address()
 		assert.Equal(t, testCase.Address, address)
 	}
 }

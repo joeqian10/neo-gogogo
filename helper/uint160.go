@@ -9,10 +9,10 @@ import (
 
 const uint160Size = 20
 
-// UInt160 is a 20 byte long unsigned integer.
+// UInt160 is a 20 byte long unsigned integer. little endian
 type UInt160 [uint160Size]uint8
 
-// UInt160FromString attempts to decode the given string into an UInt160.
+// UInt160FromString attempts to decode the given big endian string into an UInt160.
 func UInt160FromString(s string) (UInt160, error) {
 	var u UInt160
 	if len(s) != uint160Size*2 {
@@ -22,7 +22,7 @@ func UInt160FromString(s string) (UInt160, error) {
 	if err != nil {
 		return u, err
 	}
-	return UInt160FromBytes(b)
+	return UInt160FromBytes(ReverseBytes(b))
 }
 
 // UInt160FromBytes attempts to decode the given bytes into an UInt160.
@@ -39,19 +39,9 @@ func (u UInt160) Bytes() []byte {
 	return u[:]
 }
 
-// BytesReversed returns a reversed byte representation of u.
-func (u UInt160) BytesReversed() []byte {
-	return ReverseBytes(u.Bytes())
-}
-
 // String implements the stringer interface.
 func (u UInt160) String() string {
-	return hex.EncodeToString(u.Bytes())
-}
-
-// StringReversed is the same as String, but returns a reversed representation.
-func (u UInt160) StringReversed() string {
-	return hex.EncodeToString(u.BytesReversed())
+	return hex.EncodeToString(ReverseBytes(u.Bytes()))
 }
 
 // Equals returns true if both UInt256 values are the same.
@@ -62,7 +52,7 @@ func (u UInt160) Equals(other UInt160) bool {
 // Less returns true if this value is less than given UInt160 value. It's
 // primarily intended to be used for sorting purposes.
 func (u UInt160) Less(other UInt160) bool {
-	for k := range u {
+	for k := len(u.Bytes()) - 1; k >= 0; k-- {
 		if u[k] == other[k] {
 			continue
 		}

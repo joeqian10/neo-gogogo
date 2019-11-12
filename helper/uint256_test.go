@@ -9,7 +9,7 @@ import (
 
 func TestUInt256UnmarshalJSON(t *testing.T) {
 	str := "f037308fa0ab18155bccfc08485468c112409ea5064595699e98c545f245f32d"
-	expected, err := UInt256FromReversedString(str)
+	expected, err := UInt256FromString(str)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,11 +36,11 @@ func TestUInt256UnmarshalJSON(t *testing.T) {
 
 func TestUInt256FromString(t *testing.T) {
 	hexStr := "f037308fa0ab18155bccfc08485468c112409ea5064595699e98c545f245f32d"
-	val, err := UInt256FromReversedString(hexStr)
+	val, err := UInt256FromString(hexStr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, hexStr, val.StringReversed())
+	assert.Equal(t, hexStr, val.String())
 }
 
 func TestUInt256FromBytes(t *testing.T) {
@@ -49,22 +49,22 @@ func TestUInt256FromBytes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	val, err := UInt256FromReversedBytes(b)
+	val, err := UInt256FromBytes(ReverseBytes(b))
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, hexStr, val.StringReversed())
+	assert.Equal(t, hexStr, val.String())
 }
 
 func TestUInt256Equals(t *testing.T) {
 	a := "f037308fa0ab18155bccfc08485468c112409ea5064595699e98c545f245f32d"
 	b := "e287c5b29a1b66092be6803c59c765308ac20287e1b4977fd399da5fc8f66ab5"
 
-	ua, err := UInt256FromReversedString(a)
+	ua, err := UInt256FromString(a)
 	if err != nil {
 		t.Fatal(err)
 	}
-	ub, err := UInt256FromReversedString(b)
+	ub, err := UInt256FromString(b)
 	if err != nil {
 		t.Fatal(err)
 	}

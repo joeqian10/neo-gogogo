@@ -22,14 +22,9 @@ type PublicKeys []*PublicKey
 func (keys PublicKeys) Len() int      { return len(keys) }
 func (keys PublicKeys) Swap(i, j int) { keys[i], keys[j] = keys[j], keys[i] }
 func (keys PublicKeys) Less(i, j int) bool {
-	if keys[i].X.Cmp(keys[j].X) == -1 {
-		return true
-	}
-	if keys[i].X.Cmp(keys[j].X) == 1 {
-		return false
-	}
-	if keys[i].X.Cmp(keys[j].X) == 0 {
-		return false
+	xLess := keys[i].X.Cmp(keys[j].X)
+	if xLess != 0 {
+		return xLess == -1
 	}
 
 	return keys[i].Y.Cmp(keys[j].Y) == -1
@@ -42,6 +37,15 @@ type PublicKey struct {
 	Y *big.Int
 }
 
+// NewPublicKey return a public key created from the given []byte.
+func NewPublicKey(data []byte) (*PublicKey, error) {
+	pubKey := new(PublicKey)
+	if err := pubKey.Deserialize(bytes.NewReader(data)); err != nil {
+		return nil, err
+	}
+	return pubKey, nil
+}
+
 // NewPublicKeyFromString return a public key created from the
 // given hex string.
 func NewPublicKeyFromString(s string) (*PublicKey, error) {
@@ -49,13 +53,14 @@ func NewPublicKeyFromString(s string) (*PublicKey, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewPublicKey(b)
+}
 
-	pubKey := new(PublicKey)
-	if err := pubKey.Deserialize(bytes.NewReader(b)); err != nil {
-		return nil, err
-	}
-
-	return pubKey, nil
+// Bytes returns the byte array representation of the public key.
+func (p *PublicKey) ecdsa() *ecdsa.PublicKey {
+	pubKey := ecdsa.PublicKey{X: p.X, Y: p.Y}
+	pubKey.Curve = elliptic.P256()
+	return &pubKey
 }
 
 // Bytes returns the byte array representation of the public key.
@@ -98,14 +103,6 @@ func decodeCompressedY(x *big.Int, ylsb uint) (*big.Int, error) {
 		y.Mod(y, cp.P)
 	}
 	return y, nil
-}
-
-// DecodeBytes decodes a PublicKey from the given slice of bytes.
-func (p *PublicKey) DecodeBytes(data []byte) error {
-	var datab []byte
-	copy(datab, data)
-	b := bytes.NewBuffer(datab)
-	return p.Deserialize(b)
 }
 
 // Deserialize a PublicKey from the given io.Reader.
@@ -152,10 +149,10 @@ func (p *PublicKey) Deserialize(r io.Reader) error {
 	c := elliptic.P256()
 	cp := c.Params()
 	if !c.IsOnCurve(x, y) {
-		return errors.New("enccoded point is not on the P256 curve")
+		return errors.New("encoded point is not on the P256 curve")
 	}
 	if x.Cmp(cp.P) >= 0 || y.Cmp(cp.P) >= 0 {
-		return errors.New("enccoded point is not correct (X or Y is bigger than P")
+		return errors.New("encoded point is not correct (X or Y is bigger than P")
 	}
 	p.X, p.Y = x, y
 
@@ -168,34 +165,18 @@ func (p *PublicKey) Serialize(w io.Writer) error {
 }
 
 // Signature returns a NEO-specific hash of the key.
-func (p *PublicKey) Signature() []byte {
+func (p *PublicKey) ScriptHash() helper.UInt160 {
 	b := CreateSignatureRedeemScript(p)
-	sig := crypto.Hash160(b)
-	return sig
+	hash := crypto.Hash160(b)
+	hash160, _ := helper.UInt160FromBytes(hash)
+	return hash160
 }
 
 // Address returns a base58-encoded NEO-specific address based on the key hash.
 func (p *PublicKey) Address() string {
-	var b = p.Signature()
-
+	var b = p.ScriptHash().Bytes()
 	b = append([]byte{0x17}, b...)
-
 	return crypto.Base58CheckEncode(b)
-}
-
-// Verify returns true if the signature is valid and corresponds
-// to the hash and public key
-func (p *PublicKey) Verify(signature []byte, hash []byte) bool {
-	publicKey := &ecdsa.PublicKey{}
-	publicKey.Curve = elliptic.P256()
-	publicKey.X = p.X
-	publicKey.Y = p.Y
-	if p.X == nil || p.Y == nil {
-		return false
-	}
-	rBytes := new(big.Int).SetBytes(signature[0:32])
-	sBytes := new(big.Int).SetBytes(signature[32:64])
-	return ecdsa.Verify(publicKey, hash, rBytes, sBytes)
 }
 
 // isInfinity checks if point P is infinity on EllipticCurve ec.
@@ -211,25 +192,37 @@ func (p *PublicKey) String() string {
 // create signature check script
 func CreateSignatureRedeemScript(p *PublicKey) []byte {
 	builder := sc.NewScriptBuilder()
-	builder.EmitPushBytes(p.EncodeCompression())
-	builder.Emit(sc.CHECKSIG)
+	_ = builder.EmitPushBytes(p.EncodeCompression())
+	_ = builder.Emit(sc.CHECKSIG)
 	return builder.ToArray()
 }
 
 // create multi-signature check script
 func CreateMultiSigRedeemScript(m int, ps ...*PublicKey) ([]byte, error) {
 	if !(m >= 1 && m < len(ps) && len(ps) <= 1024) {
-		return nil, fmt.Errorf("Argument exception %v,%v", m, len(ps))
+		return nil, fmt.Errorf("argument exception: %v,%v", m, len(ps))
 	}
 
 	builder := sc.NewScriptBuilder()
-	builder.EmitPushInt(m)
+	err := builder.EmitPushInt(m)
+	if err != nil {
+		return nil, err
+	}
 	pubKeys := PublicKeys(ps)
 	sort.Sort(pubKeys)
 	for _, p := range pubKeys {
-		builder.EmitPushBytes(p.EncodeCompression())
+		err = builder.EmitPushBytes(p.EncodeCompression())
+		if err != nil {
+			return nil, err
+		}
 	}
-	builder.EmitPushInt(pubKeys.Len())
-	builder.Emit(sc.CHECKMULTISIG)
+	err = builder.EmitPushInt(pubKeys.Len())
+	if err != nil {
+		return nil, err
+	}
+	err = builder.Emit(sc.CHECKMULTISIG)
+	if err != nil {
+		return nil, err
+	}
 	return builder.ToArray(), nil
 }
