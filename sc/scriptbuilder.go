@@ -97,7 +97,7 @@ func (sb *ScriptBuilder) EmitPushBool(data bool) error {
 
 func (sb *ScriptBuilder) EmitPushBytes(data []byte) error {
 	if data == nil {
-		return fmt.Errorf("Data is empty.")
+		return fmt.Errorf("data is empty")
 	}
 	le := len(data)
 	v := helper.VarIntFromInt(le)

@@ -19,16 +19,9 @@ import (
 // PublicKeys is a list of public keys.
 type PublicKeys []*PublicKey
 
-func (keys PublicKeys) Len() int      { return len(keys) }
-func (keys PublicKeys) Swap(i, j int) { keys[i], keys[j] = keys[j], keys[i] }
-func (keys PublicKeys) Less(i, j int) bool {
-	xLess := keys[i].X.Cmp(keys[j].X)
-	if xLess != 0 {
-		return xLess == -1
-	}
-
-	return keys[i].Y.Cmp(keys[j].Y) == -1
-}
+func (keys PublicKeys) Len() int           { return len(keys) }
+func (keys PublicKeys) Swap(i, j int)      { keys[i], keys[j] = keys[j], keys[i] }
+func (keys PublicKeys) Less(i, j int) bool { return keys[i].Compare(keys[j]) == -1 }
 
 // PublicKey represents a public key and provides a high level
 // API around the X/Y point.
@@ -185,6 +178,15 @@ func (p *PublicKey) isInfinity() bool {
 // String implements the Stringer interface.
 func (p *PublicKey) String() string {
 	return helper.BytesToHex(p.EncodeCompression())
+}
+
+// Compare q to q
+func (p *PublicKey) Compare(q *PublicKey) int {
+	xLess := p.X.Cmp(q.X)
+	if xLess != 0 {
+		return xLess
+	}
+	return p.Y.Cmp(p.Y)
 }
 
 // create signature check script
