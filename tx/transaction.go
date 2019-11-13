@@ -109,7 +109,8 @@ type ITransaction interface {
 }
 
 // add signature for ITransaction
-func AddSignature(transaction ITransaction, key keys.KeyPair) error {
+// TODO add attribute script hash if the KeyPair is not in input
+func AddSignature(transaction ITransaction, key *keys.KeyPair) error {
 	tx := transaction.GetTransaction()
 	for _, witness := range tx.Witnesses {
 		// the transaction has been signed with this KeyPair

@@ -58,7 +58,7 @@ func CreateWitnessWithScriptHash(scriptHash helper.UInt160, invocationScript []b
 }
 
 // create single signature witness
-func CreateSignatureWitness(msg []byte, pair keys.KeyPair) (witness *Witness, err error) {
+func CreateSignatureWitness(msg []byte, pair *keys.KeyPair) (witness *Witness, err error) {
 	// 	invocationScript: push signature
 	signature, err := pair.Sign(msg)
 	if err != nil {
@@ -76,8 +76,8 @@ func CreateSignatureWitness(msg []byte, pair keys.KeyPair) (witness *Witness, er
 // create multi-signature witness
 func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, publicKeys []*keys.PublicKey) (witness *Witness, err error) {
 	// TODO ensure the pairs match with publicKeys
-	if len(pairs) < least {
-		return witness, fmt.Errorf("the multi-signature contract needs at least %v signatures", least)
+	if len(pairs) == least {
+		return witness, fmt.Errorf("the multi-signature contract needs least %v signatures", least)
 	}
 	// invocationScript: push signature
 	sort.Slice(pairs, func(i, j int) bool {
