@@ -174,9 +174,7 @@ func (p *PublicKey) ScriptHash() helper.UInt160 {
 
 // Address returns a base58-encoded NEO-specific address based on the key hash.
 func (p *PublicKey) Address() string {
-	var b = p.ScriptHash().Bytes()
-	b = append([]byte{0x17}, b...)
-	return crypto.Base58CheckEncode(b)
+	return helper.ScriptHashToAddress(p.ScriptHash())
 }
 
 // isInfinity checks if point P is infinity on EllipticCurve ec.

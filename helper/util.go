@@ -27,23 +27,15 @@ func ConcatBytes(b1 []byte, b2 []byte) []byte {
 	return buffer.Bytes()
 }
 
-// ReverseBytes ...
-func ReverseBytes(b []byte) []byte {
+// ReverseBytes without change original slice
+func ReverseBytes(data []byte) []byte {
+	b := make([]byte, len(data))
+	copy(b, data)
 	for i := 0; i < len(b)/2; i++ {
 		j := len(b) - i - 1
 		b[i], b[j] = b[j], b[i]
 	}
 	return b
-}
-
-// Converts big endian human readable hex string format scripthash to little endian byte array
-func ScriptHashToBytes(scriptHash string) []byte {
-	return ReverseBytes(HexTobytes(scriptHash))
-}
-
-// Converts little endian byte array to big endian human readable hex string format scripthash
-func BytesToScriptHash(ba []byte) string {
-	return BytesToHex(ReverseBytes(ba))
 }
 
 func ScriptHashToAddress(scriptHash UInt160) string {
@@ -54,13 +46,12 @@ func ScriptHashToAddress(scriptHash UInt160) string {
 
 func AddressToScriptHash(address string) (UInt160, error) {
 	data, err := crypto.Base58CheckDecode(address)
+	var u UInt160
 	if err != nil {
-		u := UInt160{}
 		return u, err
 	}
 	if data == nil || len(data) != 21 || data[0] != 0x17 {
-		u := UInt160{}
-		return u, fmt.Errorf("Invalid address string.")
+		return u, fmt.Errorf("invalid address string")
 	}
 	return UInt160FromBytes(data[1:])
 }
