@@ -1,6 +1,7 @@
 package tx
 
 import (
+	"bytes"
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
@@ -103,22 +104,43 @@ func (t *Transaction) SerializeWitnesses(bw *io.BinWriter) {
 	}
 }
 
+// add Attribute if the script hash is not in transaction attributes
+// if you want to sign a transaction with a scriptHash which not in inputs, you need to add the scriptHash into transaction attributes
+func (t *Transaction) AddScriptHashToAttribute(scriptHash helper.UInt160) {
+	i := 0
+	for ; i < len(t.Attributes); i++ {
+		attr := t.Attributes[i]
+		if attr.Usage == Script && bytes.Equal(attr.Data, scriptHash.Bytes()) {
+			break
+		}
+	}
+	if i == len(t.Attributes) {
+		t.Attributes = append(t.Attributes, &TransactionAttribute{Usage: Script, Data: scriptHash.Bytes()})
+	}
+}
+
 type ITransaction interface {
 	GetTransaction() *Transaction
 	UnsignedRawTransaction() []byte
 }
 
 // add signature for ITransaction
-// TODO add attribute script hash if the KeyPair is not in input
 func AddSignature(transaction ITransaction, key *keys.KeyPair) error {
+	scriptHash := key.PublicKey.ScriptHash()
 	tx := transaction.GetTransaction()
 	for _, witness := range tx.Witnesses {
 		// the transaction has been signed with this KeyPair
-		if witness.scriptHash == key.PublicKey.ScriptHash() {
+		if witness.scriptHash == scriptHash {
 			return nil
 		}
 	}
 
+	// if the transaction is not signed before, just add script hash to transaction attributes
+	if len(tx.Witnesses) == 0 {
+		tx.AddScriptHashToAttribute(scriptHash)
+	}
+
+	// create witness
 	witness, err := CreateSignatureWitness(transaction.UnsignedRawTransaction(), key)
 	if err != nil {
 		return err
@@ -134,7 +156,15 @@ func AddSignature(transaction ITransaction, key *keys.KeyPair) error {
 func AddMultiSignature(transaction ITransaction, pairs []*keys.KeyPair, m int, publicKeys []*keys.PublicKey) error {
 	tx := transaction.GetTransaction()
 	script, err := keys.CreateMultiSigRedeemScript(m, publicKeys...)
+	if err != nil {
+		return err
+	}
+
 	scriptHash, err := helper.UInt160FromBytes(crypto.Hash160(script))
+	if err != nil {
+		return err
+	}
+
 	for _, witness := range tx.Witnesses {
 		// the transaction has been signed with this KeyPair
 		if witness.scriptHash == scriptHash {
@@ -142,6 +172,12 @@ func AddMultiSignature(transaction ITransaction, pairs []*keys.KeyPair, m int, p
 		}
 	}
 
+	// if the transaction is not signed before, just add script hash to transaction attributes
+	if len(tx.Witnesses) == 0 {
+		tx.AddScriptHashToAttribute(scriptHash)
+	}
+
+	// create witness
 	witness, err := CreateMultiSignatureWitness(transaction.UnsignedRawTransaction(), pairs, m, publicKeys)
 	if err != nil {
 		return err
