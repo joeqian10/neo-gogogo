@@ -60,7 +60,7 @@ func AddressToScriptHash(address string) (UInt160, error) {
 	}
 	if data == nil || len(data) != 21 || data[0] != 0x17 {
 		u := UInt160{}
-		return u, fmt.Errorf("Invalid address string.")
+		return u, fmt.Errorf("invalid address string")
 	}
 	return UInt160FromBytes(data[1:])
 }

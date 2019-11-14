@@ -5,6 +5,7 @@ import (
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"unsafe"
 )
 
 // InvocationTransaction inherits Transaction
@@ -22,6 +23,11 @@ func NewInvocationTransaction(script []byte) *InvocationTransaction {
 		}
 	itx.Type = Invocation_Transaction
 	return itx
+}
+
+func (itx *InvocationTransaction) Size() int {
+	size := unsafe.Sizeof(itx.Script) + unsafe.Sizeof(itx.Gas)
+	return itx.Transaction.Size() + int(size)
 }
 
 // HashString returns the transaction hash string
@@ -70,13 +76,13 @@ func (itx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransa
 // Deserialize implements Serializable interface.
 func (itx *InvocationTransaction) Deserialize(br *io.BinReader) {
 	itx.DeserializeUnsigned(br)
-	itx.Transaction.DeserializeWitnesses(br)
+	itx.DeserializeWitnesses(br)
 }
 
 func (itx *InvocationTransaction) DeserializeUnsigned(br *io.BinReader) {
-	itx.Transaction.DeserializeUnsigned1(br)
+	itx.DeserializeUnsigned1(br)
 	itx.DeserializeExclusiveData(br)
-	itx.Transaction.DeserializeUnsigned2(br)
+	itx.DeserializeUnsigned2(br)
 }
 
 func (itx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
@@ -95,7 +101,7 @@ func (itx *InvocationTransaction) Serialize(bw *io.BinWriter) {
 }
 
 func (itx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	itx.Transaction.SerializeUnsigned1(bw)
+	itx.SerializeUnsigned1(bw)
 	itx.SerializeExclusiveData(bw)
 	itx.SerializeUnsigned2(bw)
 }

@@ -86,7 +86,7 @@ func (ctx *ContractTransaction) Serialize(bw *io.BinWriter) {
 }
 
 func (ctx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	ctx.Transaction.SerializeUnsigned1(bw)
+	ctx.SerializeUnsigned1(bw)
 	ctx.SerializeExclusiveData(bw)
 	ctx.SerializeUnsigned2(bw)
 }

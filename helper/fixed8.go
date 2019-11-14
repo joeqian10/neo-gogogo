@@ -128,7 +128,7 @@ func (f Fixed8) Div(g Fixed8) Fixed8 {
 	return NewFixed8(f.Value / g.Value)
 }
 
-// GreaterThan implements Fixed8 < operator.
+// GreaterThan implements Fixed8 > operator.
 func (f Fixed8) GreaterThan(g Fixed8) bool {
 	return f.Value > g.Value
 }
@@ -152,20 +152,20 @@ func (f Fixed8) CompareTo(g Fixed8) int {
 }
 
 // Abs returns the absolute value of a Fixed8 type
-func Abs(input Fixed8) Fixed8 {
-	if input.Value >= 0 {
-		return input
+func (f Fixed8) Abs() Fixed8 {
+	if f.Value >= 0 {
+		return f
 	} else {
-		return NewFixed8(-input.Value)
+		return NewFixed8(-f.Value)
 	}
 }
 
 // Ceiling returns the ceiling value of a Fixed8 type
-func Ceiling(input Fixed8) Fixed8 {
-	var remainder int64 = input.Value % D
+func (f Fixed8) Ceiling() Fixed8 {
+	var remainder int64 = f.Value % D
 	if remainder > 0 {
-		return NewFixed8(input.Value - remainder + D)
+		return NewFixed8(f.Value - remainder + D)
 	} else {
-		return NewFixed8(input.Value - remainder)
+		return NewFixed8(f.Value - remainder)
 	}
 }

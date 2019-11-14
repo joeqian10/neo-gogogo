@@ -3,6 +3,7 @@ package tx
 import (
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"unsafe"
 )
 
 const (
@@ -30,6 +31,11 @@ func NewTransaction() *Transaction {
 		Outputs:    []*TransactionOutput{},
 		Witnesses:  []*Witness{},
 	}
+}
+
+func (t *Transaction) Size() int {
+	size := unsafe.Sizeof(t.Type) + unsafe.Sizeof(t.Version) + unsafe.Sizeof(t.Attributes) + unsafe.Sizeof(t.Inputs) + unsafe.Sizeof(t.Outputs) + unsafe.Sizeof(t.Witnesses)
+	return int(size)
 }
 
 func (t *Transaction) DeserializeUnsigned1(br *io.BinReader) {
