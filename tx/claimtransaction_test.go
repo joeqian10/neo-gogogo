@@ -13,7 +13,7 @@ func TestClaimTransaction(t *testing.T) {
 
 	// Deserialize
 	ctx := &ClaimTransaction{
-		Transaction:NewTransaction(),
+		Transaction: NewTransaction(),
 	}
 	ctx, err := ctx.FromHexString(rawTx)
 	assert.Nil(t, err)
@@ -25,7 +25,7 @@ func TestClaimTransaction(t *testing.T) {
 	assert.Equal(t, 1, len(ctx.Outputs))
 	address := helper.ScriptHashToAddress(ctx.Outputs[0].ScriptHash)
 	assert.Equal(t, "AQJseD8iBmCD4sgfHRhMahmoi9zvopG6yz", address)
-	assert.Equal(t, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7", ctx.Outputs[0].AssetId.StringReversed())
+	assert.Equal(t, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7", ctx.Outputs[0].AssetId.String())
 	assert.Equal(t, "0.06247739", ctx.Outputs[0].Value.String())
 	invoc := "40456349cec43053009accdb7781b0799c6b591c812768804ab0a0b56b5eae7a97694227fcd33e70899c075848b2cee8fae733faac6865b484d3f7df8949e2aadb"
 	verif := "2103945fae1ed3c31d778f149192b76734fcc951b400ba3598faa81ff92ebe477eacac"
