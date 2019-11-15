@@ -201,7 +201,62 @@ func GetGasConsumed(script []byte) (*helper.Fixed8, error) {
 	}
 }
 
-// TODO
-//func MakeClaimTransaction() *ClaimTransaction {
 //
-//}
+func MakeClaimTransaction(fromString string, changeAddressString string, attributes []*TransactionAttribute) (*ClaimTransaction, error) {
+	// use rpc to get claimable gas from the address
+	claims, total, err := GetClaimables(fromString)
+	if err != nil {
+		return nil, err
+	}
+	if claims == nil || len(claims) == 0 {
+		return nil, fmt.Errorf("no claim in this address")
+	}
+	from, err := helper.UInt160FromString(fromString)
+	if err != nil {
+		return nil, err
+	}
+	var changeAddress helper.UInt160
+	if len(changeAddressString)!=0 {
+		changeAddress, err = helper.UInt160FromString(changeAddressString)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		changeAddress = from
+	}
+	ctx := NewClaimTransaction(claims)
+	ctx.Claims = claims
+	if attributes != nil {ctx.Attributes = attributes}
+	var outputs []*TransactionOutput
+	gasToken, _ := helper.UInt256FromString(GasTokenId)
+	output := NewTransactionOutput(gasToken, *total, changeAddress)
+	outputs = append(outputs, output)
+	ctx.Outputs = outputs
+	return ctx, nil
+}
+
+func GetClaimables(addressString string) ([]*CoinReference, *helper.Fixed8, error) {
+	response := client.GetClaimable(addressString)
+	msg := response.ErrorResponse.Error.Message
+	if len(msg) != 0 {
+		return nil, nil, fmt.Errorf(msg)
+	}
+	var claims []*CoinReference
+	claimables := response.Result.Claimables
+	var MAX_CLAIMS_AMOUNT = 50 // take no more than 50 claimables
+	var total helper.Fixed8
+	l:= len(claimables)
+	for i := 0; i <= l-1 && i <= MAX_CLAIMS_AMOUNT-1; i++ {
+		h, err := helper.UInt256FromString(claimables[i].TxId)
+		if err != nil {
+			return nil, nil, err
+		}
+		claim := &CoinReference{
+			PrevHash:  h,
+			PrevIndex: uint16(claimables[i].N),
+		}
+		claims = append(claims, claim)
+		total = total.Add(helper.Fixed8FromFloat64(claimables[i].Unclaimed))
+	}
+	return claims, &total, nil
+}
