@@ -20,7 +20,7 @@ func TestUInt160UnmarshalJSON(t *testing.T) {
 	if err = u1.UnmarshalJSON([]byte(`"` + str + `"`)); err != nil {
 		t.Fatal(err)
 	}
-	assert.True(t, expected.Equals(u1))
+	assert.Equal(t, expected, u1)
 
 	s, err := expected.MarshalJSON()
 	if err != nil {
@@ -31,7 +31,7 @@ func TestUInt160UnmarshalJSON(t *testing.T) {
 	if err = u2.UnmarshalJSON(s); err != nil {
 		t.Fatal(err)
 	}
-	assert.True(t, expected.Equals(u1))
+	assert.Equal(t, expected, u2)
 }
 
 func TestUInt160FromString(t *testing.T) {

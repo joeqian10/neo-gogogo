@@ -13,7 +13,7 @@ func TestClaimTransaction(t *testing.T) {
 
 	// Deserialize
 	ctx := &ClaimTransaction{
-		Transaction:NewTransaction(),
+		Transaction: NewTransaction(),
 	}
 	ctx, err := ctx.FromHexString(rawTx)
 	assert.Nil(t, err)

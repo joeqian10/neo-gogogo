@@ -1,14 +1,18 @@
 package tx
 
 import (
+	"bytes"
+	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"unsafe"
+	"github.com/joeqian10/neo-gogogo/wallet/keys"
+	"sort"
 )
 
 const (
 	TransactionVersion uint8 = 1 // neo-2.x
-	MaxTransactionSize = 102400
+	MaxTransactionSize       = 102400
 )
 
 // base class
@@ -104,4 +108,89 @@ func (t *Transaction) SerializeWitnesses(bw *io.BinWriter) {
 	for _, s := range t.Witnesses {
 		s.Serialize(bw)
 	}
+}
+
+// add Attribute if the script hash is not in transaction attributes
+// if you want to sign a transaction with a scriptHash which not in inputs, you need to add the scriptHash into transaction attributes
+func (t *Transaction) AddScriptHashToAttribute(scriptHash helper.UInt160) {
+	i := 0
+	for ; i < len(t.Attributes); i++ {
+		attr := t.Attributes[i]
+		if attr.Usage == Script && bytes.Equal(attr.Data, scriptHash.Bytes()) {
+			break
+		}
+	}
+	if i == len(t.Attributes) {
+		t.Attributes = append(t.Attributes, &TransactionAttribute{Usage: Script, Data: scriptHash.Bytes()})
+	}
+}
+
+type ITransaction interface {
+	GetTransaction() *Transaction
+	UnsignedRawTransaction() []byte
+}
+
+// add signature for ITransaction
+func AddSignature(transaction ITransaction, key *keys.KeyPair) error {
+	scriptHash := key.PublicKey.ScriptHash()
+	tx := transaction.GetTransaction()
+	for _, witness := range tx.Witnesses {
+		// the transaction has been signed with this KeyPair
+		if witness.scriptHash == scriptHash {
+			return nil
+		}
+	}
+
+	// if the transaction is not signed before, just add script hash to transaction attributes
+	if len(tx.Witnesses) == 0 {
+		tx.AddScriptHashToAttribute(scriptHash)
+	}
+
+	// create witness
+	witness, err := CreateSignatureWitness(transaction.UnsignedRawTransaction(), key)
+	if err != nil {
+		return err
+	}
+	tx.Witnesses = append(tx.Witnesses, witness)
+	sort.Slice(tx.Witnesses, func(i, j int) bool {
+		return tx.Witnesses[i].scriptHash.Less(tx.Witnesses[j].scriptHash)
+	})
+	return nil
+}
+
+// add multi-signature for ITransaction
+func AddMultiSignature(transaction ITransaction, pairs []*keys.KeyPair, m int, publicKeys []*keys.PublicKey) error {
+	tx := transaction.GetTransaction()
+	script, err := keys.CreateMultiSigRedeemScript(m, publicKeys...)
+	if err != nil {
+		return err
+	}
+
+	scriptHash, err := helper.UInt160FromBytes(crypto.Hash160(script))
+	if err != nil {
+		return err
+	}
+
+	for _, witness := range tx.Witnesses {
+		// the transaction has been signed with this KeyPair
+		if witness.scriptHash == scriptHash {
+			return nil
+		}
+	}
+
+	// if the transaction is not signed before, just add script hash to transaction attributes
+	if len(tx.Witnesses) == 0 {
+		tx.AddScriptHashToAttribute(scriptHash)
+	}
+
+	// create witness
+	witness, err := CreateMultiSignatureWitness(transaction.UnsignedRawTransaction(), pairs, m, publicKeys)
+	if err != nil {
+		return err
+	}
+	tx.Witnesses = append(tx.Witnesses, witness)
+	sort.Slice(tx.Witnesses, func(i, j int) bool {
+		return tx.Witnesses[i].scriptHash.Less(tx.Witnesses[j].scriptHash)
+	})
+	return nil
 }
