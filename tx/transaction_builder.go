@@ -20,7 +20,7 @@ var client *rpc.RpcClient = rpc.NewClient(LocalEndPoint)
 
 func MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId helper.UInt256, amount helper.Fixed8,
 	attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*ContractTransaction, error) {
-	if len(changeAddress.Bytes()) == 0 {
+	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
 	assetIdString := assetId.String()
@@ -99,7 +99,7 @@ func GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount he
 	var a float64 = helper.Fixed8ToFloat64(amount)
 	var inputs []*CoinReference = []*CoinReference{}
 	var sum helper.Fixed8 = helper.Zero
-	for unspents[i].Value <= a && i < len(unspents) {
+	for i < len(unspents) && unspents[i].Value <= a {
 		a -= unspents[i].Value
 		inputs = append(inputs, ToCoinReference(unspents[i]))
 		sum = sum.Add(helper.Fixed8FromFloat64(unspents[i].Value))
@@ -109,7 +109,7 @@ func GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount he
 		return inputs, sum, nil
 	}
 	// use the nearest amount
-	for unspents[i].Value >= a && i < len(unspents) {i++}
+	for i < len(unspents) && unspents[i].Value >= a {i++}
 	inputs = append(inputs, ToCoinReference(unspents[i-1]))
 	sum = sum.Add(helper.Fixed8FromFloat64(unspents[i-1].Value))
 	return inputs, sum, nil
@@ -119,7 +119,7 @@ func GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount he
 // this is a general api for invoking smart contract and creating an invocation transaction, including transferring nep-5 assets
 func MakeInvocationTransaction(scriptHash []byte, operation string, args []sc.ContractParameter, from helper.UInt160,
 	attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
-	if len(changeAddress.Bytes())==0 {
+	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
 	// make script
@@ -182,7 +182,7 @@ func MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, att
 	if claims == nil || len(claims) == 0 {
 		return nil, fmt.Errorf("no claim in this address")
 	}
-	if len(changeAddress.Bytes())==0 {
+	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
 	ctx := NewClaimTransaction(claims)
