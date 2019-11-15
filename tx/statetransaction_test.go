@@ -22,7 +22,7 @@ func TestStateTransaction(t *testing.T) {
 
 	assert.Equal(t, 1, len(stx.Inputs))
 	input := stx.Inputs[0]
-	assert.Equal(t, "a192cbabc6d613ecfcce43fd09e9197556ca5cf7d4bd1f6c65726ea9f08441cb", input.PrevHash.StringReversed())
+	assert.Equal(t, "a192cbabc6d613ecfcce43fd09e9197556ca5cf7d4bd1f6c65726ea9f08441cb", input.PrevHash.String())
 	assert.Equal(t, uint16(0), input.PrevIndex)
 
 	assert.Equal(t, 1, len(stx.Descriptors))

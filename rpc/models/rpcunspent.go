@@ -1,10 +1,5 @@
 package models
 
-import (
-	"github.com/joeqian10/neo-gogogo/helper"
-	"github.com/joeqian10/neo-gogogo/tx"
-)
-
 type RpcUnspent struct {
 	Balance []UnspentBalance `json:"balance"`
 	Address string `json:"address"`
@@ -46,13 +41,5 @@ type Unspent struct {
 	Txid  string  `json:"txid"`
 	N     int     `json:"n"`
 	Value float64 `json:"value"`
-}
-
-func (u *Unspent) ToCoinReference() *tx.CoinReference {
-	h, _:= helper.UInt256FromString(u.Txid)
-	return &tx.CoinReference{
-		PrevHash:  h,
-		PrevIndex: uint16(u.N),
-	}
 }
 

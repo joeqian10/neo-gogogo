@@ -3,6 +3,7 @@ package tx
 import (
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"github.com/joeqian10/neo-gogogo/rpc/models"
 )
 
 // TransactionInput alias CoinReference, UTXO
@@ -21,4 +22,12 @@ func (in *CoinReference) Deserialize(br *io.BinReader) {
 func (in *CoinReference) Serialize(bw *io.BinWriter) {
 	bw.WriteLE(in.PrevHash)
 	bw.WriteLE(in.PrevIndex)
+}
+
+func ToCoinReference(u models.Unspent) *CoinReference {
+	h, _:= helper.UInt256FromString(u.Txid)
+	return &CoinReference{
+		PrevHash:  h,
+		PrevIndex: uint16(u.N),
+	}
 }
