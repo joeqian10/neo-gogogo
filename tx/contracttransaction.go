@@ -94,10 +94,10 @@ func (tx *ContractTransaction) Serialize(bw *io.BinWriter) {
 	tx.SerializeWitnesses(bw)
 }
 
-func (ctx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	ctx.SerializeUnsigned1(bw)
-	ctx.SerializeExclusiveData(bw)
-	ctx.SerializeUnsigned2(bw)
+func (tx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.SerializeUnsigned1(bw)
+	tx.SerializeExclusiveData(bw)
+	tx.SerializeUnsigned2(bw)
 }
 
 func (tx *ContractTransaction) SerializeExclusiveData(bw *io.BinWriter) {
