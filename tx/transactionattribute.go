@@ -5,11 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"unsafe"
 )
 
 type TransactionAttribute struct {
 	Usage TransactionAttributeUsage
 	Data  []byte
+}
+
+func (attr *TransactionAttribute) Size() int {
+	size := unsafe.Sizeof(attr.Usage) + unsafe.Sizeof(attr.Data)
+	return int(size)
 }
 
 // Deserialize implements Serializable interface.

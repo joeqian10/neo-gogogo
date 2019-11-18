@@ -24,6 +24,10 @@ func NewInvocationTransaction(script []byte) *InvocationTransaction {
 	return itx
 }
 
+func (tx *InvocationTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
 // implement ITransaction interface
 func (tx *InvocationTransaction) GetTransaction() *Transaction {
 	return tx.Transaction
@@ -75,13 +79,13 @@ func (tx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransac
 // Deserialize implements Serializable interface.
 func (tx *InvocationTransaction) Deserialize(br *io.BinReader) {
 	tx.DeserializeUnsigned(br)
-	tx.Transaction.DeserializeWitnesses(br)
+	tx.DeserializeWitnesses(br)
 }
 
 func (tx *InvocationTransaction) DeserializeUnsigned(br *io.BinReader) {
-	tx.Transaction.DeserializeUnsigned1(br)
+	tx.DeserializeUnsigned1(br)
 	tx.DeserializeExclusiveData(br)
-	tx.Transaction.DeserializeUnsigned2(br)
+	tx.DeserializeUnsigned2(br)
 }
 
 func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
@@ -99,8 +103,8 @@ func (tx *InvocationTransaction) Serialize(bw *io.BinWriter) {
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter) {
-	tx.Transaction.SerializeUnsigned1(bw)
+func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }

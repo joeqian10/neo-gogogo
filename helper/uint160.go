@@ -34,12 +34,12 @@ func UInt160FromBytes(b []byte) (u UInt160, err error) {
 	return
 }
 
-// Bytes returns the byte slice representation of u.
+// Bytes returns the little endian byte slice representation of u.
 func (u UInt160) Bytes() []byte {
 	return u[:]
 }
 
-// String implements the stringer interface.
+// String implements the stringer interface. Return big endian hex string.
 func (u UInt160) String() string {
 	return hex.EncodeToString(ReverseBytes(u.Bytes()))
 }

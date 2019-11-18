@@ -10,7 +10,6 @@ import (
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
-	"github.com/pkg/errors"
 	"io"
 	"math/big"
 	"sort"
@@ -89,7 +88,7 @@ func decodeCompressedY(x *big.Int, ylsb uint) (*big.Int, error) {
 	ySquared.Mod(ySquared, cp.P)
 	y := new(big.Int).ModSqrt(ySquared, cp.P)
 	if y == nil {
-		return nil, errors.New("error computing Y for compressed point")
+		return nil, fmt.Errorf("error computing Y for compressed point")
 	}
 	if y.Bit(0) != ylsb {
 		y.Neg(y)
@@ -137,15 +136,15 @@ func (p *PublicKey) Deserialize(r io.Reader) error {
 		x = new(big.Int).SetBytes(xbytes)
 		y = new(big.Int).SetBytes(ybytes)
 	default:
-		return errors.Errorf("invalid prefix %d", prefix)
+		return fmt.Errorf("invalid prefix %d", prefix)
 	}
 	c := elliptic.P256()
 	cp := c.Params()
 	if !c.IsOnCurve(x, y) {
-		return errors.New("encoded point is not on the P256 curve")
+		return fmt.Errorf("encoded point is not on the P256 curve")
 	}
 	if x.Cmp(cp.P) >= 0 || y.Cmp(cp.P) >= 0 {
-		return errors.New("encoded point is not correct (X or Y is bigger than P")
+		return fmt.Errorf("encoded point is not correct (X or Y is bigger than P")
 	}
 	p.X, p.Y = x, y
 

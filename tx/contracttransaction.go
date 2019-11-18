@@ -21,6 +21,10 @@ func NewContractTransaction() *ContractTransaction {
 	return ctx
 }
 
+func (tx *ContractTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
 // implement ITransaction interface
 func (tx *ContractTransaction) GetTransaction() *Transaction {
 	return tx.Transaction
@@ -90,8 +94,8 @@ func (tx *ContractTransaction) Serialize(bw *io.BinWriter) {
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter) {
-	tx.Transaction.SerializeUnsigned1(bw)
+func (tx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
