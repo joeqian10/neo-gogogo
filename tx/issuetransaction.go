@@ -12,85 +12,85 @@ type IssueTransaction struct {
 	*Transaction
 }
 
-// NewInvocationTransaction creates an IssueTransaction
+// NewIssueTransaction creates an IssueTransaction
 func NewIssueTransaction(script []byte) *IssueTransaction {
-	itx := &IssueTransaction{
+	tx := &IssueTransaction{
 		Transaction:NewTransaction(),
 	}
-	itx.Type = Issue_Transaction
-	return itx
+	tx.Type = Issue_Transaction
+	return tx
 }
 
 // HashString returns the transaction Id string
-func (itx *IssueTransaction) HashString() string {
-	hash := crypto.Hash256(itx.UnsignedRawTransaction())
-	itx.Hash, _ = helper.UInt256FromBytes(hash)
+func (tx *IssueTransaction) HashString() string {
+	hash := crypto.Hash256(tx.UnsignedRawTransaction())
+	tx.Hash, _ = helper.UInt256FromBytes(hash)
 	return hex.EncodeToString(helper.ReverseBytes(hash)) // reverse to big endian
 }
 
-func (itx *IssueTransaction) UnsignedRawTransaction() []byte {
+func (tx *IssueTransaction) UnsignedRawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	itx.SerializeUnsigned(buf.BinWriter)
+	tx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (itx *IssueTransaction) RawTransaction() []byte {
+func (tx *IssueTransaction) RawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	itx.Serialize(buf.BinWriter)
+	tx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (itx *IssueTransaction) RawTransactionString() string {
-	return hex.EncodeToString(itx.RawTransaction())
+func (tx *IssueTransaction) RawTransactionString() string {
+	return hex.EncodeToString(tx.RawTransaction())
 }
 
 // FromHexString parses a hex string to get an IssueTransaction
-func (itx *IssueTransaction) FromHexString(rawTx string) (*IssueTransaction, error) {
+func (tx *IssueTransaction) FromHexString(rawTx string) (*IssueTransaction, error) {
 	b, err := hex.DecodeString(rawTx)
 	if err != nil {
 		return nil, err
 	}
 	br := io.NewBinReaderFromBuf(b)
-	itx.Deserialize(br)
+	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
 	}
-	return itx, nil
+	return tx, nil
 }
 
 // Deserialize implements Serializable interface.
-func (itx *IssueTransaction) Deserialize(br *io.BinReader) {
-	itx.DeserializeUnsigned(br)
-	itx.Transaction.DeserializeWitnesses(br)
+func (tx *IssueTransaction) Deserialize(br *io.BinReader) {
+	tx.DeserializeUnsigned(br)
+	tx.Transaction.DeserializeWitnesses(br)
 }
 
-func (itx *IssueTransaction) DeserializeUnsigned(br *io.BinReader) {
-	itx.Transaction.DeserializeUnsigned1(br)
-	itx.DeserializeExclusiveData(br)
-	itx.Transaction.DeserializeUnsigned2(br)
+func (tx *IssueTransaction) DeserializeUnsigned(br *io.BinReader) {
+	tx.Transaction.DeserializeUnsigned1(br)
+	tx.DeserializeExclusiveData(br)
+	tx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (itx *IssueTransaction) DeserializeExclusiveData(br *io.BinReader) {
+func (tx *IssueTransaction) DeserializeExclusiveData(br *io.BinReader) {
 }
 
 // Serialize implements Serializable interface.
-func (itx *IssueTransaction) Serialize(bw *io.BinWriter) {
-	itx.SerializeUnsigned(bw)
-	itx.SerializeWitnesses(bw)
+func (tx *IssueTransaction) Serialize(bw *io.BinWriter) {
+	tx.SerializeUnsigned(bw)
+	tx.SerializeWitnesses(bw)
 }
 
-func (itx *IssueTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	itx.Transaction.SerializeUnsigned1(bw)
-	itx.SerializeExclusiveData(bw)
-	itx.SerializeUnsigned2(bw)
+func (tx *IssueTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.Transaction.SerializeUnsigned1(bw)
+	tx.SerializeExclusiveData(bw)
+	tx.SerializeUnsigned2(bw)
 }
 
-func (itx *IssueTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
+func (tx *IssueTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
 }
 

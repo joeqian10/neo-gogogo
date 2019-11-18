@@ -10,7 +10,6 @@ import (
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
-	"github.com/pkg/errors"
 	"io"
 	"math/big"
 	"sort"
@@ -19,16 +18,9 @@ import (
 // PublicKeys is a list of public keys.
 type PublicKeys []*PublicKey
 
-func (keys PublicKeys) Len() int      { return len(keys) }
-func (keys PublicKeys) Swap(i, j int) { keys[i], keys[j] = keys[j], keys[i] }
-func (keys PublicKeys) Less(i, j int) bool {
-	xLess := keys[i].X.Cmp(keys[j].X)
-	if xLess != 0 {
-		return xLess == -1
-	}
-
-	return keys[i].Y.Cmp(keys[j].Y) == -1
-}
+func (keys PublicKeys) Len() int           { return len(keys) }
+func (keys PublicKeys) Swap(i, j int)      { keys[i], keys[j] = keys[j], keys[i] }
+func (keys PublicKeys) Less(i, j int) bool { return keys[i].Compare(keys[j]) == -1 }
 
 // PublicKey represents a public key and provides a high level
 // API around the X/Y point.
@@ -96,7 +88,7 @@ func decodeCompressedY(x *big.Int, ylsb uint) (*big.Int, error) {
 	ySquared.Mod(ySquared, cp.P)
 	y := new(big.Int).ModSqrt(ySquared, cp.P)
 	if y == nil {
-		return nil, errors.New("error computing Y for compressed point")
+		return nil, fmt.Errorf("error computing Y for compressed point")
 	}
 	if y.Bit(0) != ylsb {
 		y.Neg(y)
@@ -144,15 +136,15 @@ func (p *PublicKey) Deserialize(r io.Reader) error {
 		x = new(big.Int).SetBytes(xbytes)
 		y = new(big.Int).SetBytes(ybytes)
 	default:
-		return errors.Errorf("invalid prefix %d", prefix)
+		return fmt.Errorf("invalid prefix %d", prefix)
 	}
 	c := elliptic.P256()
 	cp := c.Params()
 	if !c.IsOnCurve(x, y) {
-		return errors.New("encoded point is not on the P256 curve")
+		return fmt.Errorf("encoded point is not on the P256 curve")
 	}
 	if x.Cmp(cp.P) >= 0 || y.Cmp(cp.P) >= 0 {
-		return errors.New("encoded point is not correct (X or Y is bigger than P")
+		return fmt.Errorf("encoded point is not correct (X or Y is bigger than P")
 	}
 	p.X, p.Y = x, y
 
@@ -174,9 +166,7 @@ func (p *PublicKey) ScriptHash() helper.UInt160 {
 
 // Address returns a base58-encoded NEO-specific address based on the key hash.
 func (p *PublicKey) Address() string {
-	var b = p.ScriptHash().Bytes()
-	b = append([]byte{0x17}, b...)
-	return crypto.Base58CheckEncode(b)
+	return helper.ScriptHashToAddress(p.ScriptHash())
 }
 
 // isInfinity checks if point P is infinity on EllipticCurve ec.
@@ -187,6 +177,15 @@ func (p *PublicKey) isInfinity() bool {
 // String implements the Stringer interface.
 func (p *PublicKey) String() string {
 	return helper.BytesToHex(p.EncodeCompression())
+}
+
+// Compare q to q
+func (p *PublicKey) Compare(q *PublicKey) int {
+	xLess := p.X.Cmp(q.X)
+	if xLess != 0 {
+		return xLess
+	}
+	return p.Y.Cmp(p.Y)
 }
 
 // create signature check script

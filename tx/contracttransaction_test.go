@@ -22,12 +22,15 @@ func TestContractTransaction(t *testing.T) {
 
 	input := ctx.Inputs[0]
 
-	assert.Equal(t, "eec17cc828d6ede932b57e4eaf79c2591151096a7825435cd67f498f9fa98d88", input.PrevHash.StringReversed())
+	assert.Equal(t, "eec17cc828d6ede932b57e4eaf79c2591151096a7825435cd67f498f9fa98d88", input.PrevHash.String())
 	assert.Equal(t, 0, int(input.PrevIndex))
 	assert.Equal(t, int64(70600000000), ctx.Outputs[0].Value.Value)
-	assert.Equal(t, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", ctx.Outputs[0].AssetId.StringReversed())
-	assert.Equal(t, "a8666b4830229d6a1a9b80f6088059191c122d2b", ctx.Outputs[0].ScriptHash.String())
+	assert.Equal(t, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", ctx.Outputs[0].AssetId.String())
+	assert.Equal(t, "2b2d121c19598008f6809b1a6a9d2230486b66a8", ctx.Outputs[0].ScriptHash.String())
 	assert.Equal(t, "bdf6cc3b9af12a7565bda80933a75ee8cef1bc771d0d58effc08e4c8b436da79", ctx.HashString())
+
+	// test Size()
+	assert.Equal(t, len(rawTx)/2, ctx.Size())
 
 	// Serialize
 	buf := io.NewBufBinWriter()

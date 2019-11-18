@@ -17,93 +17,101 @@ type InvocationTransaction struct {
 // NewInvocationTransaction creates an InvocationTransaction
 func NewInvocationTransaction(script []byte) *InvocationTransaction {
 	itx := &InvocationTransaction{
-		Transaction:NewTransaction(),
-		Script:script,
-		}
+		Transaction: NewTransaction(),
+		Script:      script,
+	}
 	itx.Type = Invocation_Transaction
 	return itx
 }
 
+func (tx *InvocationTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
+// implement ITransaction interface
+func (tx *InvocationTransaction) GetTransaction() *Transaction {
+	return tx.Transaction
+}
+
 // HashString returns the transaction hash string
-func (itx *InvocationTransaction) HashString() string {
-	hash := crypto.Hash256(itx.UnsignedRawTransaction()) // twice sha-256
-	itx.Hash, _ = helper.UInt256FromBytes(hash)
+func (tx *InvocationTransaction) HashString() string {
+	hash := crypto.Hash256(tx.UnsignedRawTransaction()) // twice sha-256
+	tx.Hash, _ = helper.UInt256FromBytes(hash)
 	return hex.EncodeToString(helper.ReverseBytes(hash)) // reverse to big endian
 }
 
-func (itx *InvocationTransaction) UnsignedRawTransaction() []byte {
+func (tx *InvocationTransaction) UnsignedRawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	itx.SerializeUnsigned(buf.BinWriter)
+	tx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (itx *InvocationTransaction) RawTransaction() []byte {
+func (tx *InvocationTransaction) RawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	itx.Serialize(buf.BinWriter)
+	tx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (itx *InvocationTransaction) RawTransactionString() string {
-	return hex.EncodeToString(itx.RawTransaction())
+func (tx *InvocationTransaction) RawTransactionString() string {
+	return hex.EncodeToString(tx.RawTransaction())
 }
 
 // FromHexString parses a hex string to get an InvocationTransaction
-func (itx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransaction, error) {
+func (tx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransaction, error) {
 	b, err := hex.DecodeString(rawTx)
 	if err != nil {
 		return nil, err
 	}
 	br := io.NewBinReaderFromBuf(b)
-	itx.Deserialize(br)
+	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
 	}
-	return itx, nil
+	return tx, nil
 }
 
 // Deserialize implements Serializable interface.
-func (itx *InvocationTransaction) Deserialize(br *io.BinReader) {
-	itx.DeserializeUnsigned(br)
-	itx.Transaction.DeserializeWitnesses(br)
+func (tx *InvocationTransaction) Deserialize(br *io.BinReader) {
+	tx.DeserializeUnsigned(br)
+	tx.DeserializeWitnesses(br)
 }
 
-func (itx *InvocationTransaction) DeserializeUnsigned(br *io.BinReader) {
-	itx.Transaction.DeserializeUnsigned1(br)
-	itx.DeserializeExclusiveData(br)
-	itx.Transaction.DeserializeUnsigned2(br)
+func (tx *InvocationTransaction) DeserializeUnsigned(br *io.BinReader) {
+	tx.DeserializeUnsigned1(br)
+	tx.DeserializeExclusiveData(br)
+	tx.DeserializeUnsigned2(br)
 }
 
-func (itx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
-	itx.Script = br.ReadBytes()
-	if itx.Version >= 1 {
-		br.ReadLE(&itx.Gas)
+func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
+	tx.Script = br.ReadBytes()
+	if tx.Version >= 1 {
+		br.ReadLE(&tx.Gas)
 	} else {
-		itx.Gas = helper.Fixed8FromInt64(0)
+		tx.Gas = helper.Fixed8FromInt64(0)
 	}
 }
 
 // Serialize implements Serializable interface.
-func (itx *InvocationTransaction) Serialize(bw *io.BinWriter) {
-	itx.SerializeUnsigned(bw)
-	itx.SerializeWitnesses(bw)
+func (tx *InvocationTransaction) Serialize(bw *io.BinWriter) {
+	tx.SerializeUnsigned(bw)
+	tx.SerializeWitnesses(bw)
 }
 
-func (itx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	itx.Transaction.SerializeUnsigned1(bw)
-	itx.SerializeExclusiveData(bw)
-	itx.SerializeUnsigned2(bw)
+func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.SerializeUnsigned1(bw)
+	tx.SerializeExclusiveData(bw)
+	tx.SerializeUnsigned2(bw)
 }
 
-func (itx *InvocationTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
-	bw.WriteBytes(itx.Script)
-	if itx.Version >= 1 {
-		bw.WriteLE(itx.Gas)
+func (tx *InvocationTransaction) SerializeExclusiveData(bw *io.BinWriter) {
+	bw.WriteBytes(tx.Script)
+	if tx.Version >= 1 {
+		bw.WriteLE(tx.Gas)
 	}
 }
-

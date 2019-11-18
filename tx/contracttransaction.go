@@ -15,82 +15,90 @@ type ContractTransaction struct {
 // CreateContractTransaction creates a contract transaction
 func NewContractTransaction() *ContractTransaction {
 	ctx := &ContractTransaction{
-		Transaction:NewTransaction(),
+		Transaction: NewTransaction(),
 	}
 	ctx.Type = Contract_Transaction
 	return ctx
 }
 
+func (tx *ContractTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
+// implement ITransaction interface
+func (tx *ContractTransaction) GetTransaction() *Transaction {
+	return tx.Transaction
+}
+
 // HashString returns the transaction Id string
-func (ctx *ContractTransaction) HashString() string {
-	hash := crypto.Hash256(ctx.UnsignedRawTransaction())
-	ctx.Hash, _ = helper.UInt256FromBytes(hash)
+func (tx *ContractTransaction) HashString() string {
+	hash := crypto.Hash256(tx.UnsignedRawTransaction())
+	tx.Hash, _ = helper.UInt256FromBytes(hash)
 	return hex.EncodeToString(helper.ReverseBytes(hash)) // reverse to big endian
 }
 
-func (ctx *ContractTransaction) UnsignedRawTransaction() []byte {
+func (tx *ContractTransaction) UnsignedRawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	ctx.SerializeUnsigned(buf.BinWriter)
+	tx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (ctx *ContractTransaction) RawTransaction() []byte {
+func (tx *ContractTransaction) RawTransaction() []byte {
 	buf := io.NewBufBinWriter()
-	ctx.Serialize(buf.BinWriter)
+	tx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
 	return buf.Bytes()
 }
 
-func (ctx *ContractTransaction) RawTransactionString() string {
-	return hex.EncodeToString(ctx.RawTransaction())
+func (tx *ContractTransaction) RawTransactionString() string {
+	return hex.EncodeToString(tx.RawTransaction())
 }
 
 // FromHexString parses a hex string
-func (ctx *ContractTransaction) FromHexString(rawTx string) (*ContractTransaction, error) {
+func (tx *ContractTransaction) FromHexString(rawTx string) (*ContractTransaction, error) {
 	b, err := hex.DecodeString(rawTx)
 	if err != nil {
 		return nil, err
 	}
 	br := io.NewBinReaderFromBuf(b)
-	ctx.Deserialize(br)
+	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
 	}
-	return ctx, nil
+	return tx, nil
 }
 
 // Deserialize implements Serializable interface.
-func (ctx *ContractTransaction) Deserialize(br *io.BinReader) {
-	ctx.DeserializeUnsigned(br)
-	ctx.Transaction.DeserializeWitnesses(br)
+func (tx *ContractTransaction) Deserialize(br *io.BinReader) {
+	tx.DeserializeUnsigned(br)
+	tx.Transaction.DeserializeWitnesses(br)
 }
 
-func (ctx *ContractTransaction) DeserializeUnsigned(br *io.BinReader) {
-	ctx.Transaction.DeserializeUnsigned1(br)
-	ctx.DeserializeExclusiveData(br)
-	ctx.Transaction.DeserializeUnsigned2(br)
+func (tx *ContractTransaction) DeserializeUnsigned(br *io.BinReader) {
+	tx.Transaction.DeserializeUnsigned1(br)
+	tx.DeserializeExclusiveData(br)
+	tx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (ctx *ContractTransaction) DeserializeExclusiveData(br *io.BinReader) {
+func (tx *ContractTransaction) DeserializeExclusiveData(br *io.BinReader) {
 }
 
 // Serialize implements Serializable interface.
-func (ctx *ContractTransaction) Serialize(bw *io.BinWriter) {
-	ctx.SerializeUnsigned(bw)
-	ctx.SerializeWitnesses(bw)
+func (tx *ContractTransaction) Serialize(bw *io.BinWriter) {
+	tx.SerializeUnsigned(bw)
+	tx.SerializeWitnesses(bw)
 }
 
-func (ctx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
-	ctx.Transaction.SerializeUnsigned1(bw)
-	ctx.SerializeExclusiveData(bw)
-	ctx.SerializeUnsigned2(bw)
+func (tx *ContractTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+	tx.SerializeUnsigned1(bw)
+	tx.SerializeExclusiveData(bw)
+	tx.SerializeUnsigned2(bw)
 }
 
-func (ctx *ContractTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
+func (tx *ContractTransaction) SerializeExclusiveData(bw *io.BinWriter) {
 }
-

@@ -12,7 +12,6 @@ const uint256Size = 32
 // UInt256 is a 32 byte long unsigned integer.
 type UInt256 [uint256Size]uint8
 
-
 // UInt256FromString attempts to decode the given string (in BE representation) into an UInt256.
 func UInt256FromString(s string) (u UInt256, err error) {
 	if len(s) != uint256Size*2 {
