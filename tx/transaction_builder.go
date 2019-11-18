@@ -14,11 +14,24 @@ const GasTokenId = "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee796928
 
 var NeoToken, _ = helper.UInt256FromString(NeoTokenId)
 var GasToken, _ = helper.UInt256FromString(GasTokenId)
-var LocalEndPoint = "http://localhost:50003" // change to yours when using this SDK
-var TestNetEndPoint = "http://seed1.ngd.network:20332"
-var client *rpc.RpcClient = rpc.NewClient(LocalEndPoint)
 
-func MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId helper.UInt256, amount helper.Fixed8,
+type TransactionBuilder struct {
+	EndPoint string
+	Client *rpc.RpcClient
+}
+
+func NewTransactionBuilder(endPoint string) *TransactionBuilder {
+	client := rpc.NewClient(endPoint)
+	if client == nil {
+		return nil
+	}
+	return &TransactionBuilder{
+		EndPoint: endPoint,
+		Client:   client,
+	}
+}
+
+func (tb *TransactionBuilder)MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId helper.UInt256, amount helper.Fixed8,
 	attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*ContractTransaction, error) {
 	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
@@ -40,18 +53,18 @@ func MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId hel
 		// has network fee
 		if assetIdString == GasTokenId { // all are gas
 			amount = amount.Add(fee)
-			inputs, totalPayGas, err = GetTransactionInputs(from, GasToken, amount)
+			inputs, totalPayGas, err = tb.GetTransactionInputs(from, GasToken, amount)
 			if err != nil {return nil, err}
 			if totalPayGas.GreaterThan(amount) {
 				outputs = append(outputs, NewTransactionOutput(assetId, totalPayGas.Sub(amount), changeAddress))
 			}
 		} else { // more than gas
-			inputs, totalPay, err = GetTransactionInputs(from, assetId, amount)
+			inputs, totalPay, err = tb.GetTransactionInputs(from, assetId, amount)
 			if err != nil {return nil, err}
 			if totalPay.GreaterThan(amount) {
 				outputs = append(outputs, NewTransactionOutput(assetId, totalPay.Sub(amount), changeAddress))
 			}
-			gasInputs, totalPayGas, err = GetTransactionInputs(from, GasToken, fee)
+			gasInputs, totalPayGas, err = tb.GetTransactionInputs(from, GasToken, fee)
 			if err != nil {return nil, err}
 			for _, gasInput := range gasInputs {inputs = append(inputs, gasInput)}
 			if totalPayGas.GreaterThan(fee) {
@@ -60,7 +73,7 @@ func MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId hel
 		}
 	} else {
 		// no network fee
-		inputs, totalPay, err = GetTransactionInputs(from, assetId, amount)
+		inputs, totalPay, err = tb.GetTransactionInputs(from, assetId, amount)
 		if err != nil {return nil, err}
 		if totalPay.GreaterThan(amount) {
 			outputs = append(outputs, NewTransactionOutput(assetId, totalPay.Sub(amount), changeAddress))
@@ -72,8 +85,8 @@ func MakeContractTransaction(from helper.UInt160, to helper.UInt160, assetId hel
 }
 
 // get transaction inputs according to the amount, and return UTXOs and their total amount
-func GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount helper.Fixed8) ([]*CoinReference, helper.Fixed8, error) {
-	response := client.GetUnspents(helper.ScriptHashToAddress(from))
+func (tb *TransactionBuilder)GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount helper.Fixed8) ([]*CoinReference, helper.Fixed8, error) {
+	response := tb.Client.GetUnspents(helper.ScriptHashToAddress(from))
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
 		return nil, helper.Zero, fmt.Errorf(msg)
@@ -117,17 +130,17 @@ func GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount he
 
 
 // this is a general api for invoking smart contract and creating an invocation transaction, including transferring nep-5 assets
-func MakeInvocationTransaction(scriptHash []byte, operation string, args []sc.ContractParameter, from helper.UInt160,
+func (tb *TransactionBuilder)MakeInvocationTransaction(scriptHash helper.UInt160, operation string, args []sc.ContractParameter, from helper.UInt160,
 	attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
 	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
 	// make script
 	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash, operation, args)
+	sb.MakeInvocationScript(scriptHash.Bytes(), operation, args)
 	script := sb.ToArray()
 	// use rpc to get gas consumed
-	gas, err := GetGasConsumed(script)
+	gas, err := tb.GetGasConsumed(script)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +152,7 @@ func MakeInvocationTransaction(scriptHash []byte, operation string, args []sc.Co
 		fee = fee.Add(helper.Fixed8FromFloat64( float64(itx.Size()) * 0.00001))
 	}
 	// get transaction inputs
-	inputs, totalPayGas, err := GetTransactionInputs(from, GasToken, fee)
+	inputs, totalPayGas, err := tb.GetTransactionInputs(from, GasToken, fee)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +163,8 @@ func MakeInvocationTransaction(scriptHash []byte, operation string, args []sc.Co
 	return itx, nil
 }
 
-func GetGasConsumed(script []byte) (*helper.Fixed8, error) {
-	response := client.InvokeScript(helper.BytesToHex(script))
+func (tb *TransactionBuilder)GetGasConsumed(script []byte) (*helper.Fixed8, error) {
+	response := tb.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
 		return nil, fmt.Errorf(msg)
@@ -173,9 +186,9 @@ func GetGasConsumed(script []byte) (*helper.Fixed8, error) {
 }
 
 //
-func MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, attributes []*TransactionAttribute) (*ClaimTransaction, error) {
+func (tb *TransactionBuilder)MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, attributes []*TransactionAttribute) (*ClaimTransaction, error) {
 	// use rpc to get claimable gas from the address
-	claims, total, err := GetClaimables(from)
+	claims, total, err := tb.GetClaimables(from)
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +209,8 @@ func MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, att
 	return ctx, nil
 }
 
-func GetClaimables(from helper.UInt160) ([]*CoinReference, *helper.Fixed8, error) {
-	response := client.GetClaimable(helper.ScriptHashToAddress(from))
+func (tb *TransactionBuilder)GetClaimables(from helper.UInt160) ([]*CoinReference, *helper.Fixed8, error) {
+	response := tb.Client.GetClaimable(helper.ScriptHashToAddress(from))
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
 		return nil, nil, fmt.Errorf(msg)

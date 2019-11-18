@@ -19,7 +19,7 @@ type MinerTransaction struct {
 //		Transaction:NewTransaction(),
 //		Nonce:rand.Uint32(),
 //	}
-//	mtx.Type = Issue_Transaction
+//	mtx.Type = Miner_Transaction
 //	return mtx
 //}
 

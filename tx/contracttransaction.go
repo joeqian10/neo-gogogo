@@ -21,6 +21,10 @@ func NewContractTransaction() *ContractTransaction {
 	return ctx
 }
 
+func (tx *ContractTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
 // implement ITransaction interface
 func (tx *ContractTransaction) GetTransaction() *Transaction {
 	return tx.Transaction
