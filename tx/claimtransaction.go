@@ -23,6 +23,10 @@ func NewClaimTransaction(claims []*CoinReference) *ClaimTransaction {
 	return ctx
 }
 
+func (tx *ClaimTransaction) Size() int {
+	return len(tx.RawTransaction())
+}
+
 // implement ITransaction interface
 func (tx *ClaimTransaction) GetTransaction() *Transaction {
 	return tx.Transaction

@@ -29,6 +29,9 @@ func TestContractTransaction(t *testing.T) {
 	assert.Equal(t, "2b2d121c19598008f6809b1a6a9d2230486b66a8", ctx.Outputs[0].ScriptHash.String())
 	assert.Equal(t, "bdf6cc3b9af12a7565bda80933a75ee8cef1bc771d0d58effc08e4c8b436da79", ctx.HashString())
 
+	// test Size()
+	assert.Equal(t, len(rawTx)/2, ctx.Size())
+
 	// Serialize
 	buf := io.NewBufBinWriter()
 	ctx.Serialize(buf.BinWriter)
