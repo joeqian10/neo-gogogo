@@ -8,9 +8,14 @@ import (
 	"time"
 )
 
+// add IHttpClient for mock unit test
+type IHttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type RpcClient struct {
-	Endpoint   url.URL
-	httpClient *http.Client
+	Endpoint   *url.URL
+	httpClient IHttpClient
 }
 
 func NewClient(endpoint string) *RpcClient {
@@ -21,7 +26,7 @@ func NewClient(endpoint string) *RpcClient {
 	var netClient = &http.Client{
 		Timeout: time.Second * 60,
 	}
-	return &RpcClient{Endpoint: *u, httpClient: netClient}
+	return &RpcClient{Endpoint: u, httpClient: netClient}
 }
 
 func (n *RpcClient) makeRequest(method string, params []interface{}, out interface{}) error {
@@ -49,7 +54,7 @@ func (n *RpcClient) makeRequest(method string, params []interface{}, out interfa
 func (n *RpcClient) ClaimGas(address string) ClaimGasResponse {
 	response := ClaimGasResponse{}
 	params := []interface{}{address}
-	n.makeRequest("claimgas", params, &response)
+	_ = n.makeRequest("claimgas", params, &response)
 	return response
 }
 
