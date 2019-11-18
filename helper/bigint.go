@@ -73,21 +73,25 @@ func Negate(n *big.Int) *big.Int {
 	return t.Neg(n)
 }
 
+// Add implements big.Int + operator
 func Add(x *big.Int, y *big.Int) *big.Int {
 	t := &big.Int{}
 	return t.Add(x, y)
 }
 
-func Minus(x *big.Int, y *big.Int) *big.Int {
+// Sub implements big.Int - operator
+func Sub(x *big.Int, y *big.Int) *big.Int {
 	t := &big.Int{}
 	return t.Sub(x, y)
 }
 
-func Mtpl(x *big.Int, y *big.Int) *big.Int {
+// Mul implements big.Int * operator
+func Mul(x *big.Int, y *big.Int) *big.Int {
 	t := &big.Int{}
 	return t.Mul(x, y)
 }
 
+// Mod implements big.Int % operator
 func Mod(x *big.Int, y *big.Int) *big.Int {
 	t := &big.Int{}
 	return t.Mod(x, y)
@@ -115,7 +119,7 @@ func RightShift(n *big.Int, i uint) *big.Int {
 
 func NextBigInt(sizeInBit int) (n *big.Int, err error) {
 	if sizeInBit < 0 {
-		return nil, fmt.Errorf("sizeInBits must be non-negative.")
+		return nil, fmt.Errorf("sizeInBits must be non-negative")
 	}
 	if sizeInBit == 0 {
 		return big.NewInt(0), nil

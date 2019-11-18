@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"github.com/gogo/protobuf/test/int64support"
 	"github.com/joeqian10/neo-gogogo/crypto"
 )
 
@@ -73,4 +74,12 @@ func Int64ToBytes(n int64) []byte {
 	var buff = make([]byte, 8)
 	binary.LittleEndian.PutUint64(buff, uint64(n))
 	return buff
+}
+
+func Abs(x int64) int64 {
+	if x >= 0 {
+		return x
+	} else {
+		return -x
+	}
 }
