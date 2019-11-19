@@ -132,8 +132,8 @@ func (f Fixed8) Mul(g Fixed8) (Fixed8, error) {
 	gv := constant.MakeInt64(g.Value)
 	sign := constant.Sign(fv) * constant.Sign(gv)
 
-	ux := uint64(f.Abs().Value)
-	uy := uint64(g.Abs().Value)
+	ux := uint64(Abs(f.Value))
+	uy := uint64(Abs(g.Value))
 	xh := ux >> 32
 	xl := ux & 0x00000000ffffffff
 	yh := uy >> 32
