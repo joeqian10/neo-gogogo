@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/gogo/protobuf/test/int64support"
 	"github.com/joeqian10/neo-gogogo/crypto"
 )
 

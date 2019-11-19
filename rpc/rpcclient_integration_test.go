@@ -1,13 +1,16 @@
-package rpc_test
+// +build integration
+
+package rpc_integration
 
 import (
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
-	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"net/rpc"
+
 	//"math/rand"
 	"crypto/rand"
 	"testing"
