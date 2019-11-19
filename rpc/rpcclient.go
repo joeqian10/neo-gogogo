@@ -62,7 +62,7 @@ func (n *RpcClient) ClaimGas(address string) ClaimGasResponse {
 func (n *RpcClient) GetAccountState(address string) GetAccountStateResponse {
 	response := GetAccountStateResponse{}
 	params := []interface{}{address}
-	n.makeRequest("getaccountstate", params, &response)
+	_ = n.makeRequest("getaccountstate", params, &response)
 	return response
 }
 
