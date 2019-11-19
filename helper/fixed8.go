@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"go/constant"
 	"strconv"
 	"strings"
 )
@@ -112,18 +113,54 @@ func (f Fixed8) String() string {
 	return buf.String()
 }
 
-// Add implements Fixed8 addition operator.
+// Add implements Fixed8 + operator.
 func (f Fixed8) Add(g Fixed8) Fixed8 {
 	return NewFixed8(f.Value + g.Value)
 }
 
+// Sub implements Fixed8 - operator
 func (f Fixed8) Sub(g Fixed8) Fixed8 {
 	return NewFixed8(f.Value - g.Value)
 }
 
-// TODO: multiply
+// Mul implements Fixed8 * operator
+func (f Fixed8) Mul(g Fixed8) (Fixed8, error) {
+	var QUO uint64 = (1 << 63) / (D >> 1)
+	var REM uint64 = ((1 << 63) % (D >> 1)) << 1
 
-// Div implements Fixed8 division operator.
+	fv := constant.MakeInt64(f.Value)
+	gv := constant.MakeInt64(g.Value)
+	sign := constant.Sign(fv) * constant.Sign(gv)
+
+	ux := uint64(Abs(f.Value))
+	uy := uint64(Abs(g.Value))
+	xh := ux >> 32
+	xl := ux & 0x00000000ffffffff
+	yh := uy >> 32
+	yl := uy & 0x00000000ffffffff
+	rh := xh * yh
+	rm := xh*yl + xl*yh
+	rl := xl * yl
+	rmh := rm >> 32
+	rml := rm << 32
+	rh += rmh
+	rl += rml
+	if rl < rml {
+		rh++
+	}
+	if rh >= D {
+		return Fixed8{}, fmt.Errorf("overflow error")
+	}
+	rd := rh*REM + rl
+	if rd < rl {
+		rh++
+	}
+	r := rh*QUO + rd/D
+	result := int64(r) * int64(sign)
+	return NewFixed8(result), nil
+}
+
+// Div implements Fixed8 / operator.
 func (f Fixed8) Div(g Fixed8) Fixed8 {
 	return NewFixed8(f.Value / g.Value)
 }
