@@ -12,42 +12,42 @@ type VarInt struct {
 }
 
 // Length returns the serialized bytes length of the var int
-func (varint VarInt) Length() int {
-	if varint.Value < 0xfd {
+func (v VarInt) Length() int {
+	if v.Value < 0xfd {
 		return 1
 	}
-	if varint.Value <= 0xffff {
+	if v.Value <= 0xffff {
 		return 3
 	}
-	if varint.Value <= 0xffffffff {
+	if v.Value <= 0xffffffff {
 		return 5
 	}
 	return 9
 }
 
 // Bytes returns the serialized bytes of the var int
-func (varint VarInt) Bytes() []byte {
+func (v VarInt) Bytes() []byte {
 
-	if varint.Value < 0xfd {
+	if v.Value < 0xfd {
 		ret := make([]byte, 1)
-		ret[0] = byte(varint.Value)
+		ret[0] = byte(v.Value)
 		return ret
 	}
-	if varint.Value <= 0xffff {
+	if v.Value <= 0xffff {
 		ret := make([]byte, 3)
 		ret[0] = 0xfd
-		binary.LittleEndian.PutUint16(ret[1:], uint16(varint.Value))
+		binary.LittleEndian.PutUint16(ret[1:], uint16(v.Value))
 		return ret
 	}
-	if varint.Value <= 0xffffffff {
+	if v.Value <= 0xffffffff {
 		ret := make([]byte, 5)
 		ret[0] = 0xfe
-		binary.LittleEndian.PutUint32(ret[1:], uint32(varint.Value))
+		binary.LittleEndian.PutUint32(ret[1:], uint32(v.Value))
 		return ret
 	}
 	ret := make([]byte, 9)
 	ret[0] = 0xff
-	binary.LittleEndian.PutUint64(ret[1:], uint64(varint.Value))
+	binary.LittleEndian.PutUint64(ret[1:], uint64(v.Value))
 	return ret
 }
 

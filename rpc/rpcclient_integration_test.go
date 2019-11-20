@@ -34,8 +34,6 @@ var AssetIdNeo = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c
 var Nep5ScriptHash = "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263" // Qlink Token
 var MyToken = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26" // change to yours when testing via private net
 
-
-
 func TestNewClient(t *testing.T) {
 	client := rpc.NewClient(TestNetEndPoint)
 	if client == nil {
@@ -119,7 +117,7 @@ func TestRpcClient_GetBalance(t *testing.T) {
 	response := LocalClient.GetBalance(AssetIdNeo)
 	//log.Printf("%+v", response)
 	r:= response.Result
-	assert.Equal(t, 100000000, r.Balance)
+	assert.Equal(t, "100000000", r.Balance)
 }
 
 //=== RUN   TestRpcClient_GetBalance
@@ -363,7 +361,7 @@ func TestRpcClient_GetTxOut(t *testing.T) {
 	r := response.Result
 	assert.Equal(t, 0, r.N)
 	assert.Equal(t, "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Asset)
-	assert.Equal(t, 1000000, r.Value)
+	assert.Equal(t, "1000000", r.Value)
 	assert.Equal(t, "AazAnhssUfNyBC3rdBKseGuck7voaF5p68", r.Address)
 }
 
@@ -566,6 +564,7 @@ func TestRpcClient_SendToAddress(t *testing.T) {
 //--- PASS: TestRpcClient_SendToAddress (0.34s)
 //PASS
 
+// TODO
 func TestRpcClient_SubmitBlock(t *testing.T) {
 
 }

@@ -18,6 +18,7 @@ var One Fixed8 = NewFixed8(int64(D))
 var Satosh Fixed8 = NewFixed8(int64(1))
 var Zero Fixed8 = NewFixed8(int64(0))
 
+// NewFixed8 returns a Fixed8 using an int64 as raw data
 func NewFixed8(data int64) Fixed8 {
 	return Fixed8{
 		Value: data,
@@ -162,7 +163,7 @@ func (f Fixed8) Mul(g Fixed8) (Fixed8, error) {
 
 // Div implements Fixed8 / operator.
 func (f Fixed8) Div(g Fixed8) Fixed8 {
-	return NewFixed8(f.Value / g.Value)
+	return NewFixed8(f.Value / g.Value * D)
 }
 
 // GreaterThan implements Fixed8 > operator.
@@ -180,13 +181,13 @@ func (f Fixed8) Equal(g Fixed8) bool {
 	return f.Value == g.Value
 }
 
-// CompareTo returns the difference between the f and g.
-// difference < 0 implies f < g.
-// difference = 0 implies f = g.
-// difference > 0 implies f > g.
-func (f Fixed8) CompareTo(g Fixed8) int {
-	return int(f.Value - g.Value)
-}
+//// CompareTo returns the difference between the f and g.
+//// difference < 0 implies f < g.
+//// difference = 0 implies f = g.
+//// difference > 0 implies f > g.
+//func (f Fixed8) CompareTo(g Fixed8) int {
+//	return int(f.Value - g.Value)
+//}
 
 // Abs returns the absolute value of a Fixed8 type
 func (f Fixed8) Abs() Fixed8 {
