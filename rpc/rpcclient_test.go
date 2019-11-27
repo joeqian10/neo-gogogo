@@ -10,11 +10,11 @@ import (
 	"testing"
 )
 
-type ClientMock struct {
+type HttpClientMock struct {
 	mock.Mock
 }
 
-func (c *ClientMock) Do(req *http.Request) (*http.Response, error) {
+func (c *HttpClientMock) Do(req *http.Request) (*http.Response, error) {
 	args := c.Called(req)
 	return args.Get(0).(*http.Response), args.Error(1)
 }
@@ -29,7 +29,7 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestRpcClient_ClaimGas(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		StatusCode: http.StatusOK,
@@ -108,7 +108,7 @@ func TestRpcClient_ClaimGas(t *testing.T) {
 }
 
 func TestRpcClient_GetAccountState(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -136,7 +136,7 @@ func TestRpcClient_GetAccountState(t *testing.T) {
 }
 
 func TestRpcClient_GetApplicationLog(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -200,7 +200,7 @@ func TestRpcClient_GetApplicationLog(t *testing.T) {
 }
 
 func TestRpcClient_GetAssetState(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -245,7 +245,7 @@ func TestRpcClient_GetAssetState(t *testing.T) {
 }
 
 func TestRpcClient_GetBalance(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -264,7 +264,7 @@ func TestRpcClient_GetBalance(t *testing.T) {
 }
 
 func TestRpcClient_GetBestBlockHash(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -280,7 +280,7 @@ func TestRpcClient_GetBestBlockHash(t *testing.T) {
 }
 
 func TestRpcClient_GetBlockByHash(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -447,7 +447,7 @@ func TestRpcClient_GetBlockByHash(t *testing.T) {
 }
 
 func TestRpcClient_GetBlockByIndex(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -614,7 +614,7 @@ func TestRpcClient_GetBlockByIndex(t *testing.T) {
 }
 
 func TestRpcClient_GetBlockCount(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -630,7 +630,7 @@ func TestRpcClient_GetBlockCount(t *testing.T) {
 }
 
 func TestRpcClient_GetBlockHeaderByHash(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -670,7 +670,7 @@ func TestRpcClient_GetBlockHeaderByHash(t *testing.T) {
 }
 
 func TestRpcClient_GetBlockHash(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -686,7 +686,7 @@ func TestRpcClient_GetBlockHash(t *testing.T) {
 }
 
 func TestRpcClient_GetClaimable(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -721,7 +721,7 @@ func TestRpcClient_GetClaimable(t *testing.T) {
 }
 
 func TestRpcClient_GetConnectionCount(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -737,7 +737,7 @@ func TestRpcClient_GetConnectionCount(t *testing.T) {
 }
 
 func TestRpcClient_GetContractState(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -773,7 +773,7 @@ func TestRpcClient_GetContractState(t *testing.T) {
 }
 
 func TestRpcClient_GetNep5Balances(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -799,7 +799,7 @@ func TestRpcClient_GetNep5Balances(t *testing.T) {
 }
 
 func TestRpcClient_GetNep5Transfers(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -831,7 +831,7 @@ func TestRpcClient_GetNep5Transfers(t *testing.T) {
 }
 
 func TestRpcClient_GetNewAddress(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -847,7 +847,7 @@ func TestRpcClient_GetNewAddress(t *testing.T) {
 }
 
 func TestRpcClient_GetPeers(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -895,7 +895,7 @@ func TestRpcClient_GetPeers(t *testing.T) {
 }
 
 func TestRpcClient_GetRawMemPool(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -915,7 +915,7 @@ func TestRpcClient_GetRawMemPool(t *testing.T) {
 }
 
 func TestRpcClient_GetRawTransaction(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -964,7 +964,7 @@ func TestRpcClient_GetRawTransaction(t *testing.T) {
 }
 
 func TestRpcClient_GetStorage(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -980,7 +980,7 @@ func TestRpcClient_GetStorage(t *testing.T) {
 }
 
 func TestRpcClient_GetTransactionHeight(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -996,7 +996,7 @@ func TestRpcClient_GetTransactionHeight(t *testing.T) {
 }
 
 func TestRpcClient_GetTxOut(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1020,7 +1020,7 @@ func TestRpcClient_GetTxOut(t *testing.T) {
 }
 
 func TestRpcClient_GetUnclaimed(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1041,7 +1041,7 @@ func TestRpcClient_GetUnclaimed(t *testing.T) {
 }
 
 func TestRpcClient_GetUnclaimedGas(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1061,7 +1061,7 @@ func TestRpcClient_GetUnclaimedGas(t *testing.T) {
 }
 
 func TestRpcClient_GetUnspents(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1123,14 +1123,14 @@ func TestRpcClient_GetUnspents(t *testing.T) {
 
 	response := rpc.GetUnspents("")
 	r := response.Result
-	assert.Equal(t, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7", r.Balance[0].AssetHash)
-	assert.Equal(t, "GAS", r.Balance[0].Asset)
-	assert.Equal(t, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Balance[1].AssetHash)
-	assert.Equal(t, "NEO", r.Balance[1].Asset)
+	assert.Equal(t, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7", r.Balances[0].AssetHash)
+	assert.Equal(t, "GAS", r.Balances[0].Asset)
+	assert.Equal(t, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b", r.Balances[1].AssetHash)
+	assert.Equal(t, "NEO", r.Balances[1].Asset)
 }
 
 func TestRpcClient_GetValidators(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1190,7 +1190,7 @@ func TestRpcClient_GetValidators(t *testing.T) {
 }
 
 func TestRpcClient_GetVersion(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1212,7 +1212,7 @@ func TestRpcClient_GetVersion(t *testing.T) {
 }
 
 func TestRpcClient_GetWalletHeight(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1228,7 +1228,7 @@ func TestRpcClient_GetWalletHeight(t *testing.T) {
 }
 
 func TestRpcClient_ImportPrivKey(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1250,7 +1250,7 @@ func TestRpcClient_ImportPrivKey(t *testing.T) {
 }
 
 func TestRpcClient_InvokeFunction(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1278,7 +1278,7 @@ func TestRpcClient_InvokeFunction(t *testing.T) {
 }
 
 func TestRpcClient_InvokeScript(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1306,7 +1306,7 @@ func TestRpcClient_InvokeScript(t *testing.T) {
 }
 
 func TestRpcClient_ListAddress(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1338,7 +1338,7 @@ func TestRpcClient_ListAddress(t *testing.T) {
 }
 
 func TestRpcClient_ListPlugins(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1408,7 +1408,7 @@ func TestRpcClient_ListPlugins(t *testing.T) {
 }
 
 func TestRpcClient_SendFrom(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1460,7 +1460,7 @@ func TestRpcClient_SendFrom(t *testing.T) {
 }
 
 func TestRpcClient_SendRawTransaction(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1476,7 +1476,7 @@ func TestRpcClient_SendRawTransaction(t *testing.T) {
 }
 
 func TestRpcClient_SendToAddress(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1528,7 +1528,7 @@ func TestRpcClient_SendToAddress(t *testing.T) {
 }
 
 func TestRpcClient_SubmitBlock(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{
@@ -1544,7 +1544,7 @@ func TestRpcClient_SubmitBlock(t *testing.T) {
 }
 
 func TestRpcClient_ValidateAddress(t *testing.T) {
-	var client = new(ClientMock)
+	var client = new(HttpClientMock)
 	var rpc = RpcClient{Endpoint: new(url.URL), httpClient: client}
 	client.On("Do", mock.Anything).Return(&http.Response{
 		Body: ioutil.NopCloser(bytes.NewReader([]byte(`{

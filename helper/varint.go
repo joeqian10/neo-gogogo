@@ -5,8 +5,7 @@ import (
 	"fmt"
 )
 
-// VarInt 变长整数，可以根据表达的值进行编码以节省空间。
-// 最长表示64位无符号整数，通常用于表示数组长度
+// VarInt
 type VarInt struct {
 	Value uint64
 }
@@ -27,7 +26,6 @@ func (v VarInt) Length() int {
 
 // Bytes returns the serialized bytes of the var int
 func (v VarInt) Bytes() []byte {
-
 	if v.Value < 0xfd {
 		ret := make([]byte, 1)
 		ret[0] = byte(v.Value)

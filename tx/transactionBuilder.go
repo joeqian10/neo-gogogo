@@ -5,7 +5,6 @@ import (
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
-	"github.com/joeqian10/neo-gogogo/sc"
 	"sort"
 )
 
@@ -15,9 +14,10 @@ const GasTokenId = "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee796928
 var NeoToken, _ = helper.UInt256FromString(NeoTokenId)
 var GasToken, _ = helper.UInt256FromString(GasTokenId)
 
+
 type TransactionBuilder struct {
 	EndPoint string
-	Client *rpc.RpcClient
+	Client rpc.IRpcClient
 }
 
 func NewTransactionBuilder(endPoint string) *TransactionBuilder {
@@ -86,27 +86,10 @@ func (tb *TransactionBuilder)MakeContractTransaction(from helper.UInt160, to hel
 
 // get transaction inputs according to the amount, and return UTXOs and their total amount
 func (tb *TransactionBuilder)GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount helper.Fixed8) ([]*CoinReference, helper.Fixed8, error) {
-	response := tb.Client.GetUnspents(helper.ScriptHashToAddress(from))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return nil, helper.Zero, fmt.Errorf(msg)
-	}
-	balances := response.Result.Balance
-	var unspentBalance *models.UnspentBalance = nil
-	// check if there is enough balance of this asset in this account
-	for _, balance := range balances {
-		if balance.AssetHash == assetId.String() {
-			if balance.Amount >= helper.Fixed8ToFloat64(amount) {
-				unspentBalance = &balance
-			} else {
-				return nil, helper.Zero, fmt.Errorf("not enough balance in address: %s", helper.ScriptHashToAddress(from))
-			}
-		}
-	}
-	if unspentBalance == nil {
-		return nil, helper.Zero, fmt.Errorf("asset you want to transfer is not found")
-	}
-	unspents := unspentBalance.Unspent
+	unspentBalance, available, err := tb.GetBalance(from, assetId)
+	if err != nil {return nil, helper.Zero, err}
+	if available.LessThan(amount) {return nil, helper.Zero, fmt.Errorf("not enough balance in address: %s", helper.ScriptHashToAddress(from))}
+	unspents := unspentBalance.Unspents
 	sort.Sort(sort.Reverse(models.UnspentSlice(unspents))) // sort in decreasing order
 	var i int = 0
 	var a float64 = helper.Fixed8ToFloat64(amount)
@@ -128,17 +111,30 @@ func (tb *TransactionBuilder)GetTransactionInputs(from helper.UInt160, assetId h
 	return inputs, sum, nil
 }
 
+// GetBalance is used to get balance of neo or gas or other utxo asset
+func (tb *TransactionBuilder) GetBalance(account helper.UInt160, assetId helper.UInt256) (*models.UnspentBalance, helper.Fixed8, error) {
+	response := tb.Client.GetUnspents(helper.ScriptHashToAddress(account))
+	msg := response.ErrorResponse.Error.Message
+	if len(msg) != 0 {
+		return nil, helper.Zero, fmt.Errorf(msg)
+	}
+	balances := response.Result.Balances
+	// check if there is enough balance of this asset in this account
+	for _, balance := range balances {
+		if balance.AssetHash == assetId.String() {
+			return &balance, helper.Fixed8FromFloat64(balance.Amount), nil
+		}
+	}
+	return nil, helper.Zero, fmt.Errorf("asset not found")
+}
 
+
+//
 // this is a general api for invoking smart contract and creating an invocation transaction, including transferring nep-5 assets
-func (tb *TransactionBuilder)MakeInvocationTransaction(scriptHash helper.UInt160, operation string, args []sc.ContractParameter, from helper.UInt160,
-	attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
+func (tb *TransactionBuilder)MakeInvocationTransaction(script []byte, from helper.UInt160, attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
 	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
-	// make script
-	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash.Bytes(), operation, args)
-	script := sb.ToArray()
 	// use rpc to get gas consumed
 	gas, err := tb.GetGasConsumed(script)
 	if err != nil {
@@ -184,6 +180,7 @@ func (tb *TransactionBuilder)GetGasConsumed(script []byte) (*helper.Fixed8, erro
 		return &g, nil
 	}
 }
+
 
 //
 func (tb *TransactionBuilder)MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, attributes []*TransactionAttribute) (*ClaimTransaction, error) {

@@ -1,9 +1,10 @@
 // +build integration
 
-package tx
+package tx_integration
 
 import (
 	"github.com/joeqian10/neo-gogogo/helper"
+	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,7 +18,6 @@ func TestNewTransactionBuilder(t *testing.T) {
 		t.Fail()
 	}
 	assert.Equal(t, LocalEndPoint, tb.EndPoint)
-	assert.Equal(t, "localhost:50003", tb.Client.Endpoint.Host)
 }
 
 var tb = NewTransactionBuilder(LocalEndPoint)
@@ -38,7 +38,10 @@ func TestMakeInvocationTransaction(t *testing.T) {
 	scriptHash, err := helper.UInt160FromString("14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26")
 	assert.Nil(t, err)
 	operation := "name"
-	itx, _ := tb.MakeInvocationTransaction(scriptHash, operation, nil, from, nil, helper.UInt160{}, helper.Fixed8FromInt64(0))
+	sb := sc.NewScriptBuilder()
+	sb.MakeInvocationScript(scriptHash, operation, []sc.ContractParameter{})
+	script := sb.ToArray()
+	itx, _ := tb.MakeInvocationTransaction(script, nil, from, nil, helper.UInt160{}, helper.Fixed8FromInt64(0))
 	assert.Equal(t, helper.Fixed8FromInt64(0).Value, itx.Gas.Value)
 }
 

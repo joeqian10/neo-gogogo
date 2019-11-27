@@ -8,10 +8,12 @@ type RpcResponse struct {
 }
 
 type ErrorResponse struct {
-	Error struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-	} `json:"error"`
+	Error RpcError `json:"error"`
+}
+
+type RpcError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type ClaimGasResponse struct {

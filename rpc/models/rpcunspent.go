@@ -1,12 +1,12 @@
 package models
 
 type RpcUnspent struct {
-	Balance []UnspentBalance `json:"balance"`
+	Balances []UnspentBalance `json:"balance"`
 	Address string `json:"address"`
 }
 
 type UnspentBalance struct {
-	Unspent     []Unspent `json:"unspent"`
+	Unspents     []Unspent `json:"unspent"`
 	AssetHash   string    `json:"asset_hash"`
 	Asset       string    `json:"asset"`
 	AssetSymbol string    `json:"asset_symbol"`

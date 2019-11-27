@@ -71,7 +71,7 @@ func (sb *ScriptBuilder) EmitAppCall(scriptHah []byte, useTailCall bool) error {
 
 func (sb *ScriptBuilder) EmitJump(op OpCode, offset int16) error {
 	if op != JMP && op != JMPIF && op != JMPIFNOT && op != CALL {
-		return fmt.Errorf("Invalid OpCode.")
+		return fmt.Errorf("invalid OpCode")
 	}
 	//b := make([]byte, 2)
 	//binary.LittleEndian.PutUInt16(b, uint16(i))
@@ -146,13 +146,12 @@ func (sb *ScriptBuilder) EmitPushParameter(data ContractParameter) error {
 	switch data.Type {
 	case Signature:
 	case ByteArray:
-		//sb.EmitPushBytes([]byte(fmt.Sprintf("%v", data.Value)))
 		err = sb.EmitPushBytes(data.Value.([]byte))
 	case Boolean:
 		err = sb.EmitPushBool(data.Value.(bool))
 	case Integer:
-		num := data.Value.(int64)
-		err = sb.EmitPushBigInt(*big.NewInt(num))
+		num := data.Value.(uint64)
+		err = sb.EmitPushBigInt(*big.NewInt(int64(num)))
 	case Hash160:
 		u, e := helper.UInt160FromBytes(data.Value.([]byte))
 		if e != nil {
@@ -166,7 +165,6 @@ func (sb *ScriptBuilder) EmitPushParameter(data ContractParameter) error {
 		}
 		err = sb.EmitPushBytes(u.Bytes())
 	case PublicKey:
-		//TODO ecc.go
 		err = sb.EmitPushBytes(data.Value.([]byte))
 	case String:
 		s := string(data.Value.(string))
@@ -193,7 +191,7 @@ func (sb *ScriptBuilder) EmitPushParameter(data ContractParameter) error {
 
 func (sb *ScriptBuilder) EmitSysCall(api string, compress bool) error {
 	if len(api) == 0 {
-		return fmt.Errorf("Argument api is empty.")
+		return fmt.Errorf("argument api is empty")
 	}
 	b := []byte(api)
 	if compress {
@@ -201,7 +199,7 @@ func (sb *ScriptBuilder) EmitSysCall(api string, compress bool) error {
 		b = b[0:4]
 	} else {
 		if len(b) > 252 {
-			return fmt.Errorf("Argument api has a too long length.")
+			return fmt.Errorf("argument api has a too long length")
 		}
 	}
 	arg := append([]byte{byte(len(b))}, b...)
