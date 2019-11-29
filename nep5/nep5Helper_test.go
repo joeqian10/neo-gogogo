@@ -14,7 +14,7 @@ func TestNewNep5Helper(t *testing.T) {
 	if nep5helper == nil {
 		t.Fail()
 	}
-	assert.Equal(t, "seed1.ngd.network:20332", nep5helper.EndPoint)
+	assert.Equal(t, "http://seed1.ngd.network:20332", nep5helper.EndPoint)
 }
 
 func TestNep5Helper_BalanceOf(t *testing.T) {
