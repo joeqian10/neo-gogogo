@@ -2,6 +2,7 @@ package sc
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
@@ -73,10 +74,10 @@ func (sb *ScriptBuilder) EmitJump(op OpCode, offset int16) error {
 	if op != JMP && op != JMPIF && op != JMPIFNOT && op != CALL {
 		return fmt.Errorf("invalid OpCode")
 	}
-	//b := make([]byte, 2)
-	//binary.LittleEndian.PutUInt16(b, uint16(i))
-	v := helper.VarIntFromInt16(offset)
-	return sb.Emit(op, v.Bytes()...)
+	b := make([]byte, 2)
+	binary.LittleEndian.PutUint16(b, uint16(offset))
+	//v := helper.VarIntFromInt16(offset)
+	return sb.Emit(op, b...)
 }
 
 func (sb *ScriptBuilder) EmitPushBigInt(number big.Int) error {
@@ -91,7 +92,7 @@ func (sb *ScriptBuilder) EmitPushBigInt(number big.Int) error {
 		return sb.Emit(PUSH1 - 1 + OpCode(b))
 	}
 	// need little endian
-	reversed := helper.ReverseBytes(number.Bytes())
+	reversed := helper.ReverseBytes(number.Bytes()) // Bytes() returns big-endian
 	return sb.EmitPushBytes(reversed)
 }
 

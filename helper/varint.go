@@ -74,11 +74,14 @@ func ParseVarInt(bytes []byte) (VarInt, error) {
 		return ret, nil
 	}
 
-	if len(bytes) < 9 {
-		return ret, fmt.Errorf("ParseVarInt: input bytes starts with 0xfe but length %d", len(bytes))
+	if bytes[0] == 0xff {
+		if len(bytes) < 9 {
+			return ret, fmt.Errorf("ParseVarInt: input bytes starts with 0xfe but length %d", len(bytes))
+		}
+		ret.Value = binary.LittleEndian.Uint64(bytes[1:])
+		return ret, nil
 	}
-	ret.Value = binary.LittleEndian.Uint64(bytes[1:])
-	return ret, nil
+	return ret, fmt.Errorf("invalid input")
 }
 
 func VarIntFromUInt64(input uint64) VarInt {

@@ -1,6 +1,7 @@
 package nep5
 
 import (
+	"encoding/binary"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
@@ -10,7 +11,8 @@ import (
 
 // nep5 wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
 type Nep5Helper struct {
-	Client *rpc.RpcClient
+	EndPoint string
+	Client rpc.IRpcClient
 }
 
 func NewNep5Helper(endPoint string) *Nep5Helper {
@@ -19,6 +21,7 @@ func NewNep5Helper(endPoint string) *Nep5Helper {
 		return nil
 	}
 	return &Nep5Helper{
+		EndPoint:endPoint,
 		Client:   client,
 	}
 }
@@ -39,11 +42,12 @@ func (n *Nep5Helper) TotalSupply(scriptHash helper.UInt160) (uint64, error) {
 		return 0, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	ts, err := helper.ParseVarInt(helper.HexTobytes(stack.Value))
-	if err != nil {
-		return 0, fmt.Errorf("conversion failed")
+	bytes := helper.HexTobytes(stack.Value)
+	for len(bytes) < 8 {
+		bytes = append(bytes, byte(0x00))
 	}
-	return ts.Value, nil
+	ts := binary.LittleEndian.Uint64(bytes)
+	return ts, nil
 }
 
 func (n *Nep5Helper) Name(scriptHash helper.UInt160) (string, error) {
@@ -115,7 +119,7 @@ func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160
 		Type:  sc.Hash160,
 		Value: address.Bytes(),
 	}
-	sb.MakeInvocationScript(scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{cp})
+	sb.MakeInvocationScript(scriptHash.Bytes(), "balanceOf", []sc.ContractParameter{cp})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -129,14 +133,15 @@ func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160
 		return 0, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	balance, err := helper.ParseVarInt(helper.HexTobytes(stack.Value))
-	if err != nil {
-		return 0, fmt.Errorf("conversion failed")
+	bytes := helper.HexTobytes(stack.Value)
+	for len(bytes) < 8 {
+		bytes = append(bytes, byte(0x00))
 	}
-	return balance.Value, nil
+	balance := binary.LittleEndian.Uint64(bytes)
+	return balance, nil
 }
 
-func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount uint64) ([]byte, error) {
+func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount uint64) (bool, error) {
 	sb := sc.NewScriptBuilder()
 	cp1 := sc.ContractParameter{
 		Type:  sc.Hash160,
@@ -150,26 +155,23 @@ func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to
 		Type:  sc.Integer,
 		Value: amount,
 	}
-	sb.MakeInvocationScript(scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{cp1, cp2, cp3})
+	sb.MakeInvocationScript(scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
-		return nil, fmt.Errorf(msg)
+		return false, fmt.Errorf(msg)
 	}
 	if response.Result.State == "FAULT" {
-		return nil, fmt.Errorf("engine faulted")
+		return false, fmt.Errorf("engine faulted")
 	}
 	if len(response.Result.Stack) == 0 {
-		return nil, fmt.Errorf("no stack result returned")
+		return false, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
 	b, err := strconv.ParseBool(stack.Value)
 	if err != nil {
-		return nil, fmt.Errorf("conversion failed")
+		return false, fmt.Errorf("conversion failed")
 	}
-	if b == true {
-		return script, nil
-	}
-	return nil, fmt.Errorf("false result")
+	return b, nil
 }

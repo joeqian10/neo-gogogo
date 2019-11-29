@@ -31,7 +31,7 @@ var LocalWalletAddress = "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR"
 var TestNetWalletAddress = "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY"
 
 var AssetIdNeo = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
-var Nep5ScriptHash = "0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263" // Qlink Token
+var Nep5ScriptHash = "b9d7ea3062e6aeeb3e8ad9548220c4ba1361d263" // Qlink Token, big-endian
 var MyToken = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26" // change to yours when testing via private net
 
 func TestNewClient(t *testing.T) {

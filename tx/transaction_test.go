@@ -15,8 +15,6 @@ func TestAddSignature(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, Contract_Transaction, ctx.Type)
 	assert.IsType(t, ctx, &ContractTransaction{})
-	ctx.Attributes = append(ctx.Attributes, &TransactionAttribute{ Usage:Description,Data: []byte("Send to Qian $100")} )
-	//ctx.Attributes = append(ctx.Attributes, &TransactionAttribute{ Usage:Description,Data: time.Now()} )
 
 	key, _ := keys.GenerateKeyPair()
 	ctx.Witnesses = make([]*Witness, 0)
