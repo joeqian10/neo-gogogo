@@ -66,8 +66,17 @@ func NewAccount() (*Account, error) {
 	return NewAccountFromKeyPair(privateKey), nil
 }
 
-// DecryptAccount decrypt the nep2Key with the given passphrase and
-// return the decrypted Account.
+// NewAccountFromWIF creates a new Account from the given WIF.
+func NewAccountFromWIF(wif string) (*Account, error) {
+	privateKey, err := keys.NewKeyPairFromWIF(wif)
+	if err != nil {
+		return nil, err
+	}
+	return NewAccountFromKeyPair(privateKey), nil
+}
+
+// NewAccountFromNep2 decrypts the nep2Key with the given passphrase and
+// returns the decrypted Account.
 func NewAccountFromNep2(nep2Key, passphrase string) (*Account, error) {
 	wif, err := keys.NEP2Decrypt(nep2Key, passphrase)
 	if err != nil {
@@ -98,13 +107,4 @@ func (a *Account) Decrypt(passphrase string) (err error) {
 		a.Address = a.KeyPair.PublicKey.Address()
 	}
 	return err
-}
-
-// NewAccountFromWIF creates a new Account from the given WIF.
-func NewAccountFromWIF(wif string) (*Account, error) {
-	privateKey, err := keys.NewKeyPairFromWIF(wif)
-	if err != nil {
-		return nil, err
-	}
-	return NewAccountFromKeyPair(privateKey), nil
 }

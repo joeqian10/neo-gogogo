@@ -68,7 +68,7 @@ func (w *Wallet) ImportFromWIF(wif string) error {
 	return nil
 }
 
-// Import account from WIF
+// Import account from Nep2Key
 func (w *Wallet) ImportFromNep2Key(nep2Key, passphare string) error {
 	acc, err := NewAccountFromNep2(nep2Key, passphare)
 	if err != nil {

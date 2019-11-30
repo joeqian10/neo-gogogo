@@ -175,3 +175,6 @@ func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to
 	}
 	return b, nil
 }
+
+// TODO
+// Add a truely transfer method

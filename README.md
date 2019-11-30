@@ -6,8 +6,8 @@ This is a light-weight golang SDK for neo 2.x created by NGD Shanghai.
 ## Getting Started
 This SDK has seven modules, features and usages of each module will be introduced below.
 
-### "crypto" Module
-This module offers methods used for cryptography purposes, such as AES encryption/decryption, Base58 encoding/decoding, Hash160/Hash256 hashing functions.
+### "crypto" module
+This module offers methods used for cryptography purposes, such as AES encryption/decryption, Base58 encoding/decoding, Hash160/Hash256 hashing functions. For more information about the crypto algorithms used in neo, refer to [Cryptography](https://docs.neo.org/docs/en-us/tooldev/concept/cryptography/encode_algorithm.html).
 
 Typical usage:
 
@@ -29,7 +29,7 @@ func SampleMethod() {
 }
 ```
 
-### "helper" Module
+### "helper" module
 As its name indicated, this module acts as a helper and provides some standard data types used in neo, such as `Fixed8`, `UInt160`, `UInt256`, and some auxiliary methods with basic functionalities including conversion between a hex string and a byte array, conversion between a script hash and a standard neo address, concatenating/reversing byte arrays and so on.
 
 Typical usage:
@@ -85,7 +85,7 @@ func SampleMethod() {
 }
 ```
 
-### "rpc" Module
+### "rpc" module
 This module provides structs and methods which can be used to send RPC requests to and receive RPC responses from a neo node. For more information about neo RPC API, refer to [API Reference](https://docs.neo.org/docs/en-us/reference/rpc/latest-version/api.html).
 
 Typical usage:
@@ -170,6 +170,92 @@ func SampleMethod() {
 	ctx, _ := tb.MakeContractTransaction(from, to, assetId, amount, nil, helper.UInt160{}, helper.Fixed8FromInt64(0))
     // get the raw byte array of this transaction
     unsignedRaw := ctx.UnsignedRawTransaction()
+
+    ...
+}
+
+```
+
+### "wallet" module
+This module defines the account and wallet in the neo network, and methods for creating an account or a wallet, signing a message/verifying signature with private/public key pair are also provided. For more information about the neo wallet, refer to [Wallet](https://docs.neo.org/docs/en-us/tooldev/wallets.html).
+
+Typical usage:
+
+```golang
+
+package sample
+
+import "github.com/joeqian10/neo-gogogo/tx"
+import "github.com/joeqian10/neo-gogogo/wallet"
+
+func SampleMethod() {
+    // create an account with a random generated private key
+    a1, err := wallet.NewAccount()
+    // or create an account with your own private key in WIF format
+    a2, err := wallet.NewAccountFromWIF("your private key in WIF format")
+    // or create an account with a private key encrypted in NEP-2 standard and a passphrase
+    a3, err := wallet.NewAccountFromNep2("your private key encrypted in NEP-2 standard", "your passphrase")
+
+    // create a new wallet
+    w := wallet.NewWallet()
+    // add a new account into the wallet
+    w.AddNewAccount()
+    // or import an account from a WIF key
+    w.ImportFromWIF("your account private key in WIF format")
+    // or import an account from a private key encrypted in NEP-2 standard and a passphrase
+    w.ImportFromNep2Key("your account private key encrypted in NEP-2 standard", "your account passphrase")
+    // or simply add an existing account
+    w.AddAccount(a1)
+
+    // create a WalletHelper
+    var TestNetEndPoint = "http://seed1.ngd.network:20332"
+    tb := tx.NewTransactionBuilder(TestNetEndPoint)
+    wh := wallet.NewWalletHelper(tb, a2)
+    // transfer some neo
+    wh.Transfer(tx.NeoToken, a2.Address, a3.Address, 80000)
+    // claim gas
+    wh.ClaimGas(a2.Address)
+
+    ...
+}
+
+```
+
+### "nep5" module
+This module is to make life easier when dealing with NEP-5 tokens. Methods for querying basic information of a NEP-5 token, such as name, total supply, are provided. Also, it offers the ability to test run the scripts to transfer and get the balance of a NEP-5 token. For more information about NEP-5, refer to [NEP-5](https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki).
+
+Typical usage:
+
+```golang
+
+package sample
+
+import "github.com/joeqian10/neo-gogogo/nep5"
+import "github.com/joeqian10/neo-gogogo/wallet"
+
+func SampleMethod() {
+    // create a Nep5Helper
+    var TestNetEndPoint = "http://seed1.ngd.network:20332"
+    nh := tx.NewNep5Helper(TestNetEndPoint)
+    
+    // get the name of a NEP-5 token
+    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+    name, err := nh.Name(scriptHash)
+    
+    // get the total supply of a NEP-5 token
+    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+	s, e := nh.TotalSupply(scriptHash)
+
+    // get the balance of a NEP-5 token of an address
+    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
+	u, e := nh.BalanceOf(scriptHash, address)
+
+    // test run the script for transfer a NEP-5 token
+    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+    address1, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
+    address2, _ := helper.AddressToScriptHash("AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV")
+	b, e := nh.Transfer(scriptHash, address1, address2, 1) 
 
     ...
 }
