@@ -50,14 +50,14 @@ func SampleMethod() {
     // UInt160
     hexStr := "2d3b96ae1bcc5a585e075e3b81920210dec16302"
     v1, err := helper.UInt160FromString(hexStr)
-	b1, err := hex.DecodeString(hexStr)
+    b1, err := hex.DecodeString(hexStr)
     v2, err := helper.UInt160FromBytes(ReverseBytes(b))
     // v1 and v2 are equal
 
     // UInt256
     str := "f037308fa0ab18155bccfc08485468c112409ea5064595699e98c545f245f32d"
     u1, err := helper.UInt256FromString(str)
-	b2, err := hex.DecodeString(hexStr)
+    b2, err := hex.DecodeString(hexStr)
     u2, err := helper.UInt256FromBytes(ReverseBytes(b))
     // u1 and u2 are equal
     
@@ -103,7 +103,7 @@ func SampleMethod() {
 
     // get block count
     r1 := client.GetBlockCount()
-	height := r1.Result
+    height := r1.Result
 
     // get raw mempool, get all the transactions' id in this node's mempool
     r2 := client.GetRawMemPool()
