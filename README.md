@@ -18,7 +18,7 @@ import "encoding/hex"
 import "github.com/joeqian10/neo-gogogo/crypto"
 
 func SampleMethod() {
-    var b58CheckEncoded = "KxhEDBQyyEFymvfJD96q8stMbJMbZUb6D1PmXqBWZDU2WvbvVs9o"
+	var b58CheckEncoded = "KxhEDBQyyEFymvfJD96q8stMbJMbZUb6D1PmXqBWZDU2WvbvVs9o"
 	var b58CheckDecodedHex = "802bfe58ab6d9fd575bdc3a624e4825dd2b375d64ac033fbc46ea79dbab4f69a3e01"
 
 	b58CheckDecoded, _ := hex.DecodeString(b58CheckDecodedHex)
@@ -236,7 +236,7 @@ import "github.com/joeqian10/neo-gogogo/wallet"
 func SampleMethod() {
     // create a Nep5Helper
     var TestNetEndPoint = "http://seed1.ngd.network:20332"
-    nh := tx.NewNep5Helper(TestNetEndPoint)
+    nh := nep5.NewNep5Helper(TestNetEndPoint)
     
     // get the name of a NEP-5 token
     scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
