@@ -24,12 +24,12 @@ func TestWriteLE(t *testing.T) {
 		readval uint32
 		bin     = []byte{0xef, 0xbe, 0xad, 0xde}
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteLE(val)
 	assert.Nil(t, bw.Err)
 	wrotebin := bw.Bytes()
-	assert.Equal(t, wrotebin, bin)
-	br := NewBinReaderFromBuf(bin)
+	assert.Equal(t, bin, wrotebin)
+	br := NewBinaryReaderFromBuf(bin)
 	br.ReadLE(&readval)
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, readval)
@@ -41,12 +41,12 @@ func TestWriteBE(t *testing.T) {
 		readval uint32
 		bin     = []byte{0xde, 0xad, 0xbe, 0xef}
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteBE(val)
 	assert.Nil(t, bw.Err)
 	wrotebin := bw.Bytes()
-	assert.Equal(t, wrotebin, bin)
-	br := NewBinReaderFromBuf(bin)
+	assert.Equal(t, bin, wrotebin)
+	br := NewBinaryReaderFromBuf(bin)
 	br.ReadBE(&readval)
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, readval)
@@ -54,7 +54,7 @@ func TestWriteBE(t *testing.T) {
 
 func TestWriterErrHandling(t *testing.T) {
 	var badio = &badRW{}
-	bw := NewBinWriterFromIO(badio)
+	bw := NewBinaryWriterFromIO(badio)
 	bw.WriteLE(uint32(0))
 	assert.NotNil(t, bw.Err)
 	// these should work (without panic), preserving the Err
@@ -72,7 +72,7 @@ func TestReaderErrHandling(t *testing.T) {
 		iorig        = i
 		badio        = &badRW{}
 	)
-	br := NewBinReaderFromIO(badio)
+	br := NewBinaryReaderFromIO(badio)
 	br.ReadLE(&i)
 	assert.NotNil(t, br.Err)
 	// i shouldn't change
@@ -90,8 +90,8 @@ func TestReaderErrHandling(t *testing.T) {
 	assert.NotNil(t, br.Err)
 }
 
-func TestBufBinWriterErr(t *testing.T) {
-	bw := NewBufBinWriter()
+func TestBufBinaryWriterErr(t *testing.T) {
+	bw := NewBufBinaryWriter()
 	bw.WriteLE(uint32(0))
 	assert.Nil(t, bw.Err)
 	// inject error
@@ -101,8 +101,8 @@ func TestBufBinWriterErr(t *testing.T) {
 	assert.Nil(t, res)
 }
 
-func TestBufBinWriterReset(t *testing.T) {
-	bw := NewBufBinWriter()
+func TestBufBinaryWriterReset(t *testing.T) {
+	bw := NewBufBinaryWriter()
 	for i := 0; i < 3; i++ {
 		bw.WriteLE(uint32(i))
 		assert.Nil(t, bw.Err)
@@ -117,13 +117,13 @@ func TestWriteString(t *testing.T) {
 	var (
 		str = "teststring"
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteString(str)
 	assert.Nil(t, bw.Err)
 	wrotebin := bw.Bytes()
 	// +1 byte for length
 	assert.Equal(t, len(wrotebin), len(str)+1)
-	br := NewBinReaderFromBuf(wrotebin)
+	br := NewBinaryReaderFromBuf(wrotebin)
 	readstr := br.ReadString()
 	assert.Nil(t, br.Err)
 	assert.Equal(t, str, readstr)
@@ -133,12 +133,12 @@ func TestWriteVarUint1(t *testing.T) {
 	var (
 		val = uint64(1)
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteVarUint(val)
 	assert.Nil(t, bw.Err)
 	buf := bw.Bytes()
 	assert.Equal(t, 1, len(buf))
-	br := NewBinReaderFromBuf(buf)
+	br := NewBinaryReaderFromBuf(buf)
 	res := br.ReadVarUint()
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, res)
@@ -148,13 +148,13 @@ func TestWriteVarUint1000(t *testing.T) {
 	var (
 		val = uint64(1000)
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteVarUint(val)
 	assert.Nil(t, bw.Err)
 	buf := bw.Bytes()
 	assert.Equal(t, 3, len(buf))
 	assert.Equal(t, byte(0xfd), buf[0])
-	br := NewBinReaderFromBuf(buf)
+	br := NewBinaryReaderFromBuf(buf)
 	res := br.ReadVarUint()
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, res)
@@ -164,13 +164,13 @@ func TestWriteVarUint100000(t *testing.T) {
 	var (
 		val = uint64(100000)
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteVarUint(val)
 	assert.Nil(t, bw.Err)
 	buf := bw.Bytes()
 	assert.Equal(t, 5, len(buf))
 	assert.Equal(t, byte(0xfe), buf[0])
-	br := NewBinReaderFromBuf(buf)
+	br := NewBinaryReaderFromBuf(buf)
 	res := br.ReadVarUint()
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, res)
@@ -180,13 +180,13 @@ func TestWriteVarUint100000000000(t *testing.T) {
 	var (
 		val = uint64(1000000000000)
 	)
-	bw := NewBufBinWriter()
+	bw := NewBufBinaryWriter()
 	bw.WriteVarUint(val)
 	assert.Nil(t, bw.Err)
 	buf := bw.Bytes()
 	assert.Equal(t, 9, len(buf))
 	assert.Equal(t, byte(0xff), buf[0])
-	br := NewBinReaderFromBuf(buf)
+	br := NewBinaryReaderFromBuf(buf)
 	res := br.ReadVarUint()
 	assert.Nil(t, br.Err)
 	assert.Equal(t, val, res)
