@@ -18,11 +18,11 @@ import "encoding/hex"
 import "github.com/joeqian10/neo-gogogo/crypto"
 
 func SampleMethod() {
-	var b58CheckEncoded = "KxhEDBQyyEFymvfJD96q8stMbJMbZUb6D1PmXqBWZDU2WvbvVs9o"
-	var b58CheckDecodedHex = "802bfe58ab6d9fd575bdc3a624e4825dd2b375d64ac033fbc46ea79dbab4f69a3e01"
+    var b58CheckEncoded = "KxhEDBQyyEFymvfJD96q8stMbJMbZUb6D1PmXqBWZDU2WvbvVs9o"
+    var b58CheckDecodedHex = "802bfe58ab6d9fd575bdc3a624e4825dd2b375d64ac033fbc46ea79dbab4f69a3e01"
 
-	b58CheckDecoded, _ := hex.DecodeString(b58CheckDecodedHex)
-	encoded := crypto.Base58CheckEncode(b58CheckDecoded)
+    b58CheckDecoded, _ := hex.DecodeString(b58CheckDecodedHex)
+    encoded := crypto.Base58CheckEncode(b58CheckDecoded)
     decoded, err := crypto.Base58CheckDecode(b58CheckEncoded)
     
     ...
@@ -164,10 +164,10 @@ func SampleMethod() {
 
     // build a contract transaction
     from, _ := helper.AddressToScriptHash("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
-	to, _ := helper.AddressToScriptHash("AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV")
-	assetId := NeoToken
-	amount := helper.Fixed8FromInt64(50000000)
-	ctx, _ := tb.MakeContractTransaction(from, to, assetId, amount, nil, helper.UInt160{}, helper.Fixed8FromInt64(0))
+    to, _ := helper.AddressToScriptHash("AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV")
+    assetId := NeoToken
+    amount := helper.Fixed8FromInt64(50000000)
+    ctx, _ := tb.MakeContractTransaction(from, to, assetId, amount, nil, helper.UInt160{}, helper.Fixed8FromInt64(0))
     // get the raw byte array of this transaction
     unsignedRaw := ctx.UnsignedRawTransaction()
 
@@ -244,18 +244,18 @@ func SampleMethod() {
     
     // get the total supply of a NEP-5 token
     scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	s, e := nh.TotalSupply(scriptHash)
+    s, e := nh.TotalSupply(scriptHash)
 
     // get the balance of a NEP-5 token of an address
     scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-	u, e := nh.BalanceOf(scriptHash, address)
+    address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
+    u, e := nh.BalanceOf(scriptHash, address)
 
     // test run the script for transfer a NEP-5 token
     scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
     address1, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
     address2, _ := helper.AddressToScriptHash("AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV")
-	b, e := nh.Transfer(scriptHash, address1, address2, 1) 
+    b, e := nh.Transfer(scriptHash, address1, address2, 1) 
 
     ...
 }
