@@ -22,7 +22,7 @@ type StateDescriptor struct {
 }
 
 // Deserialize implements Serializable interface.
-func (s *StateDescriptor) Deserialize(r *io.BinReader) {
+func (s *StateDescriptor) Deserialize(r *io.BinaryReader) {
 	r.ReadLE(&s.Type)
 
 	s.Key = r.ReadBytes()
@@ -31,7 +31,7 @@ func (s *StateDescriptor) Deserialize(r *io.BinReader) {
 }
 
 // Serialize implements Serializable interface.
-func (s *StateDescriptor) Serialize(w *io.BinWriter) {
+func (s *StateDescriptor) Serialize(w *io.BinaryWriter) {
 	w.WriteLE(s.Type)
 	w.WriteBytes(s.Key)
 	w.WriteBytes(s.Value)

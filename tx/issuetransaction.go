@@ -29,8 +29,8 @@ func (tx *IssueTransaction) HashString() string {
 }
 
 func (tx *IssueTransaction) UnsignedRawTransaction() []byte {
-	buf := io.NewBufBinWriter()
-	tx.SerializeUnsigned(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	tx.SerializeUnsigned(buf.BinaryWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -38,8 +38,8 @@ func (tx *IssueTransaction) UnsignedRawTransaction() []byte {
 }
 
 func (tx *IssueTransaction) RawTransaction() []byte {
-	buf := io.NewBufBinWriter()
-	tx.Serialize(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	tx.Serialize(buf.BinaryWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -56,7 +56,7 @@ func (tx *IssueTransaction) FromHexString(rawTx string) (*IssueTransaction, erro
 	if err != nil {
 		return nil, err
 	}
-	br := io.NewBinReaderFromBuf(b)
+	br := io.NewBinaryReaderFromBuf(b)
 	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
@@ -65,32 +65,32 @@ func (tx *IssueTransaction) FromHexString(rawTx string) (*IssueTransaction, erro
 }
 
 // Deserialize implements Serializable interface.
-func (tx *IssueTransaction) Deserialize(br *io.BinReader) {
+func (tx *IssueTransaction) Deserialize(br *io.BinaryReader) {
 	tx.DeserializeUnsigned(br)
 	tx.Transaction.DeserializeWitnesses(br)
 }
 
-func (tx *IssueTransaction) DeserializeUnsigned(br *io.BinReader) {
+func (tx *IssueTransaction) DeserializeUnsigned(br *io.BinaryReader) {
 	tx.Transaction.DeserializeUnsigned1(br)
 	tx.DeserializeExclusiveData(br)
 	tx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (tx *IssueTransaction) DeserializeExclusiveData(br *io.BinReader) {
+func (tx *IssueTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
 }
 
 // Serialize implements Serializable interface.
-func (tx *IssueTransaction) Serialize(bw *io.BinWriter) {
+func (tx *IssueTransaction) Serialize(bw *io.BinaryWriter) {
 	tx.SerializeUnsigned(bw)
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *IssueTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+func (tx *IssueTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
 	tx.Transaction.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
 
-func (tx *IssueTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
+func (tx *IssueTransaction) SerializeExclusiveData(bw *io.BinaryWriter)  {
 }
 

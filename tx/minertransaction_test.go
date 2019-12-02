@@ -22,8 +22,8 @@ func TestMinerTransaction(t *testing.T) {
 	assert.Equal(t, "a1f219dc6be4c35eca172e65e02d4591045220221b1543f1a4b67b9e9442c264", mtx.HashString())
 
 	// Serialize
-	buf := io.NewBufBinWriter()
-	mtx.Serialize(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	mtx.Serialize(buf.BinaryWriter)
 	assert.Equal(t, nil, buf.Err)
 	assert.Equal(t, rawTx, hex.EncodeToString(buf.Bytes()))
 }

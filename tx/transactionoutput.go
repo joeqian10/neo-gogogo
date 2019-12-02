@@ -22,14 +22,14 @@ func NewTransactionOutput(assetID helper.UInt256, value helper.Fixed8, scriptHas
 }
 
 // Deserialize implements Serializable interface.
-func (out *TransactionOutput) Deserialize(br *io.BinReader) {
+func (out *TransactionOutput) Deserialize(br *io.BinaryReader) {
 	br.ReadLE(&out.AssetId)
 	br.ReadLE(&out.Value)
 	br.ReadLE(&out.ScriptHash)
 }
 
 // Serialize implements Serializable interface.
-func (out *TransactionOutput) Serialize(bw *io.BinWriter) {
+func (out *TransactionOutput) Serialize(bw *io.BinaryWriter) {
 	bw.WriteLE(out.AssetId)
 	bw.WriteLE(out.Value)
 	bw.WriteLE(out.ScriptHash)

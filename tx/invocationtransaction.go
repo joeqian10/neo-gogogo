@@ -41,8 +41,8 @@ func (tx *InvocationTransaction) HashString() string {
 }
 
 func (tx *InvocationTransaction) UnsignedRawTransaction() []byte {
-	buf := io.NewBufBinWriter()
-	tx.SerializeUnsigned(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	tx.SerializeUnsigned(buf.BinaryWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -50,8 +50,8 @@ func (tx *InvocationTransaction) UnsignedRawTransaction() []byte {
 }
 
 func (tx *InvocationTransaction) RawTransaction() []byte {
-	buf := io.NewBufBinWriter()
-	tx.Serialize(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	tx.Serialize(buf.BinaryWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -68,7 +68,7 @@ func (tx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransac
 	if err != nil {
 		return nil, err
 	}
-	br := io.NewBinReaderFromBuf(b)
+	br := io.NewBinaryReaderFromBuf(b)
 	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
@@ -77,18 +77,18 @@ func (tx *InvocationTransaction) FromHexString(rawTx string) (*InvocationTransac
 }
 
 // Deserialize implements Serializable interface.
-func (tx *InvocationTransaction) Deserialize(br *io.BinReader) {
+func (tx *InvocationTransaction) Deserialize(br *io.BinaryReader) {
 	tx.DeserializeUnsigned(br)
 	tx.DeserializeWitnesses(br)
 }
 
-func (tx *InvocationTransaction) DeserializeUnsigned(br *io.BinReader) {
+func (tx *InvocationTransaction) DeserializeUnsigned(br *io.BinaryReader) {
 	tx.DeserializeUnsigned1(br)
 	tx.DeserializeExclusiveData(br)
 	tx.DeserializeUnsigned2(br)
 }
 
-func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
+func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
 	tx.Script = br.ReadBytes()
 	if tx.Version >= 1 {
 		br.ReadLE(&tx.Gas)
@@ -98,18 +98,18 @@ func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinReader) {
 }
 
 // Serialize implements Serializable interface.
-func (tx *InvocationTransaction) Serialize(bw *io.BinWriter) {
+func (tx *InvocationTransaction) Serialize(bw *io.BinaryWriter) {
 	tx.SerializeUnsigned(bw)
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinWriter)  {
+func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
 	tx.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
 
-func (tx *InvocationTransaction) SerializeExclusiveData(bw *io.BinWriter) {
+func (tx *InvocationTransaction) SerializeExclusiveData(bw *io.BinaryWriter) {
 	bw.WriteBytes(tx.Script)
 	if tx.Version >= 1 {
 		bw.WriteLE(tx.Gas)

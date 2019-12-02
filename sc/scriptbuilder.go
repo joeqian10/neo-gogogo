@@ -151,8 +151,8 @@ func (sb *ScriptBuilder) EmitPushParameter(data ContractParameter) error {
 	case Boolean:
 		err = sb.EmitPushBool(data.Value.(bool))
 	case Integer:
-		num := data.Value.(uint64)
-		err = sb.EmitPushBigInt(*big.NewInt(int64(num)))
+		num := data.Value.(int64)
+		err = sb.EmitPushBigInt(*big.NewInt(num))
 	case Hash160:
 		u, e := helper.UInt160FromBytes(data.Value.([]byte))
 		if e != nil {

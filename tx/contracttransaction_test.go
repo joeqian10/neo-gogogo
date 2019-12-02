@@ -33,8 +33,8 @@ func TestContractTransaction(t *testing.T) {
 	assert.Equal(t, len(rawTx)/2, ctx.Size())
 
 	// Serialize
-	buf := io.NewBufBinWriter()
-	ctx.Serialize(buf.BinWriter)
+	buf := io.NewBufBinaryWriter()
+	ctx.Serialize(buf.BinaryWriter)
 	assert.Equal(t, nil, buf.Err)
 	assert.Equal(t, rawTx, hex.EncodeToString(buf.Bytes()))
 }

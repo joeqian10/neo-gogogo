@@ -13,13 +13,13 @@ type CoinReference struct {
 }
 
 // Deserialize implements Serializable interface.
-func (in *CoinReference) Deserialize(br *io.BinReader) {
+func (in *CoinReference) Deserialize(br *io.BinaryReader) {
 	br.ReadLE(&in.PrevHash)
 	br.ReadLE(&in.PrevIndex)
 }
 
 // Serialize implements Serializable interface.
-func (in *CoinReference) Serialize(bw *io.BinWriter) {
+func (in *CoinReference) Serialize(bw *io.BinaryWriter) {
 	bw.WriteLE(in.PrevHash)
 	bw.WriteLE(in.PrevIndex)
 }

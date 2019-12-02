@@ -141,7 +141,8 @@ func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160
 	return balance, nil
 }
 
-func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount uint64) (bool, error) {
+// Transfer is only testing the transfer script, please use WalletHelper to truly transfer nep5 token
+func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error) {
 	sb := sc.NewScriptBuilder()
 	cp1 := sc.ContractParameter{
 		Type:  sc.Hash160,
@@ -153,28 +154,25 @@ func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to
 	}
 	cp3 := sc.ContractParameter{
 		Type:  sc.Integer,
-		Value: amount,
+		Value: amount.Value,
 	}
 	sb.MakeInvocationScript(scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
-		return false, fmt.Errorf(msg)
+		return false, []byte{}, fmt.Errorf(msg)
 	}
 	if response.Result.State == "FAULT" {
-		return false, fmt.Errorf("engine faulted")
+		return false, []byte{}, fmt.Errorf("engine faulted")
 	}
 	if len(response.Result.Stack) == 0 {
-		return false, fmt.Errorf("no stack result returned")
+		return false, []byte{}, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
 	b, err := strconv.ParseBool(stack.Value)
 	if err != nil {
-		return false, fmt.Errorf("conversion failed")
+		return false, []byte{}, fmt.Errorf("conversion failed")
 	}
-	return b, nil
+	return b, script, nil
 }
-
-// TODO
-// Add a truely transfer method
