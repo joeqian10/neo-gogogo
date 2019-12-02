@@ -21,6 +21,7 @@ func NewInvocationTransaction(script []byte) *InvocationTransaction {
 		Script:      script,
 	}
 	itx.Type = Invocation_Transaction
+	itx.Version = 1
 	return itx
 }
 
@@ -103,7 +104,7 @@ func (tx *InvocationTransaction) Serialize(bw *io.BinaryWriter) {
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
+func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinaryWriter) {
 	tx.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
