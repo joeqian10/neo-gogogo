@@ -20,13 +20,13 @@ type Witness struct {
 }
 
 // Deserialize implements Serializable interface.
-func (w *Witness) Deserialize(br *io.BinaryReader) {
+func (w *Witness) Deserialize(br *io.BinReader) {
 	w.InvocationScript = br.ReadBytes()
 	w.VerificationScript = br.ReadBytes()
 }
 
 // Serialize implements Serializable interface.
-func (w *Witness) Serialize(bw *io.BinaryWriter) {
+func (w *Witness) Serialize(bw *io.BinWriter) {
 	bw.WriteBytes(w.InvocationScript)
 	bw.WriteBytes(w.VerificationScript)
 }

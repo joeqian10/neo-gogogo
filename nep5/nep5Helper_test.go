@@ -231,7 +231,7 @@ func TestNep5Helper_Transfer(t *testing.T) {
 
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-	b, _, e := nh.Transfer(scriptHash, address, address, helper.Fixed8FromInt64(1))
+	b, e := nh.Transfer(scriptHash, address, address, 1)
 	assert.Nil(t, e)
 	assert.Equal(t, true, b)
 }

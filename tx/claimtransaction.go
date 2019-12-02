@@ -40,8 +40,8 @@ func (tx *ClaimTransaction) HashString() string {
 }
 
 func (tx *ClaimTransaction) UnsignedRawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	tx.SerializeUnsigned(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	tx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -49,8 +49,8 @@ func (tx *ClaimTransaction) UnsignedRawTransaction() []byte {
 }
 
 func (tx *ClaimTransaction) RawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	tx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	tx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -67,7 +67,7 @@ func (tx *ClaimTransaction) FromHexString(rawTx string) (*ClaimTransaction, erro
 	if err != nil {
 		return nil, err
 	}
-	br := io.NewBinaryReaderFromBuf(b)
+	br := io.NewBinReaderFromBuf(b)
 	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
@@ -76,18 +76,18 @@ func (tx *ClaimTransaction) FromHexString(rawTx string) (*ClaimTransaction, erro
 }
 
 // Deserialize implements Serializable interface.
-func (tx *ClaimTransaction) Deserialize(br *io.BinaryReader) {
+func (tx *ClaimTransaction) Deserialize(br *io.BinReader) {
 	tx.DeserializeUnsigned(br)
 	tx.Transaction.DeserializeWitnesses(br)
 }
 
-func (tx *ClaimTransaction) DeserializeUnsigned(br *io.BinaryReader) {
+func (tx *ClaimTransaction) DeserializeUnsigned(br *io.BinReader) {
 	tx.Transaction.DeserializeUnsigned1(br)
 	tx.DeserializeExclusiveData(br)
 	tx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (tx *ClaimTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
+func (tx *ClaimTransaction) DeserializeExclusiveData(br *io.BinReader) {
 	lenClaims := br.ReadVarUint()
 	tx.Claims = make([]*CoinReference, lenClaims)
 	for i := 0; i < int(lenClaims); i++ {
@@ -97,18 +97,18 @@ func (tx *ClaimTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
 }
 
 // Serialize implements Serializable interface.
-func (tx *ClaimTransaction) Serialize(bw *io.BinaryWriter) {
+func (tx *ClaimTransaction) Serialize(bw *io.BinWriter) {
 	tx.SerializeUnsigned(bw)
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *ClaimTransaction) SerializeUnsigned(bw *io.BinaryWriter) {
+func (tx *ClaimTransaction) SerializeUnsigned(bw *io.BinWriter) {
 	tx.Transaction.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
 
-func (tx *ClaimTransaction) SerializeExclusiveData(bw *io.BinaryWriter) {
+func (tx *ClaimTransaction) SerializeExclusiveData(bw *io.BinWriter) {
 	bw.WriteVarUint(uint64(len(tx.Claims)))
 	for _, claim := range tx.Claims {
 		claim.Serialize(bw)

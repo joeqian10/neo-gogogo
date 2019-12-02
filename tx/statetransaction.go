@@ -30,8 +30,8 @@ func (tx *StateTransaction) HashString() string {
 }
 
 func (tx *StateTransaction) UnsignedRawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	tx.SerializeUnsigned(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	tx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -39,8 +39,8 @@ func (tx *StateTransaction) UnsignedRawTransaction() []byte {
 }
 
 func (tx *StateTransaction) RawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	tx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	tx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -57,7 +57,7 @@ func (tx *StateTransaction) FromHexString(rawTx string) (*StateTransaction, erro
 	if err != nil {
 		return nil, err
 	}
-	br := io.NewBinaryReaderFromBuf(b)
+	br := io.NewBinReaderFromBuf(b)
 	tx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
@@ -66,18 +66,18 @@ func (tx *StateTransaction) FromHexString(rawTx string) (*StateTransaction, erro
 }
 
 // Deserialize implements Serializable interface.
-func (tx *StateTransaction) Deserialize(br *io.BinaryReader) {
+func (tx *StateTransaction) Deserialize(br *io.BinReader) {
 	tx.DeserializeUnsigned(br)
 	tx.Transaction.DeserializeWitnesses(br)
 }
 
-func (tx *StateTransaction) DeserializeUnsigned(br *io.BinaryReader) {
+func (tx *StateTransaction) DeserializeUnsigned(br *io.BinReader) {
 	tx.Transaction.DeserializeUnsigned1(br)
 	tx.DeserializeExclusiveData(br)
 	tx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (tx *StateTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
+func (tx *StateTransaction) DeserializeExclusiveData(br *io.BinReader) {
 	lenDesc := br.ReadVarUint()
 	tx.Descriptors = make([]*StateDescriptor, lenDesc)
 	for i := 0; i < int(lenDesc); i++ {
@@ -87,18 +87,18 @@ func (tx *StateTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
 }
 
 // Serialize implements Serializable interface.
-func (tx *StateTransaction) Serialize(bw *io.BinaryWriter) {
+func (tx *StateTransaction) Serialize(bw *io.BinWriter) {
 	tx.SerializeUnsigned(bw)
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *StateTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
+func (tx *StateTransaction) SerializeUnsigned(bw *io.BinWriter)  {
 	tx.Transaction.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
 
-func (tx *StateTransaction) SerializeExclusiveData(bw *io.BinaryWriter)  {
+func (tx *StateTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
 	bw.WriteVarUint(uint64(len(tx.Descriptors)))
 	for _, desc := range tx.Descriptors {
 		desc.Serialize(bw)

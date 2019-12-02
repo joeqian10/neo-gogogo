@@ -6,27 +6,27 @@ import (
 	"io"
 )
 
-// BinaryReader is a convenient wrapper around a io.Reader and err object.
+// BinReader is a convenient wrapper around a io.Reader and err object.
 // Used to simplify error handling when reading into a struct with many fields.
-type BinaryReader struct {
+type BinReader struct {
 	r   io.Reader
 	Err error
 }
 
-// NewBinaryReaderFromIO makes a BinaryReader from io.Reader.
-func NewBinaryReaderFromIO(ior io.Reader) *BinaryReader {
-	return &BinaryReader{r: ior}
+// NewBinReaderFromIO makes a BinReader from io.Reader.
+func NewBinReaderFromIO(ior io.Reader) *BinReader {
+	return &BinReader{r: ior}
 }
 
-// NewBinaryReaderFromBuf makes a BinaryReader from byte buffer.
-func NewBinaryReaderFromBuf(b []byte) *BinaryReader {
+// NewBinReaderFromBuf makes a BinReader from byte buffer.
+func NewBinReaderFromBuf(b []byte) *BinReader {
 	r := bytes.NewReader(b)
-	return NewBinaryReaderFromIO(r)
+	return NewBinReaderFromIO(r)
 }
 
 // ReadLE reads from the underlying io.Reader
 // into the interface v in little-endian format.
-func (r *BinaryReader) ReadLE(v interface{}) {
+func (r *BinReader) ReadLE(v interface{}) {
 	if r.Err != nil {
 		return
 	}
@@ -35,7 +35,7 @@ func (r *BinaryReader) ReadLE(v interface{}) {
 
 // ReadBE reads from the underlying io.Reader
 // into the interface v in big-endian format.
-func (r *BinaryReader) ReadBE(v interface{}) {
+func (r *BinReader) ReadBE(v interface{}) {
 	if r.Err != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func (r *BinaryReader) ReadBE(v interface{}) {
 
 // ReadVarUint reads a variable-length-encoded integer from the
 // underlying reader.
-func (r *BinaryReader) ReadVarUint() uint64 {
+func (r *BinReader) ReadVarUint() uint64 {
 	if r.Err != nil {
 		return 0
 	}
@@ -73,7 +73,7 @@ func (r *BinaryReader) ReadVarUint() uint64 {
 
 // ReadBytes reads the next set of bytes from the underlying reader.
 // ReadVarUInt() is used to determine how large that slice is
-func (r *BinaryReader) ReadBytes() []byte {
+func (r *BinReader) ReadBytes() []byte {
 	n := r.ReadVarUint()
 	b := make([]byte, n)
 	r.ReadLE(b)
@@ -81,7 +81,7 @@ func (r *BinaryReader) ReadBytes() []byte {
 }
 
 // ReadString calls ReadBytes and casts the results as a string.
-func (r *BinaryReader) ReadString() string {
+func (r *BinReader) ReadString() string {
 	b := r.ReadBytes()
 	return string(b)
 }

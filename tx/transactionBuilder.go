@@ -129,6 +129,7 @@ func (tb *TransactionBuilder) GetBalance(account helper.UInt160, assetId helper.
 }
 
 
+//
 // this is a general api for invoking smart contract and creating an invocation transaction, including transferring nep-5 assets
 func (tb *TransactionBuilder)MakeInvocationTransaction(script []byte, from helper.UInt160, attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
 	if changeAddress.String() == "0000000000000000000000000000000000000000" {
@@ -141,7 +142,6 @@ func (tb *TransactionBuilder)MakeInvocationTransaction(script []byte, from helpe
 	}
 	fee = fee.Add(*gas)
 	itx := NewInvocationTransaction(script)
-	if attributes != nil {itx.Attributes = attributes}
 	itx.Gas = *gas
 	if itx.Size() > 1024 {
 		fee = fee.Add(helper.Fixed8FromFloat64(0.001))

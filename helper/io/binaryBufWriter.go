@@ -5,22 +5,22 @@ import (
 	"errors"
 )
 
-// BufBinaryWriter is an additional layer on top of BinaryWriter that
+// BufBinWriter is an additional layer on top of BinWriter that
 // automatically creates buffer to write into that you can get after all
 // writes via Bytes().
-type BufBinaryWriter struct {
-	*BinaryWriter
+type BufBinWriter struct {
+	*BinWriter
 	buf *bytes.Buffer
 }
 
-// NewBufBinaryWriter makes a BufBinaryWriter with an empty byte buffer.
-func NewBufBinaryWriter() *BufBinaryWriter {
+// NewBufBinWriter makes a BufBinWriter with an empty byte buffer.
+func NewBufBinWriter() *BufBinWriter {
 	b := new(bytes.Buffer)
-	return &BufBinaryWriter{BinaryWriter: NewBinaryWriterFromIO(b), buf: b}
+	return &BufBinWriter{BinWriter: NewBinWriterFromIO(b), buf: b}
 }
 
 // Bytes returns resulting buffer and makes future writes return an error.
-func (bw *BufBinaryWriter) Bytes() []byte {
+func (bw *BufBinWriter) Bytes() []byte {
 	if bw.Err != nil {
 		return nil
 	}
@@ -33,7 +33,7 @@ func (bw *BufBinaryWriter) Bytes() []byte {
 // create it again, but beware that the buffer is gonna be the same as the one
 // returned by Bytes(), so if you need that data after Reset() you have to copy
 // it yourself.
-func (bw *BufBinaryWriter) Reset() {
+func (bw *BufBinWriter) Reset() {
 	bw.Err = nil
 	bw.buf.Reset()
 }

@@ -36,12 +36,12 @@ func NewTransaction() *Transaction {
 	}
 }
 
-func (t *Transaction) DeserializeUnsigned1(br *io.BinaryReader) {
+func (t *Transaction) DeserializeUnsigned1(br *io.BinReader) {
 	br.ReadLE(&t.Type)
 	br.ReadLE(&t.Version)
 }
 
-func (t *Transaction) DeserializeUnsigned2(br *io.BinaryReader) {
+func (t *Transaction) DeserializeUnsigned2(br *io.BinReader) {
 	// Attributes
 	lenAttributes := br.ReadVarUint()
 	t.Attributes = make([]*TransactionAttribute, lenAttributes)
@@ -65,7 +65,7 @@ func (t *Transaction) DeserializeUnsigned2(br *io.BinaryReader) {
 	}
 }
 
-func (t *Transaction) DeserializeWitnesses(br *io.BinaryReader) {
+func (t *Transaction) DeserializeWitnesses(br *io.BinReader) {
 	lenWitnesses := br.ReadVarUint()
 	t.Witnesses = make([]*Witness, lenWitnesses)
 	for i := 0; i < int(lenWitnesses); i++ {
@@ -74,12 +74,12 @@ func (t *Transaction) DeserializeWitnesses(br *io.BinaryReader) {
 	}
 }
 
-func (t *Transaction) SerializeUnsigned1(bw *io.BinaryWriter) {
+func (t *Transaction) SerializeUnsigned1(bw *io.BinWriter) {
 	bw.WriteLE(t.Type)
 	bw.WriteLE(t.Version)
 }
 
-func (t *Transaction) SerializeUnsigned2(bw *io.BinaryWriter) {
+func (t *Transaction) SerializeUnsigned2(bw *io.BinWriter) {
 	// Attributes
 	bw.WriteVarUint(uint64(len(t.Attributes)))
 	for _, attr := range t.Attributes {
@@ -97,7 +97,7 @@ func (t *Transaction) SerializeUnsigned2(bw *io.BinaryWriter) {
 	}
 }
 
-func (t *Transaction) SerializeWitnesses(bw *io.BinaryWriter) {
+func (t *Transaction) SerializeWitnesses(bw *io.BinWriter) {
 	bw.WriteVarUint(uint64(len(t.Witnesses)))
 	for _, s := range t.Witnesses {
 		s.Serialize(bw)

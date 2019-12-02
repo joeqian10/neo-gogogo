@@ -34,8 +34,8 @@ func TestInvocationTransaction(t *testing.T) {
 	assert.Equal(t, len(rawTx)/2, itx.Size())
 
 	// Serialize
-	buf := io.NewBufBinaryWriter()
-	itx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	itx.Serialize(buf.BinWriter)
 	assert.Nil(t, buf.Err)
 
 	assert.Equal(t, rawTx, hex.EncodeToString(buf.Bytes()))

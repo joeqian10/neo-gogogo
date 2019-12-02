@@ -33,8 +33,8 @@ func TestStateTransaction(t *testing.T) {
 	assert.Equal(t, Validator, descriptor.Type)
 
 	// Serialize
-	buf := io.NewBufBinaryWriter()
-	stx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	stx.Serialize(buf.BinWriter)
 
 	assert.Equal(t, nil, buf.Err)
 	assert.Equal(t, rawTx, hex.EncodeToString(buf.Bytes()))

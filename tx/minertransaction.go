@@ -31,8 +31,8 @@ func (mtx *MinerTransaction) HashString() string {
 }
 
 func (mtx *MinerTransaction) UnsignedRawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	mtx.SerializeUnsigned(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	mtx.SerializeUnsigned(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -40,8 +40,8 @@ func (mtx *MinerTransaction) UnsignedRawTransaction() []byte {
 }
 
 func (mtx *MinerTransaction) RawTransaction() []byte {
-	buf := io.NewBufBinaryWriter()
-	mtx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	mtx.Serialize(buf.BinWriter)
 	if buf.Err != nil {
 		return nil
 	}
@@ -58,7 +58,7 @@ func (mtx *MinerTransaction) FromHexString(rawTx string) (*MinerTransaction, err
 	if err != nil {
 		return nil, err
 	}
-	br := io.NewBinaryReaderFromBuf(b)
+	br := io.NewBinReaderFromBuf(b)
 	mtx.Deserialize(br)
 	if br.Err != nil {
 		return nil, br.Err
@@ -67,34 +67,34 @@ func (mtx *MinerTransaction) FromHexString(rawTx string) (*MinerTransaction, err
 }
 
 // Deserialize implements Serializable interface.
-func (mtx *MinerTransaction) Deserialize(br *io.BinaryReader) {
+func (mtx *MinerTransaction) Deserialize(br *io.BinReader) {
 	mtx.DeserializeUnsigned(br)
 	mtx.Transaction.DeserializeWitnesses(br)
 }
 
-func (mtx *MinerTransaction) DeserializeUnsigned(br *io.BinaryReader) {
+func (mtx *MinerTransaction) DeserializeUnsigned(br *io.BinReader) {
 	mtx.Transaction.DeserializeUnsigned1(br)
 	mtx.DeserializeExclusiveData(br)
 	mtx.Transaction.DeserializeUnsigned2(br)
 }
 
-func (mtx *MinerTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
+func (mtx *MinerTransaction) DeserializeExclusiveData(br *io.BinReader) {
 	br.ReadLE(&mtx.Nonce)
 }
 
 // Serialize implements Serializable interface.
-func (mtx *MinerTransaction) Serialize(bw *io.BinaryWriter) {
+func (mtx *MinerTransaction) Serialize(bw *io.BinWriter) {
 	mtx.SerializeUnsigned(bw)
 	mtx.SerializeWitnesses(bw)
 }
 
-func (mtx *MinerTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
+func (mtx *MinerTransaction) SerializeUnsigned(bw *io.BinWriter)  {
 	mtx.Transaction.SerializeUnsigned1(bw)
 	mtx.SerializeExclusiveData(bw)
 	mtx.SerializeUnsigned2(bw)
 }
 
-func (mtx *MinerTransaction) SerializeExclusiveData(bw *io.BinaryWriter)  {
+func (mtx *MinerTransaction) SerializeExclusiveData(bw *io.BinWriter)  {
 	bw.WriteLE(mtx.Nonce)
 }
 

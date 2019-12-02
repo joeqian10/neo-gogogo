@@ -19,7 +19,7 @@ func (attr *TransactionAttribute) Size() int {
 }
 
 // Deserialize implements Serializable interface.
-func (attr *TransactionAttribute) Deserialize(br *io.BinaryReader) {
+func (attr *TransactionAttribute) Deserialize(br *io.BinReader) {
 	br.ReadLE(&attr.Usage)
 
 	// very special case
@@ -54,7 +54,7 @@ func (attr *TransactionAttribute) Deserialize(br *io.BinaryReader) {
 }
 
 // Serialize implements Serializable interface.
-func (attr *TransactionAttribute) Serialize(bw *io.BinaryWriter) {
+func (attr *TransactionAttribute) Serialize(bw *io.BinWriter) {
 	bw.WriteLE(&attr.Usage)
 	switch attr.Usage {
 	case ECDH02, ECDH03:

@@ -34,8 +34,8 @@ func TestClaimTransaction(t *testing.T) {
 	assert.Equal(t, verif, hex.EncodeToString(ctx.Witnesses[0].VerificationScript))
 
 	// Serialize
-	buf := io.NewBufBinaryWriter()
-	ctx.Serialize(buf.BinaryWriter)
+	buf := io.NewBufBinWriter()
+	ctx.Serialize(buf.BinWriter)
 	assert.Nil(t, buf.Err)
 	assert.Equal(t, rawTx, hex.EncodeToString(buf.Bytes()))
 
