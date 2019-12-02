@@ -15,6 +15,7 @@ type UInt160 [uint160Size]uint8
 // UInt160FromString attempts to decode the given big endian string into an UInt160.
 func UInt160FromString(s string) (UInt160, error) {
 	var u UInt160
+	s = strings.TrimPrefix(s, "0x")
 	if len(s) != uint160Size*2 {
 		return u, fmt.Errorf("expected string size of %d got %d", uint160Size*2, len(s))
 	}

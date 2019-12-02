@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	TransactionVersion uint8 = 1 // neo-2.x
+	TransactionVersion uint8 = 0 // neo-2.x
 	MaxTransactionSize       = 102400
 )
 
@@ -117,6 +117,15 @@ func (t *Transaction) AddScriptHashToAttribute(scriptHash helper.UInt160) {
 	if i == len(t.Attributes) {
 		t.Attributes = append(t.Attributes, &TransactionAttribute{Usage: Script, Data: scriptHash.Bytes()})
 	}
+}
+
+// add address if the account is not in transaction attributes
+func (t *Transaction) AddAddressToAttribute(address string, err error) {
+	scriptHash, err := helper.AddressToScriptHash(address)
+	if err != nil {
+		return
+	}
+	t.AddScriptHashToAttribute(scriptHash)
 }
 
 type ITransaction interface {
