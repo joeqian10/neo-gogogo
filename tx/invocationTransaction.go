@@ -1,6 +1,7 @@
 package tx
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
@@ -22,6 +23,9 @@ func NewInvocationTransaction(script []byte) *InvocationTransaction {
 	}
 	itx.Type = Invocation_Transaction
 	itx.Version = 1
+	nonce := make([]byte, 32)
+	rand.Read(nonce)
+	itx.Attributes = append(itx.Attributes, &TransactionAttribute{Usage: Remark1, Data: nonce})
 	return itx
 }
 

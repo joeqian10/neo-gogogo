@@ -295,13 +295,39 @@ func TestWalletHelper_TransferNep5(t *testing.T) {
 //func TestWallet_Transfer(t *testing.T) {
 //	txBuilder := tx.NewTransactionBuilder("http://seed2.ngd.network:20332")
 //	account, _ := NewAccountFromWIF("L2LGkrwiNmUAnWYb1XGd5mv7v2eDf6P4F3gHyXSrNJJR4ArmBp7Q")
+//	address := "AKeLhhHm4hEUfLWVBCYRNjio9xhGJAom5G"
 //	api := NewWalletHelper(txBuilder, account)
-//	neoBalance, gasBalace, _ := api.GetBalance("AKeLhhHm4hEUfLWVBCYRNjio9xhGJAom5G")
+//	neoBalance, gasBalace, _ := api.GetBalance(address)
 //
 //	assert.Equal(t, 800, neoBalance)
 //	assert.Equal(t, 500.12345678, gasBalace)
 //
-//	result, err := api.Transfer(tx.NeoToken, "AKeLhhHm4hEUfLWVBCYRNjio9xhGJAom5G", "AR2uSMBjLv1RppjW9dYn4PHTnuPyBKtGta", 200)
-//	assert.NotNil(t,err)
+//	result, err := api.Transfer(tx.NeoToken, address, "AR2uSMBjLv1RppjW9dYn4PHTnuPyBKtGta", 200)
+//	assert.Nil(t, err)
 //	assert.True(t, result)
+//
+//	claimable := txBuilder.Client.GetClaimable(address)
+//	assert.True(t, claimable.Result.Unclaimed > 0)
+//
+//	res, _ := api.ClaimGas(address)
+//	assert.True(t, res)
+//}
+//
+//func TestWallet_NEP5(t *testing.T) {
+//	txBuilder := tx.NewTransactionBuilder("http://localhost:30333")
+//	account, _ := NewAccountFromWIF("L2LGkrwiNmUAnWYb1XGd5mv7v2eDf6P4F3gHyXSrNJJR4ArmBp7Q")
+//	address := "AKeLhhHm4hEUfLWVBCYRNjio9xhGJAom5G"
+//	api := NewWalletHelper(txBuilder, account)
+//
+//	tokenHash, _ := helper.UInt160FromString("0x43bb08d7c03ac66582079b57059108565f91ece5")
+//	addressHash, _ := helper.AddressToScriptHash(address)
+//	nep5Api := nep5.NewNep5Helper("http://localhost:30333")
+//	tokenBalance, _ := nep5Api.BalanceOf(tokenHash, addressHash)
+//
+//	result, err := api.TransferNep5(tokenHash, "AKeLhhHm4hEUfLWVBCYRNjio9xhGJAom5G", "AdmyedL3jdw2TLvBzoUD2yU443NeKrP5t5", 200)
+//	assert.Nil(t, err)
+//	assert.True(t, result)
+//
+//	tokenBalanceAfter, _ := nep5Api.BalanceOf(tokenHash, addressHash)
+//	assert.Equal(t, uint64(0), tokenBalanceAfter-tokenBalance)
 //}

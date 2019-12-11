@@ -11,22 +11,18 @@ import (
 
 func TestNewNep5Helper(t *testing.T) {
 	nep5helper := NewNep5Helper("http://seed1.ngd.network:20332")
-	if nep5helper == nil {
-		t.Fail()
-	}
-	assert.Equal(t, "http://seed1.ngd.network:20332", nep5helper.EndPoint)
+	assert.NotNil(t, nep5helper)
 }
 
 func TestNep5Helper_BalanceOf(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -34,10 +30,10 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"148f6c5be89c0cb6579e44a8bf9bfd2ecbcc11dfdc51c10962616c616e63654f666763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.383",
+		Result: models.InvokeResult{
+			Script:      "148f6c5be89c0cb6579e44a8bf9bfd2ecbcc11dfdc51c10962616c616e63654f666763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.383",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "ByteArray",
@@ -57,13 +53,12 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 func TestNep5Helper_Decimals(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -71,10 +66,10 @@ func TestNep5Helper_Decimals(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"00c108646563696d616c736763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.246",
+		Result: models.InvokeResult{
+			Script:      "00c108646563696d616c736763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.246",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "Integer",
@@ -93,13 +88,12 @@ func TestNep5Helper_Decimals(t *testing.T) {
 func TestNep5Helper_Name(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -107,10 +101,10 @@ func TestNep5Helper_Name(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.126",
+		Result: models.InvokeResult{
+			Script:      "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.126",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "ByteArray",
@@ -130,13 +124,12 @@ func TestNep5Helper_Name(t *testing.T) {
 func TestNep5Helper_Symbol(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -144,10 +137,10 @@ func TestNep5Helper_Symbol(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"00c10673796d626f6c6763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.141",
+		Result: models.InvokeResult{
+			Script:      "00c10673796d626f6c6763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.141",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "ByteArray",
@@ -166,13 +159,12 @@ func TestNep5Helper_Symbol(t *testing.T) {
 func TestNep5Helper_TotalSupply(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -180,10 +172,10 @@ func TestNep5Helper_TotalSupply(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"00c10b746f74616c537570706c796763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.223",
+		Result: models.InvokeResult{
+			Script:      "00c10b746f74616c537570706c796763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.223",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "ByteArray",
@@ -202,13 +194,12 @@ func TestNep5Helper_TotalSupply(t *testing.T) {
 func TestNep5Helper_Transfer(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	var nh = Nep5Helper{
-		EndPoint: "",
-		Client:   clientMock,
+		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -216,10 +207,10 @@ func TestNep5Helper_Transfer(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"5114dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f14dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f53c1087472616e736665726763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.494",
+		Result: models.InvokeResult{
+			Script:      "5114dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f14dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f53c1087472616e736665726763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.494",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "Boolean",
