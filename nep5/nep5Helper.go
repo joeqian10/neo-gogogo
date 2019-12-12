@@ -11,7 +11,6 @@ import (
 
 // nep5 wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
 type Nep5Helper struct {
-	EndPoint string
 	Client rpc.IRpcClient
 }
 
@@ -21,8 +20,7 @@ func NewNep5Helper(endPoint string) *Nep5Helper {
 		return nil
 	}
 	return &Nep5Helper{
-		EndPoint:endPoint,
-		Client:   client,
+		Client: client,
 	}
 }
 
