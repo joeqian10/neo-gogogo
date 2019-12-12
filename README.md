@@ -22,7 +22,7 @@ go get github.com/joeqian10/neo-gogogo
 
 ### 2.2 Structure
 
-This SDK has seven modules, and the structure of how these modules compose each other is shown below. For example, the "helper", "sc", "tx", "wallet" modules are all composed of "crypto" module.
+This SDK has seven modules, and the structure of how these modules compose each other is shown [here](https://mermaidjs.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiY2xhc3NEaWFncmFtXG4gICAgd2FsbGV0ICotLSBjcnlwdG9cbiAgICB3YWxsZXQgKi0tIGhlbHBlclxuICAgIHdhbGxldCAqLS0gc2NcbiAgICB3YWxsZXQgKi0tKiB0eFxuXG4gICAgdHggKi0tIGNyeXB0b1xuICAgIHR4ICotLSBoZWxwZXJcbiAgICB0eCAqLS0gcnBjXG4gICAgdHggKi0tIHNjXG5cbiAgICBuZXA1ICotLSBoZWxwZXJcbiAgICBuZXA1ICotLSBycGNcbiAgICBuZXA1ICotLSBzY1xuXG4gICAgc2MgKi0tIGNyeXB0b1xuICAgIHNjICotLSBoZWxwZXJcblxuICAgIHJwYyAqLS0gaGVscGVyXG4gICAgaGVscGVyICotLSBjcnlwdG86wqBjb21wb3NpdGlvblxuIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifX0). For example, the "helper", "sc", "tx", "wallet" modules are all composed of "crypto" module.
 
 ```mermaid
 classDiagram
