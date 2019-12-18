@@ -438,12 +438,12 @@ func TestRpcClient_GetBlockByHash(t *testing.T) {
 	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
 	assert.Equal(t, 1521, r.Size)
 	assert.Equal(t, 0, r.Version)
-	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
-	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.PreviousBlockHash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.MerkleRoot)
 	assert.Equal(t, 1573123342, r.Time)
 	assert.Equal(t, 3386365, r.Index)
 	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
-	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.NextConsensus)
 }
 
 func TestRpcClient_GetBlockByIndex(t *testing.T) {
@@ -605,12 +605,12 @@ func TestRpcClient_GetBlockByIndex(t *testing.T) {
 	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
 	assert.Equal(t, 1521, r.Size)
 	assert.Equal(t, 0, r.Version)
-	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
-	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.PreviousBlockHash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.MerkleRoot)
 	assert.Equal(t, 1573123342, r.Time)
 	assert.Equal(t, 3386365, r.Index)
 	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
-	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.NextConsensus)
 }
 
 func TestRpcClient_GetBlockCount(t *testing.T) {
@@ -661,12 +661,12 @@ func TestRpcClient_GetBlockHeaderByHash(t *testing.T) {
 	assert.Equal(t, "0x035212da3f0e73cd41e3f6e22ccbedaac064e4150ad6dd2bed3eeff420be3179", r.Hash)
 	assert.Equal(t, 676, r.Size)
 	assert.Equal(t, 0, r.Version)
-	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.Previousblockhash)
-	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.Merkleroot)
+	assert.Equal(t, "0xff5396db837d368acd334c19f98b7bc8885b5efcbd85fa02e6a5558c4966e840", r.PreviousBlockHash)
+	assert.Equal(t, "0x3216ea4203e7a90d188cc97eabbfa0bbfc6589debbcacbc43eeff0952b380757", r.MerkleRoot)
 	assert.Equal(t, 1573123342, r.Time)
 	assert.Equal(t, 3386365, r.Index)
 	assert.Equal(t, "a6e6d82b50273b82", r.Nonce)
-	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.Nextconsensus)
+	assert.Equal(t, "AUNSizuErA3dv1a2ag2ozvikkQS7hhPY1X", r.NextConsensus)
 }
 
 func TestRpcClient_GetBlockHash(t *testing.T) {

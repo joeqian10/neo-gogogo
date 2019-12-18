@@ -5,7 +5,7 @@ type ContractState struct {
 	Hash        string   `json:"hash"`
 	Script      string   `json:"script"`
 	Parameters  []string `json:"parameters"`
-	Returntype  string   `json:"returntype"`
+	ReturnType  string   `json:"returntype"`
 	Name        string   `json:"name"`
 	CodeVersion string   `json:"code_version"`
 	Author      string   `json:"author"`

@@ -12,3 +12,16 @@ type InvokeStackResult struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
 }
+
+type InvokeFunctionStackArg struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+func NewInvokeFunctionStackArg(t string, v string) InvokeFunctionStackArg {
+	return InvokeFunctionStackArg{Type: t, Value: v}
+}
+
+func NewInvokeFunctionStackByteArray(value string) InvokeFunctionStackArg {
+	return InvokeFunctionStackArg{Type: "ByteArray", Value: value}
+}

@@ -124,12 +124,10 @@ func (n *RpcClient) GetBlockHeaderByHash(blockHash string) GetBlockHeaderRespons
 	return response
 }
 
-//func (n *RpcClient) GetBlockHeaderByIndex(index uint32) GetBlockHeaderResponse {
-//	response := GetBlockHeaderResponse{}
-//	params := []interface{}{index, 1}
-//	_ = n.makeRequest("getblockheader", params, &response)
-//	return response
-//}
+func (n *RpcClient) GetBlockHeaderByIndex(index uint32) GetBlockHeaderResponse {
+	hash := n.GetBlockHash(index).Result
+	return n.GetBlockHeaderByHash(hash)
+}
 
 func (n *RpcClient) GetBlockHash(index uint32) GetBlockHashResponse {
 	response := GetBlockHashResponse{}
@@ -344,5 +342,12 @@ func (n *RpcClient) ValidateAddress(address string) ValidateAddressResponse {
 	response := ValidateAddressResponse{}
 	params := []interface{}{address}
 	_ = n.makeRequest("validateaddress", params, &response)
+	return response
+}
+
+func (n *RpcClient) GetCrossChainProof(blockIndex int, txID string) GetCrossChainProofResponse {
+	response := GetCrossChainProofResponse{}
+	params := []interface{}{blockIndex, txID}
+	_ = n.makeRequest("getcrossproof", params, &response)
 	return response
 }

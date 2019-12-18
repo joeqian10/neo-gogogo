@@ -243,8 +243,9 @@ type ValidateAddressResponse struct {
 	Result models.ValidateAddress `json:"result"`
 }
 
-type GetCrosschainProofResponse struct {
+type GetCrossChainProofResponse struct {
 	RpcResponse
 	ErrorResponse
 	CrosschainProof string `json:"result"`
 }
+

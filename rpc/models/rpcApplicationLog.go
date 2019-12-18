@@ -15,12 +15,13 @@ type RpcApplicationLog struct {
 			Contract string `json:"contract"`
 			State    struct {
 				Type  string        `json:"type"`
-				Value []interface{} `json:"value"`
-				//Value []struct {
-				//	Type  string `json:"type"`
-				//	Value string `json:"value"`
-				//}
+				Value interface{} `json:"value"`
 			} `json:"state"`
 		} `json:"notifications"`
 	} `json:"executions"`
+}
+
+type RpcContractParameter struct {
+	Type string 		`json:"type"`
+	Value interface{} 	`json:"value"`
 }
