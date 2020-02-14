@@ -100,7 +100,7 @@ func TestScriptBuilder_EmitSysCall(t *testing.T) {
 func TestScriptBuilder_MakeInvocationScript(t *testing.T) {
 	sb := NewScriptBuilder()
 	scriptHash, _ := helper.UInt160FromString("b9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	sb.MakeInvocationScript(scriptHash.Bytes(), "name", []ContractParameter{})
+	sb.MakeInvocationScript(scriptHash, "name", []ContractParameter{})
 	b := sb.ToArray()
 	assert.Equal(t, "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9", helper.BytesToHex(b))
 }
@@ -124,7 +124,7 @@ func TestScriptBuilder_MakeInvocationScript2(t *testing.T) {
 		Value: int64(20000000000),
 	}
 
-	sb.MakeInvocationScript(scriptHash.Bytes(), "transfer", []ContractParameter{cp1, cp2, cp3})
+	sb.MakeInvocationScript(scriptHash, "transfer", []ContractParameter{cp1, cp2, cp3})
 	b := sb.ToArray()
 	assert.Equal(t, "0500c817a80414f157c713c1972ba426ceb4c2b10826e54047d522142a73c28a1e57d7bbd212d598715194690e29d8bc53c1087472616e7366657267e5ec915f56089105579b078265c63ac0d708bb43", helper.BytesToHex(b))
 }
