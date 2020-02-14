@@ -26,7 +26,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 	clientMock.On("GetUnspents", mock.Anything).Return(rpc.GetUnspentsResponse{
 		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID:      1,
+			ID: 1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -37,7 +37,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 		Result: models.RpcUnspent{
 			Balances: []models.UnspentBalance{
 				{
-					Unspents: []models.Unspent{
+					Unspents:    []models.Unspent{
 						{
 							Txid:  "4ee4af75d5aa60598fbae40ce86fb9a23ffec5a75dfa8b59d259d15f9e304319",
 							N:     0,
@@ -50,7 +50,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 					Amount:      27844.821,
 				},
 				{
-					Unspents: []models.Unspent{
+					Unspents:    []models.Unspent{
 						{
 							Txid:  "c3182952855314b3f4b1ecf01a03b891d4627d19426ce841275f6d4c186e729a",
 							N:     0,
@@ -80,9 +80,9 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 		Client:   clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse: rpc.RpcResponse{
+		RpcResponse:   rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID:      1,
+			ID: 1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -90,10 +90,10 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result: models.InvokeResult{
-			Script:      "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:       "HALT",
-			GasConsumed: "0.126",
+		Result:        models.InvokeResult{
+			Script:"00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:"HALT",
+			GasConsumed:"0.126",
 			Stack: []models.InvokeStackResult{
 				{
 					Type:  "ByteArray",
@@ -115,9 +115,9 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 		Client:   clientMock,
 	}
 	clientMock.On("GetClaimable", mock.Anything).Return(rpc.GetClaimableResponse{
-		RpcResponse: rpc.RpcResponse{
+		RpcResponse:   rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID:      1,
+			ID: 1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -125,7 +125,7 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result: models.RpcClaimable{
+		Result:        models.RpcClaimable{
 			Claimables: []models.Claimable{
 				{
 					TxId:        "52ba70ef18e879785572c917795cd81422c3820b8cf44c24846a30ee7376fd77",
@@ -138,8 +138,8 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 					Unclaimed:   750.032,
 				},
 			},
-			Address:   "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
-			Unclaimed: 750.032,
+			Address:"AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
+			Unclaimed:750.032,
 		},
 	})
 
@@ -150,70 +150,4 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 	cr := crs[0]
 	assert.Equal(t, "52ba70ef18e879785572c917795cd81422c3820b8cf44c24846a30ee7376fd77", cr.PrevHash.String())
 	assert.Equal(t, helper.Fixed8FromFloat64(750.032).Value, f.Value)
-}
-
-func TestTransactionBuilder_GetTransactionInputs(t *testing.T) {
-	var clientMock = new(rpc.RpcClientMock)
-	var tb = TransactionBuilder{
-		EndPoint: "",
-		Client:   clientMock,
-	}
-	clientMock.On("GetUnspents", mock.Anything).Return(rpc.GetUnspentsResponse{
-		RpcResponse: rpc.RpcResponse{
-			JsonRpc: "2.0",
-			ID:      1,
-		},
-		ErrorResponse: rpc.ErrorResponse{
-			Error: rpc.RpcError{
-				Code:    0,
-				Message: "",
-			},
-		},
-		Result: models.RpcUnspent{
-			Balances: []models.UnspentBalance{
-				{
-					Unspents: []models.Unspent{
-						{
-							Txid:  "0a99ebd286931375c2ec828603e88392e3a40e9cecd4b228bd6be206fdb21005",
-							N:     0,
-							Value: 11250,
-						},
-						{
-							Txid:  "1c2f4605fa4c5ba9ca2a8ae87ae083a241d407f59472e707fe34e52d277d2331",
-							N:     1,
-							Value: 81.96167,
-						},
-						{
-							Txid:  "6d7de9f60c1b8c86f3a2a0d8001c051e9192d59fd2e922f02516770533e0cfc4",
-							N:     0,
-							Value: 0.03833,
-						},
-					},
-					AssetHash:   "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
-					Asset:       "GAS",
-					AssetSymbol: "GAS",
-					Amount:      11332,
-				},
-				{
-					Unspents: []models.Unspent{
-						{
-							Txid:  "c724d26a3e2bb4417f6cebd56a7c5138987dc0b49b41fe1b5c632f5208c1e05f",
-							N:     0,
-							Value: 100000000,
-						},
-					},
-					AssetHash:   "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
-					Asset:       "NEO",
-					AssetSymbol: "NEO",
-					Amount:      100000000,
-				},
-			},
-			Address: "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
-		},
-	})
-
-	inputs, payTotal, err := tb.GetTransactionInputs(helper.UInt160{}, GasToken, helper.Fixed8FromFloat64(10000))
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(inputs))
-	assert.Equal(t, int64(1125000000000), payTotal.Value)
 }
