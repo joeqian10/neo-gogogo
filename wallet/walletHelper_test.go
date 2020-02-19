@@ -119,7 +119,7 @@ func TestWalletHelper_ClaimGas(t *testing.T) {
 	walletHelper := NewWalletHelper(tb, account)
 	b, err := walletHelper.ClaimGas("APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR")
 	assert.Nil(t, err)
-	assert.Equal(t, true, b)
+	assert.Equal(t, "00de0ab4da0475f018fcc751ee9979ab21003a63e360908e6933e07423e25ae1", b)
 }
 
 func TestWalletHelper_Transfer(t *testing.T) {
@@ -192,7 +192,7 @@ func TestWalletHelper_Transfer(t *testing.T) {
 	walletHelper := NewWalletHelper(tb, account)
 	b, err := walletHelper.Transfer(tx.NeoToken, "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt", "AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV", 80000)
 	assert.Nil(t, err)
-	assert.Equal(t, true, b)
+	assert.Equal(t, "e073d3e3524c16fb2996ba1dc81d1cb51364731143b0afebff6463ec17b94c32", b)
 }
 
 func TestWalletHelper_TransferNep5(t *testing.T) {
@@ -287,9 +287,9 @@ func TestWalletHelper_TransferNep5(t *testing.T) {
 	walletHelper := NewWalletHelper(tb, account)
 	scriptHash, err := helper.UInt160FromString("14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26")
 	assert.Nil(t, err)
-	b, err := walletHelper.TransferNep5(scriptHash, "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt", "AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV", 80000)
+	s, err := walletHelper.TransferNep5(scriptHash, "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt", "AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV", 80000)
 	assert.Nil(t, err)
-	assert.Equal(t, true, b)
+	assert.Equal(t, 64, len(s))
 }
 
 //func TestWallet_Transfer(t *testing.T) {

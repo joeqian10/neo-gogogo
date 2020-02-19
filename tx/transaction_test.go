@@ -43,9 +43,7 @@ func TestAddMultiSignature(t *testing.T) {
 	key2, _ := keys.GenerateKeyPair()
 	key3, _ := keys.GenerateKeyPair()
 	pairs := []*keys.KeyPair{key, key2, key3}
-	sort.Slice(pairs, func(i, j int) bool {
-		return pairs[i].PublicKey.Compare(pairs[j].PublicKey) == 1
-	})
+	sort.Sort(sort.Reverse(keys.KeyPairSlice(pairs)))
 
 	ctx.Witnesses = make([]*Witness, 0)
 	err = AddMultiSignature(ctx, pairs, 2, []*keys.PublicKey{key.PublicKey, key2.PublicKey, key3.PublicKey})

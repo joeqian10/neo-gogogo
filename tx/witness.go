@@ -41,6 +41,12 @@ func (w *Witness) MarshalJSON() ([]byte, error) {
 	return json.Marshal(data)
 }
 
+// this method is a getter of scriptHash
+func (w *Witness) GetScriptHash() helper.UInt160 {
+	w.scriptHash, _ = helper.UInt160FromBytes(crypto.Hash160(w.VerificationScript))
+	return w.scriptHash
+}
+
 // Create Witness with invocationScript and verificationScript
 func CreateWitness(invocationScript []byte, verificationScript []byte) (witness *Witness, err error) {
 	if len(verificationScript) == 0 {
@@ -75,14 +81,12 @@ func CreateSignatureWitness(msg []byte, pair *keys.KeyPair) (witness *Witness, e
 
 // create multi-signature witness
 func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, publicKeys []*keys.PublicKey) (witness *Witness, err error) {
-	// TODO ensure the pairs match with publicKeys
 	if len(pairs) == least {
 		return witness, fmt.Errorf("the multi-signature contract needs least %v signatures", least)
 	}
 	// invocationScript: push signature
-	sort.Slice(pairs, func(i, j int) bool {
-		return pairs[i].PublicKey.Compare(pairs[j].PublicKey) == 1
-	})
+	sort.Sort(sort.Reverse(keys.KeyPairSlice(pairs)))
+
 	builder := sc.NewScriptBuilder()
 	for _, pair := range pairs {
 		signature, err := pair.Sign(msg)
@@ -100,3 +104,8 @@ func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, p
 	verificationScript, _ := keys.CreateMultiSigRedeemScript(least, publicKeys...)
 	return CreateWitness(invocationScript, verificationScript)
 }
+
+type WitnessSlice []*Witness
+func (ws WitnessSlice) Len() int           { return len(ws) }
+func (ws WitnessSlice) Less(i, j int) bool { return ws[i].scriptHash.Less(ws[j].scriptHash) }
+func (ws WitnessSlice) Swap(i, j int)      { ws[i], ws[j] = ws[j], ws[i] }

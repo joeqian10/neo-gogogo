@@ -16,11 +16,11 @@ import (
 )
 
 // PublicKeys is a list of public keys.
-type PublicKeys []*PublicKey
+type PublicKeySlice []*PublicKey
 
-func (keys PublicKeys) Len() int           { return len(keys) }
-func (keys PublicKeys) Swap(i, j int)      { keys[i], keys[j] = keys[j], keys[i] }
-func (keys PublicKeys) Less(i, j int) bool { return keys[i].Compare(keys[j]) == -1 }
+func (keys PublicKeySlice) Len() int           { return len(keys) }
+func (keys PublicKeySlice) Swap(i, j int)      { keys[i], keys[j] = keys[j], keys[i] }
+func (keys PublicKeySlice) Less(i, j int) bool { return keys[i].Compare(keys[j]) == -1 }
 
 // PublicKey represents a public key and provides a high level
 // API around the X/Y point.
@@ -207,7 +207,7 @@ func CreateMultiSigRedeemScript(m int, ps ...*PublicKey) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	pubKeys := PublicKeys(ps)
+	pubKeys := PublicKeySlice(ps)
 	sort.Sort(pubKeys)
 	for _, p := range pubKeys {
 		err = builder.EmitPushBytes(p.EncodeCompression())

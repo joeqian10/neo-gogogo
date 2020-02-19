@@ -155,9 +155,7 @@ func AddSignature(transaction ITransaction, key *keys.KeyPair) error {
 		return err
 	}
 	tx.Witnesses = append(tx.Witnesses, witness)
-	sort.Slice(tx.Witnesses, func(i, j int) bool {
-		return tx.Witnesses[i].scriptHash.Less(tx.Witnesses[j].scriptHash)
-	})
+	sort.Sort(WitnessSlice(tx.Witnesses))
 	return nil
 }
 
@@ -192,8 +190,6 @@ func AddMultiSignature(transaction ITransaction, pairs []*keys.KeyPair, m int, p
 		return err
 	}
 	tx.Witnesses = append(tx.Witnesses, witness)
-	sort.Slice(tx.Witnesses, func(i, j int) bool {
-		return tx.Witnesses[i].scriptHash.Less(tx.Witnesses[j].scriptHash)
-	})
+	sort.Sort(WitnessSlice(tx.Witnesses))
 	return nil
 }

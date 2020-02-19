@@ -10,13 +10,16 @@ import (
 )
 
 func TestNewNep5Helper(t *testing.T) {
-	nep5helper := NewNep5Helper("http://seed1.ngd.network:20332")
+	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+	nep5helper := NewNep5Helper(scriptHash,"http://seed1.ngd.network:20332")
 	assert.NotNil(t, nep5helper)
 }
 
 func TestNep5Helper_BalanceOf(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
+	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
+		scriptHash:scriptHash,
 		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
@@ -43,16 +46,18 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+
 	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-	u, e := nh.BalanceOf(scriptHash, address)
+	u, e := nh.BalanceOf(address)
 	assert.Nil(t, e)
 	assert.Equal(t, uint64(48999800000000), u)
 }
 
 func TestNep5Helper_Decimals(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
+	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
+		scriptHash:scriptHash,
 		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
@@ -79,15 +84,17 @@ func TestNep5Helper_Decimals(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	d, err := nh.Decimals(scriptHash)
+
+	d, err := nh.Decimals()
 	assert.Nil(t, err)
 	assert.Equal(t, uint8(8), d)
 }
 
 func TestNep5Helper_Name(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
+	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
+		scriptHash:scriptHash,
 		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
@@ -114,8 +121,7 @@ func TestNep5Helper_Name(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	name, err := nh.Name(scriptHash)
+	name, err := nh.Name()
 	//name := string(helper.HexTobytes("516c696e6b20546f6b656e"))
 	assert.Nil(t, err)
 	assert.Equal(t, "Qlink Token", name)
@@ -123,7 +129,9 @@ func TestNep5Helper_Name(t *testing.T) {
 
 func TestNep5Helper_Symbol(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
+	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
+		scriptHash:scriptHash,
 		Client: clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
@@ -150,8 +158,7 @@ func TestNep5Helper_Symbol(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	name, err := nh.Name(scriptHash)
+	name, err := nh.Name()
 	assert.Nil(t, err)
 	assert.Equal(t, "QLC", name)
 }
@@ -185,8 +192,7 @@ func TestNep5Helper_TotalSupply(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	s, e := nh.TotalSupply(scriptHash)
+	s, e := nh.TotalSupply()
 	assert.Nil(t, e)
 	assert.Equal(t, uint64(59480000000000000), s)
 }
@@ -220,9 +226,8 @@ func TestNep5Helper_Transfer(t *testing.T) {
 		},
 	})
 
-	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-	b, _, e := nh.Transfer(scriptHash, address, address, helper.Fixed8FromInt64(1))
+	b, _, e := nh.Transfer(address, address, helper.Fixed8FromInt64(1))
 	assert.Nil(t, e)
 	assert.Equal(t, true, b)
 }

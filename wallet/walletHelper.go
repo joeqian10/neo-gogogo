@@ -48,67 +48,67 @@ func (w *WalletHelper) GetBalance(address string) (neoBalance int, gasBalance fl
 	return neoBalance, gasBalance, nil
 }
 
-// Transfer is used to transfer neo or gas or other utxo asset, single signature
-func (w *WalletHelper) Transfer(assetId helper.UInt256, from string, to string, amount float64) (bool, error) {
+// Transfer is used to transfer neo or gas or other utxo asset, single signature, return txid
+func (w *WalletHelper) Transfer(assetId helper.UInt256, from string, to string, amount float64) (string, error) {
 	f, err := helper.AddressToScriptHash(from)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	t, err := helper.AddressToScriptHash(to)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	a := helper.Fixed8FromFloat64(amount)
 	ctx, err := w.TxBuilder.MakeContractTransaction(f, t, assetId, a, nil, helper.UInt160{}, helper.Zero)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// sign
 	err = tx.AddSignature(ctx, w.Account.KeyPair)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(ctx.RawTransactionString())
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
-		return false, fmt.Errorf(msg)
+		return "", fmt.Errorf(msg)
 	}
-	return response.Result, nil
+	return ctx.HashString(), nil
 }
 
-// ClaimGas
-func (w *WalletHelper) ClaimGas(from string) (bool, error) {
+// ClaimGas, return txid
+func (w *WalletHelper) ClaimGas(from string) (string, error) {
 	f, err := helper.AddressToScriptHash(from)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	ctx, err := w.TxBuilder.MakeClaimTransaction(f, helper.UInt160{}, nil)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// sign
 	err = tx.AddSignature(ctx, w.Account.KeyPair)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(ctx.RawTransactionString())
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
-		return false, fmt.Errorf(msg)
+		return "", fmt.Errorf(msg)
 	}
-	return response.Result, nil
+	return ctx.HashString(), nil
 }
 
-func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to string, amount float64) (bool, error) {
+func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to string, amount float64) (string, error) {
 	f, err := helper.AddressToScriptHash(from)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	t, err := helper.AddressToScriptHash(to)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	a := helper.Fixed8FromFloat64(amount)
 	sb := sc.NewScriptBuilder()
@@ -128,18 +128,18 @@ func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to stri
 	script := sb.ToArray()
 	itx, err := w.TxBuilder.MakeInvocationTransaction(script, f, nil, helper.UInt160{}, helper.Zero)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// sign
 	err = tx.AddSignature(itx, w.Account.KeyPair)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(itx.RawTransactionString())
 	msg := response.ErrorResponse.Error.Message
 	if len(msg) != 0 {
-		return false, fmt.Errorf(msg)
+		return "", fmt.Errorf(msg)
 	}
-	return response.Result, nil
+	return itx.HashString(), nil
 }

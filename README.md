@@ -265,7 +265,7 @@ func SampleMethod() {
     a := helper.ScriptHashToAddress(v1)
 
     // convert address string to ScriptHash
-    v3 := helper.AddressToScriptHash
+    v3, _ := helper.AddressToScriptHash(a)
 
     ...
 }

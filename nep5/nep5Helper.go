@@ -11,22 +11,26 @@ import (
 
 // nep5 wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
 type Nep5Helper struct {
+	scriptHash helper.UInt160 // the script hash of the nep5 token
+	EndPoint string
 	Client rpc.IRpcClient
 }
 
-func NewNep5Helper(endPoint string) *Nep5Helper {
+func NewNep5Helper(scriptHash helper.UInt160, endPoint string) *Nep5Helper {
 	client := rpc.NewClient(endPoint)
 	if client == nil {
 		return nil
 	}
 	return &Nep5Helper{
+		scriptHash:scriptHash,
+		EndPoint:endPoint,
 		Client: client,
 	}
 }
 
-func (n *Nep5Helper) TotalSupply(scriptHash helper.UInt160) (uint64, error) {
+func (n *Nep5Helper) TotalSupply() (uint64, error) {
 	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -48,9 +52,9 @@ func (n *Nep5Helper) TotalSupply(scriptHash helper.UInt160) (uint64, error) {
 	return ts, nil
 }
 
-func (n *Nep5Helper) Name(scriptHash helper.UInt160) (string, error) {
+func (n *Nep5Helper) Name() (string, error) {
 	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash.Bytes(), "name", []sc.ContractParameter{})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "name", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -68,9 +72,9 @@ func (n *Nep5Helper) Name(scriptHash helper.UInt160) (string, error) {
 	return name, nil
 }
 
-func (n *Nep5Helper) Symbol(scriptHash helper.UInt160) (string, error) {
+func (n *Nep5Helper) Symbol() (string, error) {
 	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash.Bytes(), "symbol", []sc.ContractParameter{})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "symbol", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -88,9 +92,9 @@ func (n *Nep5Helper) Symbol(scriptHash helper.UInt160) (string, error) {
 	return symbol, nil
 }
 
-func (n *Nep5Helper) Decimals(scriptHash helper.UInt160) (uint8, error) {
+func (n *Nep5Helper) Decimals() (uint8, error) {
 	sb := sc.NewScriptBuilder()
-	sb.MakeInvocationScript(scriptHash.Bytes(), "decimals", []sc.ContractParameter{})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "decimals", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -111,13 +115,13 @@ func (n *Nep5Helper) Decimals(scriptHash helper.UInt160) (uint8, error) {
 	return uint8(decimals), nil
 }
 
-func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160) (uint64, error) {
+func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error) {
 	sb := sc.NewScriptBuilder()
 	cp := sc.ContractParameter{
 		Type:  sc.Hash160,
 		Value: address.Bytes(),
 	}
-	sb.MakeInvocationScript(scriptHash.Bytes(), "balanceOf", []sc.ContractParameter{cp})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "balanceOf", []sc.ContractParameter{cp})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message
@@ -140,7 +144,7 @@ func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160
 }
 
 // Transfer is only testing the transfer script, please use WalletHelper to truly transfer nep5 token
-func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error) {
+func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error) {
 	sb := sc.NewScriptBuilder()
 	cp1 := sc.ContractParameter{
 		Type:  sc.Hash160,
@@ -154,7 +158,7 @@ func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to
 		Type:  sc.Integer,
 		Value: amount.Value,
 	}
-	sb.MakeInvocationScript(scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
 	msg := response.ErrorResponse.Error.Message

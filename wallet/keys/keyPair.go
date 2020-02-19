@@ -11,6 +11,12 @@ import (
 	"math/big"
 )
 
+type KeyPairSlice []*KeyPair
+
+func (kps KeyPairSlice) Len() int { return len(kps)}
+func (kps KeyPairSlice) Less(i, j int) bool { return kps[i].PublicKey.Compare(kps[j].PublicKey) == -1}
+func (kps KeyPairSlice) Swap(i, j int) { kps[i], kps[j] = kps[j], kps[i]}
+
 type KeyPair struct {
 	PrivateKey []byte
 	PublicKey  *PublicKey
