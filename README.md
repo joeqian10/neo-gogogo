@@ -639,43 +639,55 @@ This module is to make life easier when dealing with NEP-5 tokens. Methods for q
 #### 3.7.1 Create a new Nep5Helper
 
 ```golang
-func NewNep5Helper(endPoint string) *Nep5Helper
+func NewNep5Helper(scriptHash helper.UInt160, endPoint string) *Nep5Helper
 ```
 
 #### 3.7.2 Get the total supply of a NEP-5 token
 
 ```golang
-func (n *Nep5Helper) TotalSupply(scriptHash helper.UInt160) (uint64, error)
+func (n *Nep5Helper) TotalSupply() (uint64, error)
 ```
 
 #### 3.7.3 Get the name of a NEP-5 token
 
 ```golang
-func (n *Nep5Helper) TotalSupply(scriptHash helper.UInt160) (uint64, error)
+func (n *Nep5Helper) Name() (string, error)
 ```
 
 #### 3.7.4 Get the symbol of a NEP-5 token
 
 ```golang
-func (n *Nep5Helper) Symbol(scriptHash helper.UInt160) (string, error)
+func (n *Nep5Helper) Symbol() (string, error)
 ```
 
 #### 3.7.5 Get the decimals of a NEP-5 token
 
 ```golang
-func (n *Nep5Helper) Decimals(scriptHash helper.UInt160) (uint8, error)
+func (n *Nep5Helper) Decimals() (uint8, error)
 ```
 
 #### 3.7.6 Get the balance of a NEP-5 token of an account
 
 ```golang
-func (n *Nep5Helper) BalanceOf(scriptHash helper.UInt160, address helper.UInt160) (uint64, error)
+func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error)
 ```
 
 #### 3.7.7 Test to transfer NEP-5 tokens
 
 ```golang
-func (n *Nep5Helper) Transfer(scriptHash helper.UInt160, from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error)
+func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error)
+```
+
+#### 3.7.8 Mint CGAS tokens from GAS
+
+```golang
+func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, error)
+```
+
+#### 3.7.8 Refund from GAS to CGAS tokens
+
+```golang
+func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, error)
 ```
 
 *Typical usage:*
@@ -689,27 +701,24 @@ import "github.com/joeqian10/neo-gogogo/wallet"
 
 func SampleMethod() {
     // create a Nep5Helper
-    var TestNetEndPoint = "http://seed1.ngd.network:20332"
-    nh := nep5.NewNep5Helper(TestNetEndPoint)
+    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
+    var testNetEndPoint = "http://seed1.ngd.network:20332"
+    nh := nep5.NewNep5Helper(scriptHash, testNetEndPoint)
 
     // get the name of a NEP-5 token
-    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-    name, err := nh.Name(scriptHash)
+    name, err := nh.Name()
 
     // get the total supply of a NEP-5 token
-    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-    s, e := nh.TotalSupply(scriptHash)
+    s, e := nh.TotalSupply()
 
     // get the balance of a NEP-5 token of an address
-    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
     address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-    u, e := nh.BalanceOf(scriptHash, address)
+    u, e := nh.BalanceOf(address)
 
     // test run the script for transfer a NEP-5 token
-    scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
     address1, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
     address2, _ := helper.AddressToScriptHash("AdQk428wVzpkHTxc4MP5UMdsgNdrm36dyV")
-    b, e := nh.Transfer(scriptHash, address1, address2, 1)
+    b, e := nh.Transfer(address1, address2, 1)
 
     ...
 }
