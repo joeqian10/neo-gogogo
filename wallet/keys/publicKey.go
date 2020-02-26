@@ -208,7 +208,7 @@ func CreateMultiSigRedeemScript(m int, ps ...*PublicKey) ([]byte, error) {
 		return nil, err
 	}
 	pubKeys := PublicKeySlice(ps)
-	sort.Sort(pubKeys)
+	sort.Sort(pubKeys) // ascending
 	for _, p := range pubKeys {
 		err = builder.EmitPushBytes(p.EncodeCompression())
 		if err != nil {

@@ -81,11 +81,11 @@ func CreateSignatureWitness(msg []byte, pair *keys.KeyPair) (witness *Witness, e
 
 // create multi-signature witness
 func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, publicKeys []*keys.PublicKey) (witness *Witness, err error) {
-	if len(pairs) == least {
+	if len(pairs) < least {
 		return witness, fmt.Errorf("the multi-signature contract needs least %v signatures", least)
 	}
 	// invocationScript: push signature
-	sort.Sort(sort.Reverse(keys.KeyPairSlice(pairs)))
+	sort.Sort(sort.Reverse(keys.KeyPairSlice(pairs))) // descending
 
 	builder := sc.NewScriptBuilder()
 	for _, pair := range pairs {
@@ -105,7 +105,59 @@ func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, p
 	return CreateWitness(invocationScript, verificationScript)
 }
 
+// todo UT
+func VerifySignatureWitness(msg []byte, witness *Witness) bool {
+	invocationScript := witness.InvocationScript
+	length := invocationScript[1]
+	if int(length) != len(invocationScript[1:]) {
+		return false
+	}
+	signature := invocationScript[1:]
+	verificationScript := witness.VerificationScript
+	if len(verificationScript) != 35 {
+		return false
+	}
+	publicKey, _ := keys.NewPublicKey(verificationScript[1:34])
+	return keys.VerifySignature(msg, signature, publicKey)
+}
+
+// todo UT
+func VerifyMultiSignatureWitness(msg []byte, witness *Witness) bool {
+	invocationScript := witness.InvocationScript
+	lenInvoScript := len(invocationScript)
+	if lenInvoScript%65 != 0 {
+		return false
+	}
+	m := lenInvoScript / 65 // m signatures
+
+	verificationScript := witness.VerificationScript
+	least := verificationScript[0] - byte(sc.PUSH1) + 1 // least required signatures, usually 4
+
+	if m < int(least) {
+		return false
+	} // not enough signatures
+	var signatures [][]byte
+	for i := 0; i < m; i++ {
+		signatures[i] = invocationScript[i*65+1 : i*65+65] // signature length is 64
+	}
+
+	lenVeriScript := len(verificationScript)
+	n := verificationScript[lenVeriScript-2] - byte(sc.PUSH1) + 1 // public keys, usually 7
+	if m > int(n) {
+		return false
+	} // too many signatures
+
+	var pubKeys []*keys.PublicKey
+	for i := 0; i < int(n); i++ {
+		data := verificationScript[i*34+1 : i*34+35]
+		publicKey, _ := keys.NewPublicKey(data[1:])
+		pubKeys[i] = publicKey
+	}
+	return keys.VerifyMultiSig(msg, signatures, pubKeys)
+}
+
 type WitnessSlice []*Witness
+
 func (ws WitnessSlice) Len() int           { return len(ws) }
 func (ws WitnessSlice) Less(i, j int) bool { return ws[i].scriptHash.Less(ws[j].scriptHash) }
 func (ws WitnessSlice) Swap(i, j int)      { ws[i], ws[j] = ws[j], ws[i] }

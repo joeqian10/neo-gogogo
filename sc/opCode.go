@@ -9,7 +9,7 @@ const (
 	PUSH0       OpCode = 0x00 // An empty array of bytes is pushed onto the stack.
 	PUSHF       OpCode = PUSH0
 	PUSHBYTES1  OpCode = 0x01 // 0x01-0x4B The next opcode bytes is data to be pushed onto the stack
-	PUSHBYTES75 OpCode = 0x4B
+	PUSHBYTES75 OpCode = 0x4B // 4*16+11 = 75
 	PUSHDATA1   OpCode = 0x4C // The next byte contains the number of bytes to be pushed onto the stack.
 	PUSHDATA2   OpCode = 0x4D // The next two bytes contain the number of bytes to be pushed onto the stack.
 	PUSHDATA4   OpCode = 0x4E // The next four bytes contain the number of bytes to be pushed onto the stack.
