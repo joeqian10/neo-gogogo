@@ -15,7 +15,7 @@ type BlockHeader struct {
 	Index         uint32
 	ConsensusData uint64
 	NextConsensus helper.UInt160
-	Witness       tx.Witness
+	Witness       *tx.Witness
 
 	_hash helper.UInt256
 	_size int
@@ -26,7 +26,7 @@ type BlockHeader struct {
 func (bh *BlockHeader) Deserialize(br *io.BinaryReader) {
 	bh.DeserializeUnsigned(br)
 	var b byte
-	br.ReadLE(b)
+	br.ReadLE(&b)
 	if b != byte(1) {br.Err = fmt.Errorf("format error: padding must equal 1 got %d", b)}
 	bh.Witness.Deserialize(br)
 }

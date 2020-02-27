@@ -72,7 +72,7 @@ func CreateSignatureWitness(msg []byte, pair *keys.KeyPair) (witness *Witness, e
 	}
 	builder := sc.NewScriptBuilder()
 	_ = builder.EmitPushBytes(signature)
-	invocationScript := builder.ToArray()
+	invocationScript := builder.ToArray() // length 65
 
 	// verificationScript: SignatureRedeemScript
 	verificationScript := keys.CreateSignatureRedeemScript(pair.PublicKey)
@@ -85,10 +85,11 @@ func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, p
 		return witness, fmt.Errorf("the multi-signature contract needs least %v signatures", least)
 	}
 	// invocationScript: push signature
-	sort.Sort(sort.Reverse(keys.KeyPairSlice(pairs))) // descending
+	keyPairs := keys.KeyPairSlice(pairs)
+	sort.Sort(keyPairs) // ascending
 
 	builder := sc.NewScriptBuilder()
-	for _, pair := range pairs {
+	for _, pair := range keyPairs {
 		signature, err := pair.Sign(msg)
 		if err != nil {
 			return witness, err
@@ -105,10 +106,10 @@ func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, p
 	return CreateWitness(invocationScript, verificationScript)
 }
 
-// todo UT
+
 func VerifySignatureWitness(msg []byte, witness *Witness) bool {
 	invocationScript := witness.InvocationScript
-	length := invocationScript[1]
+	length := invocationScript[0]
 	if int(length) != len(invocationScript[1:]) {
 		return false
 	}
@@ -117,11 +118,12 @@ func VerifySignatureWitness(msg []byte, witness *Witness) bool {
 	if len(verificationScript) != 35 {
 		return false
 	}
-	publicKey, _ := keys.NewPublicKey(verificationScript[1:34])
+	data := verificationScript[:34] // length 34
+	publicKey, _ := keys.NewPublicKey(data[1:])
 	return keys.VerifySignature(msg, signature, publicKey)
 }
 
-// todo UT
+
 func VerifyMultiSignatureWitness(msg []byte, witness *Witness) bool {
 	invocationScript := witness.InvocationScript
 	lenInvoScript := len(invocationScript)
@@ -136,7 +138,7 @@ func VerifyMultiSignatureWitness(msg []byte, witness *Witness) bool {
 	if m < int(least) {
 		return false
 	} // not enough signatures
-	var signatures [][]byte
+	var signatures = make([][]byte, m)
 	for i := 0; i < m; i++ {
 		signatures[i] = invocationScript[i*65+1 : i*65+65] // signature length is 64
 	}
@@ -147,9 +149,9 @@ func VerifyMultiSignatureWitness(msg []byte, witness *Witness) bool {
 		return false
 	} // too many signatures
 
-	var pubKeys []*keys.PublicKey
+	var pubKeys = make([]*keys.PublicKey, n)
 	for i := 0; i < int(n); i++ {
-		data := verificationScript[i*34+1 : i*34+35]
+		data := verificationScript[i*34+1 : i*34+35] // length 34
 		publicKey, _ := keys.NewPublicKey(data[1:])
 		pubKeys[i] = publicKey
 	}

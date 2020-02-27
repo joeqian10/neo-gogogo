@@ -40,4 +40,13 @@ var KeyCases = []Ktype{
 		Nep2key:    "6PYUKxjoTp8CmbR4ZDLLdugviWzf7QuxikGir7mudeAcSo9dviT6x6MtPB",
 		ScriptHash: "6ea9062064e43b49df964d13da0a413c113b742a",
 	},
+	{
+		Address:    "AQzRMe3zyGS8W177xLJfewRRQZY2kddMun",
+		PrivateKey: "b503c7727756aaed15e2cfc1d571e00109c92b075d080038d208f8b9cab917af",
+		PublicKey:  "03d08d6f766b54e35745bc99d643c939ec6f3d37004f2a59006be0e53610f0be25",
+		Wif:        "L3Hab7wL43SbWLnkfnVCp6dT99xzfB4qLZxeR9dFgcWWPirwKyXp",
+		Passphrase: "1",
+		Nep2key:    "6PYLjXkQzADs7r36XQjByJXoggm3beRh6UzxuN59NZiBxFBnm1HPvv3ytM",
+		ScriptHash: "d2601d3651a41a7faf6e02a280ab26d9dc971865",
+	},
 }
