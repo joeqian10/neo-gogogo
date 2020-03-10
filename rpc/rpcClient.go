@@ -345,9 +345,9 @@ func (n *RpcClient) ValidateAddress(address string) ValidateAddressResponse {
 	return response
 }
 
-func (n *RpcClient) GetProof(stateroot, nep5, storeKey string) CrossChainProofResponse {
+func (n *RpcClient) GetProof(stateroot, contractScriptHash, storeKey string) CrossChainProofResponse {
 	response := CrossChainProofResponse{}
-	params := []interface{}{stateroot, nep5, storeKey}
+	params := []interface{}{stateroot, contractScriptHash, storeKey}
 	_ = n.makeRequest("getproof", params, &response)
 	return response
 }
