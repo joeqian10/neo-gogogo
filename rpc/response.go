@@ -63,6 +63,7 @@ type GetBlockCountResponse struct {
 	ErrorResponse
 	Result int `json:"result"`
 }
+
 type GetBlockHeaderResponse struct {
 	RpcResponse
 	ErrorResponse
@@ -243,9 +244,20 @@ type ValidateAddressResponse struct {
 	Result models.ValidateAddress `json:"result"`
 }
 
-type GetCrossChainProofResponse struct {
+type CrossChainProofResponse struct {
 	RpcResponse
 	ErrorResponse
-	CrosschainProof string `json:"result"`
+	CrosschainProof models.MPTProof `json:"result"`
 }
 
+type StateHeightResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.StateHeight `json:"result"`
+}
+
+type StateRootResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.StateRootState `json:"result"`
+}

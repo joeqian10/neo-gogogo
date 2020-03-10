@@ -12,6 +12,6 @@ type RpcAddress struct {
 }
 
 type ValidateAddress struct {
-	Address   string `json:"address"`
+	Address string `json:"address"`
 	IsValid bool   `json:"isvalid"`
 }
