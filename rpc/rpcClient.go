@@ -345,9 +345,30 @@ func (n *RpcClient) ValidateAddress(address string) ValidateAddressResponse {
 	return response
 }
 
-func (n *RpcClient) GetCrossChainProof(blockIndex int, txID string) GetCrossChainProofResponse {
-	response := GetCrossChainProofResponse{}
-	params := []interface{}{blockIndex, txID}
-	_ = n.makeRequest("getcrossproof", params, &response)
+func (n *RpcClient) GetProof(stateroot, nep5, storeKey string) CrossChainProofResponse {
+	response := CrossChainProofResponse{}
+	params := []interface{}{stateroot, nep5, storeKey}
+	_ = n.makeRequest("getproof", params, &response)
+	return response
+}
+
+func (n *RpcClient) GetStateHeight() StateHeightResponse {
+	response := StateHeightResponse{}
+	params := []interface{}{}
+	_ = n.makeRequest("getstateheight", params, &response)
+	return response
+}
+
+func (n *RpcClient) GetStateRootByIndex(blockHeight uint32) StateRootResponse {
+	response := StateRootResponse{}
+	params := []interface{}{blockHeight}
+	_ = n.makeRequest("getstateroot", params, &response)
+	return response
+}
+
+func (n *RpcClient) GetStateRootByHash(blockHash string) StateRootResponse {
+	response := StateRootResponse{}
+	params := []interface{}{blockHash}
+	_ = n.makeRequest("getstateroot", params, &response)
 	return response
 }
