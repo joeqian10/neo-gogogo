@@ -96,10 +96,3 @@ func (r *BinaryReader) ReadString() string {
 	b := r.ReadBytes()
 	return string(b)
 }
-
-//ReadOneByte read one byte
-func (r *BinaryReader) ReadOneByte() byte {
-	var b byte
-	r.Err = binary.Read(r.r, binary.LittleEndian, &b)
-	return b
-}

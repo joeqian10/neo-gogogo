@@ -17,8 +17,9 @@ type node interface {
 }
 
 func decodeNode(data []byte) (node, error) {
+	var ntype byte
 	reader := io.NewBinaryReaderFromBuf(data)
-	ntype := reader.ReadOneByte()
+	reader.ReadLE(&ntype)
 	switch ntype {
 	case fullNodeType:
 		return decodeFullNode(reader)
