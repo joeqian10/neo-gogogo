@@ -3,6 +3,8 @@ package mpt
 import (
 	"bytes"
 	"errors"
+
+	"github.com/joeqian10/neo-gogogo/helper"
 )
 
 //Trie mpt tree
@@ -33,6 +35,7 @@ func (t *Trie) resolve(hash hashNode) (node, error) {
 
 //Get try get value
 func (t *Trie) Get(path []byte) (value []byte, err error) {
+	path = helper.ToNibbles(path)
 	vn, err := t.get(t.root, path)
 	v, ok := vn.(valueNode)
 	if !ok {
@@ -61,22 +64,22 @@ func (t *Trie) get(n node, path []byte) (value node, err error) {
 		}
 		return t.get(s.next, bytes.TrimPrefix(path, s.key))
 	case hashNode:
-		n, err := t.resolve(n.(hashNode))
+		nn, err := t.resolve(n.(hashNode))
 		if err != nil {
 			return nil, err
 		}
-		return t.get(n, path)
+		return t.get(nn, path)
 	}
 	return nil, errors.New("trie cant find the path")
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, key []byte, proof []string) (value []byte, err error) {
+func VerifyProof(root, path []byte, proof []string) (value []byte, err error) {
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
 		return nil, err
 	}
-	value, err = trie.Get(key)
+	value, err = trie.Get(path)
 	return value, err
 }
