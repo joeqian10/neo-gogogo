@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 )
 
@@ -36,6 +37,15 @@ func ReverseBytes(data []byte) []byte {
 		b[i], b[j] = b[j], b[i]
 	}
 	return b
+}
+
+func ToNibbles(data []byte) []byte {
+	r := make([]byte, len(data)*2)
+	for i := 0; i < len(data); i++ {
+		r[i*2] = data[i] >> 4
+		r[i*2+1] = data[i] & 0x0f
+	}
+	return r
 }
 
 func ScriptHashToAddress(scriptHash UInt160) string {

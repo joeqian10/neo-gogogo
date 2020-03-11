@@ -44,13 +44,13 @@ func (r *BinaryReader) ReadBE(v interface{}) {
 
 // ReadUnit64Bytes reads from the underlying io.Reader
 // into the interface v in little-endian format
-func (br *BinaryReader) ReadUnit64Bytes() []byte {
+func (r *BinaryReader) ReadUnit64Bytes() []byte {
 	b := make([]byte, 8)
-	br.ReadLE(b)
-	if br.Err != nil {
+	r.ReadLE(b)
+	if r.Err != nil {
 		return nil
 	}
-	return b;
+	return b
 }
 
 // ReadVarUint reads a variable-length-encoded integer from the

@@ -1,5 +1,6 @@
 package mpt
 
+//StateRoot truct of StateRoot message
 type StateRoot struct {
 	Version   int    `json:"version"`
 	Index     uint32 `json:"index"`
