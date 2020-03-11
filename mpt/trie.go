@@ -34,7 +34,7 @@ func (t *Trie) resolve(hash hashNode) (node, error) {
 }
 
 //Get try get value
-func (t *Trie) Get(path []byte) (value []byte, err error) {
+func (t *Trie) Get(path []byte) ([]byte, error) {
 	path = helper.ToNibbles(path)
 	vn, err := t.get(t.root, path)
 	v, ok := vn.(valueNode)
@@ -44,7 +44,7 @@ func (t *Trie) Get(path []byte) (value []byte, err error) {
 	return ([]byte)(v), err
 }
 
-func (t *Trie) get(n node, path []byte) (value node, err error) {
+func (t *Trie) get(n node, path []byte) (node, error) {
 	switch n.(type) {
 	case valueNode:
 		if len(path) == 0 {
@@ -74,12 +74,12 @@ func (t *Trie) get(n node, path []byte) (value node, err error) {
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, path []byte, proof []string) (value []byte, err error) {
+func VerifyProof(root, path []byte, proof []string) ([]byte, error) {
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
 		return nil, err
 	}
-	value, err = trie.Get(path)
+	value, err := trie.Get(path)
 	return value, err
 }

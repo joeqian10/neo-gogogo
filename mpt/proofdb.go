@@ -25,7 +25,7 @@ func NewProofDb(proof []string) *ProofDb {
 }
 
 //Get for TrieDb
-func (pd *ProofDb) Get(key []byte) (value []byte, err error) {
+func (pd *ProofDb) Get(key []byte) ([]byte, error) {
 	keystr := helper.BytesToHex(key)
 	if v, ok := pd.nodes[keystr]; ok {
 		return v, nil
