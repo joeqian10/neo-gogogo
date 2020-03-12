@@ -13,11 +13,11 @@ type ProofDb struct {
 }
 
 //NewProofDb new instance of ProofDb from a string list
-func NewProofDb(proof []string) *ProofDb {
+func NewProofDb(proof [][]byte) *ProofDb {
 	p := &ProofDb{}
 	p.nodes = make(map[string]([]byte), len(proof))
 	for _, v := range proof {
-		data := helper.HexTobytes(v)
+		data := v
 		hashstr := helper.BytesToHex(crypto.Hash256(data))
 		p.nodes[hashstr] = data
 	}

@@ -2,13 +2,14 @@ package nep5
 
 import (
 	"fmt"
+	"sort"
+	"time"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
 	"github.com/joeqian10/neo-gogogo/wallet"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"sort"
-	"time"
 )
 
 type CgasHelper Nep5Helper
@@ -26,7 +27,7 @@ func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, e
 	sb := sc.NewScriptBuilder()
 	sb.MakeInvocationScript(c.scriptHash.Bytes(), "mintTokens", nil)
 	script := sb.ToArray()
-	//script := helper.HexTobytes("000a6d696e74546f6b656e7367f3c7a1170d2e9cb33827210daedf257db0c38c2a") // 00  0a6d696e74546f6b656e7367 f3c7a1170d2e9cb33827210daedf257db0c38c2a
+	//script := helper.HexToBytes("000a6d696e74546f6b656e7367f3c7a1170d2e9cb33827210daedf257db0c38c2a") // 00  0a6d696e74546f6b656e7367 f3c7a1170d2e9cb33827210daedf257db0c38c2a
 
 	// Second, instantiate an object of InvocationTransaction
 	tb := tx.NewTransactionBuilder(c.EndPoint)

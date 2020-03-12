@@ -3,17 +3,18 @@ package nep5
 import (
 	"encoding/binary"
 	"fmt"
+	"strconv"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/sc"
-	"strconv"
 )
 
 // nep5 wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
 type Nep5Helper struct {
 	scriptHash helper.UInt160 // the script hash of the nep5 token
-	EndPoint string
-	Client rpc.IRpcClient
+	EndPoint   string
+	Client     rpc.IRpcClient
 }
 
 func NewNep5Helper(scriptHash helper.UInt160, endPoint string) *Nep5Helper {
@@ -22,9 +23,9 @@ func NewNep5Helper(scriptHash helper.UInt160, endPoint string) *Nep5Helper {
 		return nil
 	}
 	return &Nep5Helper{
-		scriptHash:scriptHash,
-		EndPoint:endPoint,
-		Client: client,
+		scriptHash: scriptHash,
+		EndPoint:   endPoint,
+		Client:     client,
 	}
 }
 
@@ -43,7 +44,7 @@ func (n *Nep5Helper) TotalSupply() (uint64, error) {
 		return 0, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	bytes := helper.HexTobytes(stack.Value)
+	bytes := helper.HexToBytes(stack.Value)
 	for len(bytes) < 8 {
 		bytes = append(bytes, byte(0x00))
 	}
@@ -66,7 +67,7 @@ func (n *Nep5Helper) Name() (string, error) {
 		return "", fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	name := string(helper.HexTobytes(stack.Value))
+	name := string(helper.HexToBytes(stack.Value))
 	return name, nil
 }
 
@@ -85,7 +86,7 @@ func (n *Nep5Helper) Symbol() (string, error) {
 		return "", fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	symbol := string(helper.HexTobytes(stack.Value))
+	symbol := string(helper.HexToBytes(stack.Value))
 	return symbol, nil
 }
 
@@ -130,7 +131,7 @@ func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error) {
 		return 0, fmt.Errorf("no stack result returned")
 	}
 	stack := response.Result.Stack[0]
-	bytes := helper.HexTobytes(stack.Value)
+	bytes := helper.HexToBytes(stack.Value)
 	for len(bytes) < 8 {
 		bytes = append(bytes, byte(0x00))
 	}

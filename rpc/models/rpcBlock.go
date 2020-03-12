@@ -3,21 +3,21 @@ package models
 type RpcBlockHeader struct {
 	Hash              string `json:"hash"`
 	Size              int    `json:"size"`
-	Version           int `json:"version"`
+	Version           int    `json:"version"`
 	PreviousBlockHash string `json:"previousblockhash"`
 	MerkleRoot        string `json:"merkleroot"`
-	Time              int `json:"time"`
-	Index             int `json:"index"`
+	Time              int    `json:"time"`
+	Index             int    `json:"index"`
 	Nonce             string `json:"nonce"`         //ulong = uint64
 	NextConsensus     string `json:"nextconsensus"` //address
-	Witness            struct {
+	Witness           struct {
 		InvocationScript   string `json:"invocation"`
 		VerificationScript string `json:"verification"`
 	} `json:"witness"`
 	Confirmations int    `json:"confirmations"`
 	NextBlockHash string `json:"nextblockhash"`
 	// cross chain support
-	CrossStatesRoot   string `json:"crossstatesroot"`
+	CrossStatesRoot string `json:"crossstatesroot"`
 }
 
 type RpcBlock struct {
@@ -87,11 +87,11 @@ type RpcBlock struct {
 //	bw.WriteLE(mr)
 //	bw.WriteLE(bh.Time)
 //	bw.WriteLE(bh.Index)
-//	bw.WriteLE(helper.ReverseBytes(helper.HexTobytes(bh.Nonce)))
+//	bw.WriteLE(helper.ReverseBytes(helper.HexToBytes(bh.Nonce)))
 //	var nc helper.UInt160
 //	nc, _ = helper.AddressToScriptHash(bh.NextConsensus)
 //	bw.WriteLE(nc)
-//	bw.WriteLE(helper.ReverseBytes(helper.HexTobytes(bh.ChainID)))
+//	bw.WriteLE(helper.ReverseBytes(helper.HexToBytes(bh.ChainID)))
 //	cr,_ = helper.UInt256FromString(bh.CrossStatesRoot)
 //	bw.WriteLE(cr)
 //}
@@ -99,6 +99,6 @@ type RpcBlock struct {
 ////SerializeWitness serialize witness
 //func (bh *RpcBlockHeader) SerializeWitness(bw *io.BufBinaryWriter) {
 //	bw.WriteLE(uint8(1))
-//	bw.WriteVarBytes(helper.HexTobytes(bh.Script.InvocationScript))
-//	bw.WriteVarBytes(helper.HexTobytes(bh.Script.VerificationScript))
+//	bw.WriteVarBytes(helper.HexToBytes(bh.Script.InvocationScript))
+//	bw.WriteVarBytes(helper.HexToBytes(bh.Script.VerificationScript))
 //}

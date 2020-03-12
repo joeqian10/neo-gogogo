@@ -74,7 +74,7 @@ func (t *Trie) get(n node, path []byte) (node, error) {
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, path []byte, proof []string) ([]byte, error) {
+func VerifyProof(root, path []byte, proof [][]byte) ([]byte, error) {
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
