@@ -64,8 +64,8 @@ type RpcBlock struct {
 //		br.Err = fmt.Errorf("format error: padding must equal 1 got %d", padding)
 //		return
 //	}
-//	bh.Script.InvocationScript = helper.BytesToHex(br.ReadBytes())
-//	bh.Script.VerificationScript = helper.BytesToHex(br.ReadBytes())
+//	bh.Script.InvocationScript = helper.BytesToHex(br.ReadVarBytes())
+//	bh.Script.VerificationScript = helper.BytesToHex(br.ReadVarBytes())
 //}
 //
 //
@@ -99,6 +99,6 @@ type RpcBlock struct {
 ////SerializeWitness serialize witness
 //func (bh *RpcBlockHeader) SerializeWitness(bw *io.BufBinaryWriter) {
 //	bw.WriteLE(uint8(1))
-//	bw.WriteBytes(helper.HexTobytes(bh.Script.InvocationScript))
-//	bw.WriteBytes(helper.HexTobytes(bh.Script.VerificationScript))
+//	bw.WriteVarBytes(helper.HexTobytes(bh.Script.InvocationScript))
+//	bw.WriteVarBytes(helper.HexTobytes(bh.Script.VerificationScript))
 //}

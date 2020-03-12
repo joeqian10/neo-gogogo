@@ -59,9 +59,8 @@ func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, e
 
 	// use RPC to send the tx
 	response := tb.Client.SendRawTransaction(myTx.RawTransactionString())
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	return myTx.HashString(), nil
 }
@@ -152,10 +151,9 @@ func (c *CgasHelper) Refund1(from *wallet.Account, txHash helper.UInt256, amount
 	t.Witnesses = ws
 
 	// use RPC to send the tx
-	response2 := c.Client.SendRawTransaction(t.RawTransactionString())
-	msg := response2.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	response := c.Client.SendRawTransaction(t.RawTransactionString())
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	return t.HashString(), nil
 }
@@ -194,10 +192,9 @@ func (c *CgasHelper) Refund2(from *wallet.Account, txHash helper.UInt256, amount
 	t.Witnesses = []*tx.Witness{&witness}
 
 	// use RPC to send the tx
-	response2 := c.Client.SendRawTransaction(t.RawTransactionString())
-	msg := response2.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	response := c.Client.SendRawTransaction(t.RawTransactionString())
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 
 	return t.HashString(), nil

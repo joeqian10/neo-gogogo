@@ -26,7 +26,7 @@ func decodeNode(data []byte) (node, error) {
 	case shortNodeType:
 		return decodeShortNode(reader)
 	case valueNodeType:
-		return valueNode(reader.ReadBytes()), reader.Err
+		return valueNode(reader.ReadVarBytes()), reader.Err
 	}
 	return nil, errors.New("invalid node type to decode")
 }
@@ -38,7 +38,7 @@ type fullNode struct {
 func decodeFullNode(reader *io.BinaryReader) (fullNode, error) {
 	f := fullNode{}
 	for i := range f.children {
-		f.children[i] = hashNode(reader.ReadBytes())
+		f.children[i] = hashNode(reader.ReadVarBytes())
 	}
 	return f, reader.Err
 }
@@ -50,8 +50,8 @@ type shortNode struct {
 
 func decodeShortNode(reader *io.BinaryReader) (shortNode, error) {
 	s := new(shortNode)
-	s.key = reader.ReadBytes()
-	s.next = hashNode(reader.ReadBytes())
+	s.key = reader.ReadVarBytes()
+	s.next = hashNode(reader.ReadVarBytes())
 	return *s, reader.Err
 }
 

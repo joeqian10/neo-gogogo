@@ -62,7 +62,7 @@ func (attr *TransactionAttribute) Serialize(bw *io.BinaryWriter) {
 	case Description, Remark, Remark1, Remark2, Remark3, Remark4,
 		Remark5, Remark6, Remark7, Remark8, Remark9, Remark10, Remark11,
 		Remark12, Remark13, Remark14, Remark15:
-		bw.WriteBytes(attr.Data)
+		bw.WriteVarBytes(attr.Data)
 	case DescriptionUrl:
 		var urllen = uint8(len(attr.Data))
 		bw.WriteLE(urllen)

@@ -82,17 +82,17 @@ func (r *BinaryReader) ReadVarUint() uint64 {
 	return uint64(b)
 }
 
-// ReadBytes reads the next set of bytes from the underlying reader.
+// ReadVarBytes reads the next set of bytes from the underlying reader.
 // ReadVarUInt() is used to determine how large that slice is
-func (r *BinaryReader) ReadBytes() []byte {
+func (r *BinaryReader) ReadVarBytes() []byte {
 	n := r.ReadVarUint()
 	b := make([]byte, n)
 	r.ReadLE(b)
 	return b
 }
 
-// ReadString calls ReadBytes and casts the results as a string.
-func (r *BinaryReader) ReadString() string {
-	b := r.ReadBytes()
+// ReadVarString calls ReadVarBytes and casts the results as a string.
+func (r *BinaryReader) ReadVarString() string {
+	b := r.ReadVarBytes()
 	return string(b)
 }
