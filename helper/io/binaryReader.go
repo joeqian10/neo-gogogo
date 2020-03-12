@@ -44,13 +44,13 @@ func (r *BinaryReader) ReadBE(v interface{}) {
 
 // ReadUnit64Bytes reads from the underlying io.Reader
 // into the interface v in little-endian format
-func (br *BinaryReader) ReadUnit64Bytes() []byte {
+func (r *BinaryReader) ReadUnit64Bytes() []byte {
 	b := make([]byte, 8)
-	br.ReadLE(b)
-	if br.Err != nil {
+	r.ReadLE(b)
+	if r.Err != nil {
 		return nil
 	}
-	return b;
+	return b
 }
 
 // ReadVarUint reads a variable-length-encoded integer from the
@@ -82,17 +82,17 @@ func (r *BinaryReader) ReadVarUint() uint64 {
 	return uint64(b)
 }
 
-// ReadBytes reads the next set of bytes from the underlying reader.
+// ReadVarBytes reads the next set of bytes from the underlying reader.
 // ReadVarUInt() is used to determine how large that slice is
-func (r *BinaryReader) ReadBytes() []byte {
+func (r *BinaryReader) ReadVarBytes() []byte {
 	n := r.ReadVarUint()
 	b := make([]byte, n)
 	r.ReadLE(b)
 	return b
 }
 
-// ReadString calls ReadBytes and casts the results as a string.
-func (r *BinaryReader) ReadString() string {
-	b := r.ReadBytes()
+// ReadVarString calls ReadVarBytes and casts the results as a string.
+func (r *BinaryReader) ReadVarString() string {
+	b := r.ReadVarBytes()
 	return string(b)
 }

@@ -21,14 +21,14 @@ type Witness struct {
 
 // Deserialize implements Serializable interface.
 func (w *Witness) Deserialize(br *io.BinaryReader) {
-	w.InvocationScript = br.ReadBytes()
-	w.VerificationScript = br.ReadBytes()
+	w.InvocationScript = br.ReadVarBytes()
+	w.VerificationScript = br.ReadVarBytes()
 }
 
 // Serialize implements Serializable interface.
 func (w *Witness) Serialize(bw *io.BinaryWriter) {
-	bw.WriteBytes(w.InvocationScript)
-	bw.WriteBytes(w.VerificationScript)
+	bw.WriteVarBytes(w.InvocationScript)
+	bw.WriteVarBytes(w.VerificationScript)
 }
 
 // MarshalJSON implements the json marshaller interface.

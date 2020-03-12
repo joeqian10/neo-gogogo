@@ -25,15 +25,15 @@ type StateDescriptor struct {
 func (s *StateDescriptor) Deserialize(r *io.BinaryReader) {
 	r.ReadLE(&s.Type)
 
-	s.Key = r.ReadBytes()
-	s.Value = r.ReadBytes()
-	s.Field = r.ReadString()
+	s.Key = r.ReadVarBytes()
+	s.Value = r.ReadVarBytes()
+	s.Field = r.ReadVarString()
 }
 
 // Serialize implements Serializable interface.
 func (s *StateDescriptor) Serialize(w *io.BinaryWriter) {
 	w.WriteLE(s.Type)
-	w.WriteBytes(s.Key)
-	w.WriteBytes(s.Value)
-	w.WriteString(s.Field)
+	w.WriteVarBytes(s.Key)
+	w.WriteVarBytes(s.Value)
+	w.WriteVarString(s.Field)
 }

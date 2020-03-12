@@ -33,9 +33,8 @@ func (n *Nep5Helper) TotalSupply() (uint64, error) {
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return 0, fmt.Errorf(msg)
+	if response.HasError() {
+		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return 0, fmt.Errorf("engine faulted")
@@ -57,9 +56,8 @@ func (n *Nep5Helper) Name() (string, error) {
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "name", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return "", fmt.Errorf("engine faulted")
@@ -77,9 +75,8 @@ func (n *Nep5Helper) Symbol() (string, error) {
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "symbol", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return "", fmt.Errorf("engine faulted")
@@ -97,9 +94,8 @@ func (n *Nep5Helper) Decimals() (uint8, error) {
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "decimals", []sc.ContractParameter{})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return 0, fmt.Errorf(msg)
+	if response.HasError() {
+		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return 0, fmt.Errorf("engine faulted")
@@ -124,9 +120,8 @@ func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error) {
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "balanceOf", []sc.ContractParameter{cp})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return 0, fmt.Errorf(msg)
+	if response.HasError() {
+		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return 0, fmt.Errorf("engine faulted")
@@ -161,9 +156,8 @@ func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount hel
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()
 	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return false, []byte{}, fmt.Errorf(msg)
+	if response.HasError() {
+		return false, []byte{}, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	if response.Result.State == "FAULT" {
 		return false, []byte{}, fmt.Errorf("engine faulted")

@@ -11,6 +11,13 @@ type ErrorResponse struct {
 	Error RpcError `json:"error"`
 }
 
+func (r *ErrorResponse) HasError() bool {
+	if len(r.Error.Message) == 0 {
+		return false
+	}
+	return true
+}
+
 type RpcError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -63,6 +70,7 @@ type GetBlockCountResponse struct {
 	ErrorResponse
 	Result int `json:"result"`
 }
+
 type GetBlockHeaderResponse struct {
 	RpcResponse
 	ErrorResponse
@@ -243,9 +251,20 @@ type ValidateAddressResponse struct {
 	Result models.ValidateAddress `json:"result"`
 }
 
-type GetCrossChainProofResponse struct {
+type CrossChainProofResponse struct {
 	RpcResponse
 	ErrorResponse
-	CrosschainProof string `json:"result"`
+	CrosschainProof models.MPTProof `json:"result"`
 }
 
+type StateHeightResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.StateHeight `json:"result"`
+}
+
+type StateRootResponse struct {
+	RpcResponse
+	ErrorResponse
+	Result models.StateRootState `json:"result"`
+}

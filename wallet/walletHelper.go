@@ -23,9 +23,8 @@ func NewWalletHelper(txBuilder *tx.TransactionBuilder, account *Account) *Wallet
 // GetBalance is used to transfer neo or gas or other utxo asset, single signature
 func (w *WalletHelper) GetBalance(address string) (neoBalance int, gasBalance float64, err error) {
 	response := w.TxBuilder.Client.GetAccountState(address)
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return 0, 0, fmt.Errorf(msg)
+	if response.HasError() {
+		return 0, 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	balances := response.Result.Balances
 	for _, balance := range balances {
@@ -70,9 +69,8 @@ func (w *WalletHelper) Transfer(assetId helper.UInt256, from string, to string, 
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(ctx.RawTransactionString())
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	return ctx.HashString(), nil
 }
@@ -94,9 +92,8 @@ func (w *WalletHelper) ClaimGas(from string) (string, error) {
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(ctx.RawTransactionString())
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	return ctx.HashString(), nil
 }
@@ -137,9 +134,8 @@ func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to stri
 	}
 	// use RPC to send the tx
 	response := w.TxBuilder.Client.SendRawTransaction(itx.RawTransactionString())
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return "", fmt.Errorf(msg)
+	if response.HasError() {
+		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	return itx.HashString(), nil
 }

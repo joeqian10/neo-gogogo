@@ -94,7 +94,7 @@ func (tx *InvocationTransaction) DeserializeUnsigned(br *io.BinaryReader) {
 }
 
 func (tx *InvocationTransaction) DeserializeExclusiveData(br *io.BinaryReader) {
-	tx.Script = br.ReadBytes()
+	tx.Script = br.ReadVarBytes()
 	if tx.Version >= 1 {
 		br.ReadLE(&tx.Gas)
 	} else {
@@ -115,7 +115,7 @@ func (tx *InvocationTransaction) SerializeUnsigned(bw *io.BinaryWriter) {
 }
 
 func (tx *InvocationTransaction) SerializeExclusiveData(bw *io.BinaryWriter) {
-	bw.WriteBytes(tx.Script)
+	bw.WriteVarBytes(tx.Script)
 	if tx.Version >= 1 {
 		bw.WriteLE(tx.Gas)
 	}

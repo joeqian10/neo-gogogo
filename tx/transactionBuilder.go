@@ -131,9 +131,8 @@ func (tb *TransactionBuilder) GetTransactionInputs(from helper.UInt160, assetId 
 // GetBalance is used to get balance of neo or gas or other utxo asset
 func (tb *TransactionBuilder) GetBalance(account helper.UInt160, assetId helper.UInt256) (*models.UnspentBalance, helper.Fixed8, error) {
 	response := tb.Client.GetUnspents(helper.ScriptHashToAddress(account))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return nil, helper.Zero, fmt.Errorf(msg)
+	if response.HasError() {
+		return nil, helper.Zero, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	balances := response.Result.Balances
 	// check if there is enough balance of this asset in this account
@@ -179,9 +178,8 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 
 func (tb *TransactionBuilder) GetGasConsumed(script []byte) (*helper.Fixed8, error) {
 	response := tb.Client.InvokeScript(helper.BytesToHex(script))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return nil, fmt.Errorf(msg)
+	if response.HasError() {
+		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	// transfer script will return "FAULT" when checking witness, so comment error for this issue https://github.com/neo-project/neo/pull/335
 	//if response.Result.State == "FAULT" {
@@ -228,9 +226,8 @@ func (tb *TransactionBuilder) MakeClaimTransaction(from helper.UInt160, changeAd
 
 func (tb *TransactionBuilder) GetClaimables(from helper.UInt160) ([]*CoinReference, *helper.Fixed8, error) {
 	response := tb.Client.GetClaimable(helper.ScriptHashToAddress(from))
-	msg := response.ErrorResponse.Error.Message
-	if len(msg) != 0 {
-		return nil, nil, fmt.Errorf(msg)
+	if response.HasError() {
+		return nil, nil, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	var claims []*CoinReference
 	claimables := response.Result.Claimables
