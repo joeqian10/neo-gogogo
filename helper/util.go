@@ -5,17 +5,16 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-
 	"github.com/joeqian10/neo-gogogo/crypto"
 )
 
-// bytes to hex string
+//BytesToHex bytes to hex string
 func BytesToHex(b []byte) string {
 	return hex.EncodeToString(b)
 }
 
-// Simple hex string to bytes
-func HexTobytes(hexstring string) (b []byte) {
+//HexToBytes Simple hex string to bytes
+func HexToBytes(hexstring string) (b []byte) {
 	b, _ = hex.DecodeString(hexstring)
 	return b
 }
@@ -39,6 +38,7 @@ func ReverseBytes(data []byte) []byte {
 	return b
 }
 
+//ToNibbles ..
 func ToNibbles(data []byte) []byte {
 	r := make([]byte, len(data)*2)
 	for i := 0; i < len(data); i++ {
@@ -68,7 +68,7 @@ func AddressToScriptHash(address string) (UInt160, error) {
 
 // ReverseString
 func ReverseString(input string) string {
-	return BytesToHex(ReverseBytes(HexTobytes(input)))
+	return BytesToHex(ReverseBytes(HexToBytes(input)))
 }
 
 // UInt32ToBytes ...
@@ -88,7 +88,6 @@ func Int64ToBytes(n int64) []byte {
 func Abs(x int64) int64 {
 	if x >= 0 {
 		return x
-	} else {
-		return -x
 	}
+	return -x
 }

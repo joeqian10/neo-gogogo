@@ -3,6 +3,8 @@ package io
 import (
 	"bytes"
 	"github.com/joeqian10/neo-gogogo/helper"
+
+	//"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
