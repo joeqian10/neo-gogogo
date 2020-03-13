@@ -1,17 +1,18 @@
 package nep5
 
 import (
+	"testing"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestNewNep5Helper(t *testing.T) {
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
-	nep5helper := NewNep5Helper(scriptHash,"http://seed1.ngd.network:20332")
+	nep5helper := NewNep5Helper(scriptHash, "http://seed1.ngd.network:20332")
 	assert.NotNil(t, nep5helper)
 }
 
@@ -19,8 +20,8 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
-		scriptHash:scriptHash,
-		Client: clientMock,
+		scriptHash: scriptHash,
+		Client:     clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse: rpc.RpcResponse{
@@ -46,7 +47,6 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 		},
 	})
 
-
 	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
 	u, e := nh.BalanceOf(address)
 	assert.Nil(t, e)
@@ -57,8 +57,8 @@ func TestNep5Helper_Decimals(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
-		scriptHash:scriptHash,
-		Client: clientMock,
+		scriptHash: scriptHash,
+		Client:     clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse: rpc.RpcResponse{
@@ -84,7 +84,6 @@ func TestNep5Helper_Decimals(t *testing.T) {
 		},
 	})
 
-
 	d, err := nh.Decimals()
 	assert.Nil(t, err)
 	assert.Equal(t, uint8(8), d)
@@ -94,8 +93,8 @@ func TestNep5Helper_Name(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
-		scriptHash:scriptHash,
-		Client: clientMock,
+		scriptHash: scriptHash,
+		Client:     clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse: rpc.RpcResponse{
@@ -122,7 +121,7 @@ func TestNep5Helper_Name(t *testing.T) {
 	})
 
 	name, err := nh.Name()
-	//name := string(helper.HexTobytes("516c696e6b20546f6b656e"))
+	//name := string(helper.HexToBytes("516c696e6b20546f6b656e"))
 	assert.Nil(t, err)
 	assert.Equal(t, "Qlink Token", name)
 }
@@ -131,8 +130,8 @@ func TestNep5Helper_Symbol(t *testing.T) {
 	var clientMock = new(rpc.RpcClientMock)
 	scriptHash, _ := helper.UInt160FromString("0xb9d7ea3062e6aeeb3e8ad9548220c4ba1361d263")
 	var nh = Nep5Helper{
-		scriptHash:scriptHash,
-		Client: clientMock,
+		scriptHash: scriptHash,
+		Client:     clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse: rpc.RpcResponse{

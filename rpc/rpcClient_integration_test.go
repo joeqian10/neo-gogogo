@@ -15,6 +15,7 @@ import (
 	"crypto/rand"
 	"testing"
 )
+
 /*
 If you want to run all the tests, you'd better have a private net prepared for testing,
 since a private net is more flexible and you will have plenty of neo and gas to spend.
@@ -25,14 +26,14 @@ var LocalEndPoint = "http://localhost:50003"
 var TestNetEndPoint = "http://seed1.ngd.network:20332"
 
 var LocalClient = rpc.NewClient(LocalEndPoint)
-var TestNetClient  = rpc.NewClient(TestNetEndPoint)
+var TestNetClient = rpc.NewClient(TestNetEndPoint)
 
 var LocalWalletAddress = "APPmjituYcgfNxjuQDy9vP73R2PmhFsYJR"
 var TestNetWalletAddress = "AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY"
 
 var AssetIdNeo = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
 var Nep5ScriptHash = "b9d7ea3062e6aeeb3e8ad9548220c4ba1361d263" // Qlink Token, big-endian
-var MyToken = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26" // change to yours when testing via private net
+var MyToken = "14df5d02f9a52d3e92ab8cdcce5fc76c743a9b26"        // change to yours when testing via private net
 
 func TestNewClient(t *testing.T) {
 	client := rpc.NewClient(TestNetEndPoint)
@@ -65,7 +66,7 @@ func TestRpcClient_GetAccountState(t *testing.T) {
 	response := LocalClient.GetAccountState(LocalWalletAddress)
 	//log.Printf("%+v", response)
 	r := response.Result
-	assert.Equal(t,0, r.Version)
+	assert.Equal(t, 0, r.Version)
 	assert.Equal(t, "0x758ec2715fbcaeadf1b2179b11a7d980f8eb9253", r.ScriptHash)
 }
 
@@ -116,7 +117,7 @@ func TestRpcClient_GetAssetState(t *testing.T) {
 func TestRpcClient_GetBalance(t *testing.T) {
 	response := LocalClient.GetBalance(AssetIdNeo)
 	//log.Printf("%+v", response)
-	r:= response.Result
+	r := response.Result
 	assert.Equal(t, "100000000", r.Balance)
 }
 
@@ -250,7 +251,6 @@ func TestRpcClient_GetConnectionCount(t *testing.T) {
 //2019/11/04 16:25:18 {RpcResponse:{JsonRpc:2.0 ID:1} ErrorResponse:{Error:{Code:0 Message:}} Result:48}
 //--- PASS: TestRpcClient_GetConnectionCount (0.35s)
 //PASS
-
 
 func TestRpcClient_GetContractState(t *testing.T) {
 	response := TestNetClient.GetContractState(Nep5ScriptHash)
@@ -491,7 +491,6 @@ func TestRpcClient_ListAddress(t *testing.T) {
 //--- PASS: TestRpcClient_ListAddress (0.35s)
 //PASS
 
-
 func TestRpcClient_ListPlugins(t *testing.T) {
 	response := TestNetClient.ListPlugins()
 	log.Printf("%+v", response)
@@ -520,7 +519,7 @@ func TestRpcClient_SendRawTransaction(t *testing.T) {
 	// try to create a raw invocation transaction
 	// build script
 	sb := sc.NewScriptBuilder()
-	scriptHash := helper.ReverseBytes(helper.HexTobytes(MyToken))
+	scriptHash := helper.ReverseBytes(helper.HexToBytes(MyToken))
 	sb.MakeInvocationScript(scriptHash, "name", []sc.ContractParameter{})
 	script := sb.ToArray()
 	itx := tx.NewInvocationTransaction(script)
