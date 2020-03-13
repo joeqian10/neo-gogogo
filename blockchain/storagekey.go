@@ -12,13 +12,13 @@ type Storagekey struct {
 }
 
 //Deserialize deserialize from byte array
-func (sk *Storagekey) Deserialize(reader *io.BinaryReader) (StorageItem, error) {
-	sk.ScriptHash = helper.UInt160FromBytes(reader.ReadVarBytes())
+func (sk *Storagekey) Deserialize(reader *io.BinaryReader) {
+	sk.ScriptHash, _ = helper.UInt160FromBytes(reader.ReadVarBytes())
 	sk.Key = reader.ReadVarBytes()
 }
 
 //Serialize serialize to byte array
-func (sk *Storagekey) Serialize(writer *io.BinaryWriter) []byte {
+func (sk *Storagekey) Serialize(writer *io.BinaryWriter) {
 	writer.WriteVarBytes(sk.ScriptHash.Bytes())
 	writer.WriteVarBytes(sk.Key)
 }
