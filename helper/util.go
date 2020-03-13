@@ -5,10 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"io"
-
 	"github.com/joeqian10/neo-gogogo/crypto"
-	nio "github.com/joeqian10/neo-gogogo/helper/io"
 )
 
 //BytesToHex bytes to hex string
@@ -93,18 +90,4 @@ func Abs(x int64) int64 {
 		return x
 	}
 	return -x
-}
-
-func ToArray(se nio.Serializable) ([]byte, error) {
-	buffer := &bytes.Buffer{}
-	writer := nio.NewBinaryWriterFromIO(io.Writer(buffer))
-	se.Serialize(writer)
-	return buffer.Bytes(), writer.Err
-}
-
-func AsSerializable(se nio.Serializable, data []byte) error {
-	buffer := bytes.NewBuffer(data)
-	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
-	se.Deserialize(reader)
-	return reader.Err
 }
