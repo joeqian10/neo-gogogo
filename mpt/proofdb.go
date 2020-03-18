@@ -30,5 +30,5 @@ func (pd *ProofDb) Get(key []byte) ([]byte, error) {
 	if v, ok := pd.nodes[keystr]; ok {
 		return v, nil
 	}
-	return nil, errors.New("cant find the value in ProofDb")
+	return nil, errors.New("cant find the value in ProofDb, key=" + keystr)
 }
