@@ -1,6 +1,7 @@
 package block
 
 import (
+	"encoding/binary"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/sc"
@@ -116,4 +117,9 @@ func TestBlockHeader_SerializeUnsigned(t *testing.T) {
 
 	assert.Nil(t, buf.Err)
 	assert.Equal(t, helper.BytesToHex(requiredData), helper.BytesToHex(buf.Bytes()))
+}
+
+func TestNewBlockHeaderFromRPC(t *testing.T) {
+	consensusData := binary.BigEndian.Uint64(helper.HexToBytes("000000007c2bac1d"))
+	assert.Equal(t, uint64(2083236893), consensusData)
 }

@@ -16,8 +16,6 @@ type RpcBlockHeader struct {
 	} `json:"witness"`
 	Confirmations int    `json:"confirmations"`
 	NextBlockHash string `json:"nextblockhash"`
-	// cross chain support
-	CrossStatesRoot string `json:"crossstatesroot"`
 }
 
 type RpcBlock struct {

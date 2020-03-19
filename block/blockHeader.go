@@ -1,9 +1,13 @@
 package block
 
 import (
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
+	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/tx"
 )
 
@@ -23,11 +27,52 @@ type BlockHeader struct {
 	//CrossStatesRoot string
 }
 
+func NewBlockHeaderFromRPC(header models.RpcBlockHeader) (*BlockHeader, error) {
+	version := uint32(header.Version)
+	prevHash, err := helper.UInt256FromString(header.PreviousBlockHash)
+	if err != nil {
+		return nil, err
+	}
+	merkleRoot, err := helper.UInt256FromString(header.MerkleRoot)
+	if err != nil {
+		return nil, err
+	}
+	timeStamp := uint32(header.Time)
+	index := uint32(header.Index)
+	consensusData := binary.BigEndian.Uint64(helper.HexToBytes(header.Nonce)) // Nonce is in big endian
+	nextConsensus, err := helper.UInt160FromString(header.NextConsensus)
+	if err != nil {
+		return nil, err
+	}
+	witness := &tx.Witness{
+		InvocationScript:   helper.HexToBytes(header.Witness.InvocationScript),
+		VerificationScript: helper.HexToBytes(header.Witness.VerificationScript),
+	}
+	hash, err := helper.UInt256FromString(header.Hash)
+	if err != nil {
+		return nil, err
+	}
+	bh := BlockHeader{
+		Version:       version,
+		PrevHash:      prevHash,
+		MerkleRoot:    merkleRoot,
+		Timestamp:     timeStamp,
+		Index:         index,
+		ConsensusData: consensusData,
+		NextConsensus: nextConsensus,
+		Witness:       witness,
+		_hash:         hash,
+	}
+	return &bh, nil
+}
+
 func (bh *BlockHeader) Deserialize(br *io.BinaryReader) {
 	bh.DeserializeUnsigned(br)
 	var b byte
 	br.ReadLE(&b)
-	if b != byte(1) {br.Err = fmt.Errorf("format error: padding must equal 1 got %d", b)}
+	if b != byte(1) {
+		br.Err = fmt.Errorf("format error: padding must equal 1 got %d", b)
+	}
 	bh.Witness.Deserialize(br)
 }
 
@@ -41,7 +86,6 @@ func (bh *BlockHeader) DeserializeUnsigned(br *io.BinaryReader) {
 	br.ReadLE(&bh.ConsensusData)
 	br.ReadLE(&bh.NextConsensus)
 }
-
 
 func (bh *BlockHeader) Serialize(bw *io.BinaryWriter) {
 	bh.SerializeUnsigned(bw)
@@ -67,4 +111,10 @@ func (bh *BlockHeader) GetHashData() []byte {
 		return nil
 	}
 	return buf.Bytes()
+}
+
+func (bh *BlockHeader) HashString() string {
+	hash := crypto.Hash256(bh.GetHashData())
+	bh._hash, _ = helper.UInt256FromBytes(hash)
+	return hex.EncodeToString(helper.ReverseBytes(hash)) // reverse to big endian
 }

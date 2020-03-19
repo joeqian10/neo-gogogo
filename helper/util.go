@@ -91,3 +91,18 @@ func Abs(x int64) int64 {
 	}
 	return -x
 }
+
+//func HashToInt(hash []byte) *big.Int {
+//	orderBits := 256
+//	orderBytes := (orderBits + 7) / 8
+//	if len(hash) > orderBytes {
+//		hash = hash[:orderBytes]
+//	}
+//
+//	ret := new(big.Int).SetBytes(hash)
+//	excess := len(hash)*8 - orderBits
+//	if excess > 0 {
+//		ret.Rsh(ret, uint(excess))
+//	}
+//	return ret
+//}
