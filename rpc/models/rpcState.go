@@ -5,8 +5,8 @@ import (
 )
 
 type MPTProof struct {
-	Success bool     `json:"success"`
-	Proof   []string `json:"proof"`
+	Success bool   `json:"success"`
+	Proof   string `json:"proof"`
 }
 
 type StateHeight struct {
