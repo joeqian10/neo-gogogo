@@ -120,12 +120,13 @@ func (t *Transaction) AddScriptHashToAttribute(scriptHash helper.UInt160) {
 }
 
 // add address if the account is not in transaction attributes
-func (t *Transaction) AddAddressToAttribute(address string, err error) {
+func (t *Transaction) AddAddressToAttribute(address string) error {
 	scriptHash, err := helper.AddressToScriptHash(address)
 	if err != nil {
-		return
+		return err
 	}
 	t.AddScriptHashToAttribute(scriptHash)
+	return nil
 }
 
 type ITransaction interface {
