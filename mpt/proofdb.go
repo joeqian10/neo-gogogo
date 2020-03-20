@@ -1,7 +1,11 @@
 package mpt
 
 import (
+	"bytes"
 	"errors"
+	"io"
+
+	nio "github.com/joeqian10/neo-gogogo/helper/io"
 
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
@@ -13,7 +17,8 @@ type ProofDb struct {
 }
 
 //NewProofDb new instance of ProofDb from a string list
-func NewProofDb(proof [][]byte) *ProofDb {
+func NewProofDb(proofBytes []byte) *ProofDb {
+	proof := bytesToArray(proofBytes)
 	p := &ProofDb{}
 	p.nodes = make(map[string]([]byte), len(proof))
 	for _, v := range proof {
@@ -31,4 +36,15 @@ func (pd *ProofDb) Get(key []byte) ([]byte, error) {
 		return v, nil
 	}
 	return nil, errors.New("cant find the value in ProofDb, key=" + keystr)
+}
+
+func bytesToArray(data []byte) [][]byte {
+	buffer := bytes.NewBuffer(data)
+	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
+	count := reader.ReadVarUint()
+	result := make([][]byte, count)
+	for i := uint64(0); i < count; i++ {
+		result[i] = reader.ReadVarBytes()
+	}
+	return result
 }
