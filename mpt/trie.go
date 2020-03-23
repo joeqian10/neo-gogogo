@@ -3,8 +3,10 @@ package mpt
 import (
 	"bytes"
 	"errors"
+	"io"
 
 	"github.com/joeqian10/neo-gogogo/helper"
+	nio "github.com/joeqian10/neo-gogogo/helper/io"
 )
 
 //Trie mpt tree
@@ -74,12 +76,35 @@ func (t *Trie) get(n node, path []byte) (node, error) {
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, path []byte, proof []byte) ([]byte, error) {
+func VerifyProof(root, proof []byte) ([]byte, error) {
+	key, proofs, err := resolveProof(proof)
+	if err != nil {
+		return nil, err
+	}
+	return verifyProof(root, key, proofs)
+}
+
+func verifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
 		return nil, err
 	}
-	value, err := trie.Get(path)
+	value, err := trie.Get(key)
 	return value, err
+}
+
+func resolveProof(proofBytes []byte) (key []byte, proof [][]byte, err error) {
+	buffer := bytes.NewBuffer(proofBytes)
+	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
+	key = reader.ReadVarBytes()
+	if err != nil {
+		return key, proof, err
+	}
+	count := reader.ReadVarUint()
+	proof = make([][]byte, count)
+	for i := uint64(0); i < count; i++ {
+		proof[i] = reader.ReadVarBytes()
+	}
+	return key, proof, err
 }

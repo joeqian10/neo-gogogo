@@ -26,21 +26,17 @@ func writeBytesWithGrouping(writer *io.BinaryWriter, value []byte) {
 }
 
 func readBytesWithGrouping(reader *io.BinaryReader) (key []byte, err error) {
-	padding := 0
+	padding := byte(0)
 	for padding == 0 {
 		group := [16]byte{}
 		reader.ReadLE(&group)
-		key = append(key, group[:]...)
-		var padding byte
 		reader.ReadLE(&padding)
 		if 16 < padding {
 			return key, errors.New("padding error")
 		}
 		count := 16 - padding
 		if count > 0 {
-			remain := make([]byte, count)
-			reader.ReadLE(&remain)
-			key = append(key, remain[:]...)
+			key = append(key, group[:count]...)
 		}
 	}
 	return key, nil
