@@ -23,8 +23,6 @@ type BlockHeader struct {
 
 	_hash helper.UInt256
 	_size int
-	// cross chain support, todo
-	//CrossStatesRoot string
 }
 
 func NewBlockHeaderFromRPC(header models.RpcBlockHeader) (*BlockHeader, error) {
@@ -40,7 +38,7 @@ func NewBlockHeaderFromRPC(header models.RpcBlockHeader) (*BlockHeader, error) {
 	timeStamp := uint32(header.Time)
 	index := uint32(header.Index)
 	consensusData := binary.BigEndian.Uint64(helper.HexToBytes(header.Nonce)) // Nonce is in big endian
-	nextConsensus, err := helper.UInt160FromString(header.NextConsensus)
+	nextConsensus, err := helper.AddressToScriptHash(header.NextConsensus)
 	if err != nil {
 		return nil, err
 	}
