@@ -1,9 +1,9 @@
 package block
 
 import (
-	"encoding/binary"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
 	"github.com/stretchr/testify/assert"
@@ -120,6 +120,30 @@ func TestBlockHeader_SerializeUnsigned(t *testing.T) {
 }
 
 func TestNewBlockHeaderFromRPC(t *testing.T) {
-	consensusData := binary.BigEndian.Uint64(helper.HexToBytes("000000007c2bac1d"))
-	assert.Equal(t, uint64(2083236893), consensusData)
+	//consensusData := binary.BigEndian.Uint64(helper.HexToBytes("000000007c2bac1d"))
+	//assert.Equal(t, uint64(2083236893), consensusData)
+	rpcHeader := models.RpcBlockHeader{
+		Hash:              "0xd42561e3d30e15be6400b6df2f328e02d2bf6354c41dce433bc57687c82144bf",
+		Size:              401,
+		Version:           0,
+		PreviousBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+		MerkleRoot:        "0x803ff4abe3ea6533bcc0be574efa02f83ae8fdc651c879056b0d9be336c01bf4",
+		Time:              1468595301,
+		Index:             0,
+		Nonce:             "000000007c2bac1d",
+		NextConsensus:     "APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR",
+		Witness: struct {
+			InvocationScript   string `json:"invocation"`
+			VerificationScript string `json:"verification"`
+		}{
+			InvocationScript:"",
+			VerificationScript:"51",
+		},
+		Confirmations: 5276880,
+		NextBlockHash: "0xd782db8a38b0eea0d7394e0f007c61c71798867578c77c387c08113903946cc9",
+	}
+
+	header, err := NewBlockHeaderFromRPC(&rpcHeader)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(2083236893), header.ConsensusData)
 }

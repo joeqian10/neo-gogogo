@@ -25,7 +25,7 @@ type BlockHeader struct {
 	_size int
 }
 
-func NewBlockHeaderFromRPC(header models.RpcBlockHeader) (*BlockHeader, error) {
+func NewBlockHeaderFromRPC(header *models.RpcBlockHeader) (*BlockHeader, error) {
 	version := uint32(header.Version)
 	prevHash, err := helper.UInt256FromString(header.PreviousBlockHash)
 	if err != nil {
