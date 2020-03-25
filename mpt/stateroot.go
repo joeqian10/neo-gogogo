@@ -11,7 +11,7 @@ type StateRoot struct {
 	Index     uint32 `json:"index"`
 	PreHash   string `json:"prehash"`
 	StateRoot string `json:"stateroot"`
-	Witness   []struct {
+	Witness   struct {
 		InvocationScript   string `json:"invocation"`
 		VerificationScript string `json:"verification"`
 	} `json:"witness"`
@@ -23,19 +23,15 @@ func (sr *StateRoot) Deserialize(br *io.BinaryReader) {
 	if l != 1 {
 		return
 	}
-	sr.Witness = make([]struct {
-		InvocationScript   string `json:"invocation"`
-		VerificationScript string `json:"verification"`
-	}, 1)
-	sr.Witness[0].InvocationScript = helper.BytesToHex(br.ReadVarBytes())
-	sr.Witness[0].VerificationScript = helper.BytesToHex(br.ReadVarBytes())
+	sr.Witness.InvocationScript = helper.BytesToHex(br.ReadVarBytes())
+	sr.Witness.VerificationScript = helper.BytesToHex(br.ReadVarBytes())
 }
 
 func (sr *StateRoot) Serialize(bw *io.BinaryWriter) {
 	sr.SerializeUnsigned(bw)
 	bw.WriteVarUint(1)
-	bw.WriteVarBytes(helper.HexToBytes(sr.Witness[0].InvocationScript))
-	bw.WriteVarBytes(helper.HexToBytes(sr.Witness[0].VerificationScript))
+	bw.WriteVarBytes(helper.HexToBytes(sr.Witness.InvocationScript))
+	bw.WriteVarBytes(helper.HexToBytes(sr.Witness.VerificationScript))
 }
 
 func (sr *StateRoot) DeserializeUnsigned(br *io.BinaryReader) {
