@@ -286,7 +286,7 @@ func (n *RpcClient) InvokeFunction(scriptHash string, method string, args ...int
 
 func (n *RpcClient) InvokeScript(scriptInHex string) InvokeScriptResponse {
 	response := InvokeScriptResponse{}
-	params := []interface{}{scriptInHex, 1}
+	params := []interface{}{scriptInHex}
 	_ = n.makeRequest("invokescript", params, &response)
 	return response
 }
