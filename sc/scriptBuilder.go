@@ -124,11 +124,11 @@ func (sb *ScriptBuilder) EmitPushBytes(data []byte) error {
 		sb.buff.Write(data)
 	} else if le < int(0x10000) {
 		err = sb.Emit(PUSHDATA2)
-		sb.buff.Write(v.Bytes())
+		sb.buff.Write(v.Bytes()[1:])
 		sb.buff.Write(data)
 	} else {
 		err = sb.Emit(PUSHDATA4)
-		sb.buff.Write(v.Bytes())
+		sb.buff.Write(v.Bytes()[1:])
 		sb.buff.Write(data)
 	}
 	if err != nil {
