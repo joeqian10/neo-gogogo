@@ -77,37 +77,49 @@ func (t *Trie) get(n node, path []byte) (node, error) {
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
+func VerifyProof(root []byte, scriptHash helper.UInt160, key []byte, proof [][]byte) ([]byte, error) {
+	sKey := blockchain.Storagekey{
+		ScriptHash: scriptHash,
+		Key:        key,
+	}
+	vkey, err := nio.ToArray(&sKey)
+	if err != nil {
+		return nil, err
+	}
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
 		return nil, err
 	}
-	value, err := trie.Get(key)
+	value, err := trie.Get(vkey)
 	return resolveValue(value)
 }
 
 //ResolveProof get key and proofs from proofdata
-func ResolveProof(proofBytes []byte) (key []byte, proof [][]byte, err error) {
+func ResolveProof(proofBytes []byte) (scriptHash helper.UInt160, key []byte, proof [][]byte, err error) {
 	buffer := bytes.NewBuffer(proofBytes)
 	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
 	key = reader.ReadVarBytes()
 	if err != nil {
-		return key, proof, err
+		return scriptHash, key, proof, err
 	}
 	count := reader.ReadVarUint()
 	proof = make([][]byte, count)
 	for i := uint64(0); i < count; i++ {
 		proof[i] = reader.ReadVarBytes()
 	}
-	return key, proof, err
+	scriptHash, key, err = resolveKey(key)
+	return scriptHash, key, proof, err
 }
 
 func resolveValue(value []byte) ([]byte, error) {
 	item := blockchain.StorageItem{}
 	err := nio.AsSerializable(&item, value)
-	if err != nil {
-		return nil, err
-	}
-	return item.Value, nil
+	return item.Value, err
+}
+
+func resolveKey(key []byte) (scriptHash helper.UInt160, kk []byte, err error) {
+	sKey := blockchain.Storagekey{}
+	err = nio.AsSerializable(&sKey, key)
+	return sKey.ScriptHash, sKey.Key, err
 }
