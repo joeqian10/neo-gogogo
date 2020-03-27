@@ -23,9 +23,7 @@ func TestVerifyProof(t *testing.T) {
 		t.Error("verify proof err:", err)
 	}
 
-	sItem := blockchain.StorageItem{}
-	io.AsSerializable(&sItem, value)
-	if helper.BytesToHex(sItem.Value) != "c071b504" {
+	if helper.BytesToHex(value) != "c071b504" {
 		t.Error("wrong value")
 	}
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 
+	"github.com/joeqian10/neo-gogogo/blockchain"
 	"github.com/joeqian10/neo-gogogo/helper"
 	nio "github.com/joeqian10/neo-gogogo/helper/io"
 )
@@ -83,7 +84,7 @@ func VerifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
 		return nil, err
 	}
 	value, err := trie.Get(key)
-	return value, err
+	return resolveValue(value)
 }
 
 //ResolveProof get key and proofs from proofdata
@@ -100,4 +101,13 @@ func ResolveProof(proofBytes []byte) (key []byte, proof [][]byte, err error) {
 		proof[i] = reader.ReadVarBytes()
 	}
 	return key, proof, err
+}
+
+func resolveValue(value []byte) ([]byte, error) {
+	item := blockchain.StorageItem{}
+	err := nio.AsSerializable(&item, value)
+	if err != nil {
+		return nil, err
+	}
+	return item.Value, nil
 }
