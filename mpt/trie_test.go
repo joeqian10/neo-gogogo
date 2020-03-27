@@ -3,9 +3,7 @@ package mpt
 import (
 	"testing"
 
-	"github.com/joeqian10/neo-gogogo/blockchain"
 	"github.com/joeqian10/neo-gogogo/helper"
-	"github.com/joeqian10/neo-gogogo/helper/io"
 )
 
 func TestVerifyProof(t *testing.T) {
@@ -14,24 +12,20 @@ func TestVerifyProof(t *testing.T) {
 
 	root, _ := helper.UInt256FromString("34db5a993a95e0db79efe8220bf142e5952056bb59834fe3b91fc1611ed4385e")
 
-	key, proofs, err := ResolveProof(proofdata)
+	scriptHash, key, proofs, err := ResolveProof(proofdata)
 	if err != nil {
 		t.Error(err)
 	}
-	value, err := VerifyProof(root.Bytes(), key, proofs)
+	value, err := VerifyProof(root.Bytes(), scriptHash, key, proofs)
 	if err != nil {
 		t.Error("verify proof err:", err)
 	}
 
-	sItem := blockchain.StorageItem{}
-	io.AsSerializable(&sItem, value)
-	if helper.BytesToHex(sItem.Value) != "c071b504" {
+	if helper.BytesToHex(value) != "c071b504" {
 		t.Error("wrong value")
 	}
 
-	sKey := blockchain.Storagekey{}
-	io.AsSerializable(&sKey, key)
-	if sKey.ScriptHash.String() != "8adba7caee53e2f12f130b065411840cf7b4f9a5" {
+	if scriptHash.String() != "8adba7caee53e2f12f130b065411840cf7b4f9a5" {
 		t.Error("wrong nep5")
 	}
 }
