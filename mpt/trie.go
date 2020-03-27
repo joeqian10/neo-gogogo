@@ -76,15 +76,7 @@ func (t *Trie) get(n node, path []byte) (node, error) {
 }
 
 //VerifyProof directly verify proof
-func VerifyProof(root, proof []byte) ([]byte, error) {
-	key, proofs, err := resolveProof(proof)
-	if err != nil {
-		return nil, err
-	}
-	return verifyProof(root, key, proofs)
-}
-
-func verifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
+func VerifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
 	proofdb := NewProofDb(proof)
 	trie, err := NewTrie(root, proofdb)
 	if err != nil {
@@ -94,7 +86,8 @@ func verifyProof(root, key []byte, proof [][]byte) ([]byte, error) {
 	return value, err
 }
 
-func resolveProof(proofBytes []byte) (key []byte, proof [][]byte, err error) {
+//ResolveProof get key and proofs from proofdata
+func ResolveProof(proofBytes []byte) (key []byte, proof [][]byte, err error) {
 	buffer := bytes.NewBuffer(proofBytes)
 	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
 	key = reader.ReadVarBytes()
