@@ -3,6 +3,7 @@ package rpc
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -371,4 +372,32 @@ func (n *RpcClient) GetStateRootByHash(blockHash string) StateRootResponse {
 	params := []interface{}{blockHash}
 	_ = n.makeRequest("getstateroot", params, &response)
 	return response
+}
+
+func (n *RpcClient) IsTxConfirmed(txId string) (bool, error) {
+	r1 := n.GetRawTransaction(txId)
+	if r1.HasError() {
+		return false, fmt.Errorf("GetRawTransaction: %s", r1.Error.Message)
+	}
+	return r1.Result.Confirmations > 0, nil
+}
+
+func (n *RpcClient) WaitForTransactionConfirmed(txId string) error {
+	checkPeriod := 9*time.Second
+	checkTimeout := 45*time.Second
+
+	start := time.Now()
+	first := true
+	for time.Since(start) < checkTimeout {
+		if first {
+			time.Sleep(checkPeriod/2)
+			first = false
+		} else {
+			time.Sleep(checkPeriod)
+		}
+		accepted, err := n.IsTxConfirmed(txId)
+		if err != nil {return err}
+		if accepted {return nil}
+	}
+	return fmt.Errorf("timed out waiting for %s", txId)
 }

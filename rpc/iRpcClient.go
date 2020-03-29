@@ -41,4 +41,6 @@ type IRpcClient interface {
 	SendToAddress(assetId string, to string, amount uint32, fee float32, changeAddress string) SendToAddressResponse
 	SubmitBlock(s string) SubmitBlockResponse
 	ValidateAddress(s string) ValidateAddressResponse
+	IsTxConfirmed(txId string) (bool, error)
+	WaitForTransactionConfirmed(txId string) error
 }
