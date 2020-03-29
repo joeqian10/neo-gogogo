@@ -3,6 +3,8 @@ package nep5
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/joeqian10/neo-gogogo/tx"
+	"github.com/joeqian10/neo-gogogo/wallet"
 	"strconv"
 
 	"github.com/joeqian10/neo-gogogo/helper"
@@ -173,3 +175,40 @@ func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount hel
 	}
 	return b, script, nil
 }
+
+func (n *Nep5Helper) TransferFromWallet(from *wallet.Account, to helper.UInt160, amount helper.Fixed8) (success bool, err error) {
+	sb := sc.NewScriptBuilder()
+	f, _ := helper.AddressToScriptHash(from.Address)
+	cp1 := sc.ContractParameter{
+		Type:  sc.Hash160,
+		Value: f.Bytes(),
+	}
+	cp2 := sc.ContractParameter{
+		Type:  sc.Hash160,
+		Value: to.Bytes(),
+	}
+	cp3 := sc.ContractParameter{
+		Type:  sc.Integer,
+		Value: amount.Value,
+	}
+	sb.MakeInvocationScript(n.scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1,cp2,cp3})
+	script := sb.ToArray()
+	myTx := tx.NewInvocationTransaction(script)
+	// Sign the transaction, expected by the "transfer" method
+	err = tx.AddSignature(myTx, from.KeyPair)
+	if err != nil {return}
+	response := n.Client.SendRawTransaction(myTx.RawTransactionString())
+	if response.HasError() {err = fmt.Errorf(response.ErrorResponse.Error.Message); return}
+	txId := myTx.HashString()
+	// We need to wait until the transaction is confirmed
+	err = n.Client.WaitForTransactionConfirmed(txId)
+	if err != nil {return}
+	r:= n.Client.GetApplicationLog(txId)
+	if r.HasError() {err = fmt.Errorf(r.Error.Message); return}
+	if len(r.Result.Executions) == 0 {err = fmt.Errorf("no executions returned"); return}
+	e := r.Result.Executions[0]
+	if len(e.Stack) == 0 {err = fmt.Errorf("no stack result returned"); return}
+	success, err = strconv.ParseBool(e.Stack[0].Value)
+	return
+}
+
