@@ -196,37 +196,37 @@ func TestNep5Helper_TotalSupply(t *testing.T) {
 	assert.Equal(t, uint64(59480000000000000), s)
 }
 
-func TestNep5Helper_Transfer(t *testing.T) {
-	var clientMock = new(rpc.RpcClientMock)
-	var nh = Nep5Helper{
-		Client: clientMock,
-	}
-	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse: rpc.RpcResponse{
-			JsonRpc: "2.0",
-			ID:      1,
-		},
-		ErrorResponse: rpc.ErrorResponse{
-			Error: rpc.RpcError{
-				Code:    0,
-				Message: "",
-			},
-		},
-		Result: models.InvokeResult{
-			Script:      "5114dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f14dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f53c1087472616e736665726763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:       "HALT",
-			GasConsumed: "0.494",
-			Stack: []models.InvokeStackResult{
-				{
-					Type:  "Boolean",
-					Value: "True",
-				},
-			},
-		},
-	})
-
-	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
-	b, _, e := nh.Transfer(address, address, helper.Fixed8FromInt64(1))
-	assert.Nil(t, e)
-	assert.Equal(t, true, b)
-}
+//func TestNep5Helper_Transfer(t *testing.T) {
+//	var clientMock = new(rpc.RpcClientMock)
+//	var nh = Nep5Helper{
+//		Client: clientMock,
+//	}
+//	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
+//		RpcResponse: rpc.RpcResponse{
+//			JsonRpc: "2.0",
+//			ID:      1,
+//		},
+//		ErrorResponse: rpc.ErrorResponse{
+//			Error: rpc.RpcError{
+//				Code:    0,
+//				Message: "",
+//			},
+//		},
+//		Result: models.InvokeResult{
+//			Script:      "5114dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f14dcdf11cccb2efd9bbfa8449e57b60c9ce85b6c8f53c1087472616e736665726763d26113bac4208254d98a3eebaee66230ead7b9",
+//			State:       "HALT",
+//			GasConsumed: "0.494",
+//			Stack: []models.InvokeStackResult{
+//				{
+//					Type:  "Boolean",
+//					Value: "True",
+//				},
+//			},
+//		},
+//	})
+//
+//	address, _ := helper.AddressToScriptHash("AUrE5r4NHznrgvqoFAGhoUbu96PE5YeDZY")
+//	b, _, e := nh.Transfer(address, address, helper.Fixed8FromInt64(1))
+//	assert.Nil(t, e)
+//	assert.Equal(t, true, b)
+//}

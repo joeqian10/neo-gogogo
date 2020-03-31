@@ -14,6 +14,15 @@ import (
 
 type CgasHelper Nep5Helper
 
+func NewCgasHelperFromNep5Helper(nep5Helper *Nep5Helper) *CgasHelper {
+	cgasHelper := CgasHelper{
+		scriptHash:nep5Helper.scriptHash,
+		EndPoint:nep5Helper.EndPoint,
+		Client:nep5Helper.Client,
+	}
+	return &cgasHelper
+}
+
 func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, error) {
 	// A mintTokens method for CGAS users, who can transfer GAS to CGAS contract address by constructing InvocationTransaction and convert GAS to CGAS by invoking mintTokens method.
 	// Upon successful invocation, CGAS in the equal value of the GAS will be added to the user's asset account.

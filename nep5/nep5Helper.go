@@ -139,37 +139,38 @@ func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error) {
 	return balance, nil
 }
 
+// This method is deprecated
 // Transfer is only testing the transfer script, please use WalletHelper to truly transfer nep5 token
-func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error) {
-	sb := sc.NewScriptBuilder()
-	cp1 := sc.ContractParameter{
-		Type:  sc.Hash160,
-		Value: from.Bytes(),
-	}
-	cp2 := sc.ContractParameter{
-		Type:  sc.Hash160,
-		Value: to.Bytes(),
-	}
-	cp3 := sc.ContractParameter{
-		Type:  sc.Integer,
-		Value: amount.Value,
-	}
-	sb.MakeInvocationScript(n.scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
-	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
-	if response.HasError() {
-		return false, []byte{}, fmt.Errorf(response.ErrorResponse.Error.Message)
-	}
-	if response.Result.State == "FAULT" {
-		return false, []byte{}, fmt.Errorf("engine faulted")
-	}
-	if len(response.Result.Stack) == 0 {
-		return false, []byte{}, fmt.Errorf("no stack result returned")
-	}
-	stack := response.Result.Stack[0]
-	b, err := strconv.ParseBool(stack.Value)
-	if err != nil {
-		return false, []byte{}, fmt.Errorf("conversion failed")
-	}
-	return b, script, nil
-}
+//func (n *Nep5Helper) Transfer(from helper.UInt160, to helper.UInt160, amount helper.Fixed8) (bool, []byte, error) {
+//	sb := sc.NewScriptBuilder()
+//	cp1 := sc.ContractParameter{
+//		Type:  sc.Hash160,
+//		Value: from.Bytes(),
+//	}
+//	cp2 := sc.ContractParameter{
+//		Type:  sc.Hash160,
+//		Value: to.Bytes(),
+//	}
+//	cp3 := sc.ContractParameter{
+//		Type:  sc.Integer,
+//		Value: amount.Value,
+//	}
+//	sb.MakeInvocationScript(n.scriptHash.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
+//	script := sb.ToArray()
+//	response := n.Client.InvokeScript(helper.BytesToHex(script))
+//	if response.HasError() {
+//		return false, []byte{}, fmt.Errorf(response.ErrorResponse.Error.Message)
+//	}
+//	if response.Result.State == "FAULT" {
+//		return false, []byte{}, fmt.Errorf("engine faulted")
+//	}
+//	if len(response.Result.Stack) == 0 {
+//		return false, []byte{}, fmt.Errorf("no stack result returned")
+//	}
+//	stack := response.Result.Stack[0]
+//	b, err := strconv.ParseBool(stack.Value)
+//	if err != nil {
+//		return false, []byte{}, fmt.Errorf("conversion failed")
+//	}
+//	return b, script, nil
+//}
