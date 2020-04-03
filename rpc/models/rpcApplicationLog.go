@@ -19,6 +19,6 @@ type RpcApplicationLog struct {
 }
 
 type RpcContractParameter struct {
-	Type string 		`json:"type"`
-	Value interface{} 	`json:"value"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
 }

@@ -92,6 +92,26 @@ func Abs(x int64) int64 {
 	return -x
 }
 
+func BytesToUInt64(bs []byte) uint64 {
+	l := len(bs)
+	if l > 8 {
+		return 18446744073709551615 // max value of uint64
+	}
+	bs = PadRight(bs, 8)
+	return binary.LittleEndian.Uint64(bs)
+}
+
+func PadRight(data []byte, length int) []byte {
+	if len(data) >= length {
+		return data
+	}
+	newData := data
+	for len(newData) < length {
+		newData = append(newData, byte(0))
+	}
+	return newData
+}
+
 //func HashToInt(hash []byte) *big.Int {
 //	orderBits := 256
 //	orderBytes := (orderBits + 7) / 8
