@@ -32,9 +32,16 @@ func TestScriptBuilder_EmitJump(t *testing.T) {
 
 func TestScriptBuilder_EmitPushBigInt(t *testing.T) {
 	sb := NewScriptBuilder()
-	_=sb.EmitPushBigInt(*big.NewInt(7777777777))
+	_ = sb.EmitPushBigInt(*big.NewInt(221))
 	b := sb.ToArray()
-	assert.Equal(t, "05717897cf01", helper.BytesToHex(b))
+	assert.Equal(t, "02dd00", helper.BytesToHex(b))
+}
+
+func TestScriptBuilder_EmitPushBigInt2(t *testing.T) {
+	sb := NewScriptBuilder()
+	_ = sb.EmitPushBigInt(*big.NewInt(345))
+	b := sb.ToArray()
+	assert.Equal(t, "025901", helper.BytesToHex(b))
 }
 
 func TestScriptBuilder_EmitPushBool(t *testing.T) {

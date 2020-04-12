@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/joeqian10/neo-gogogo/crypto"
+	"math/big"
 )
 
 //BytesToHex bytes to hex string
@@ -106,6 +107,67 @@ func PadRight(data []byte, length int) []byte {
 		newData = append(newData, byte(0))
 	}
 	return newData
+}
+
+func BigIntToNeoBytes(data *big.Int) []byte {
+	bs := data.Bytes()
+	if len(bs) == 0 {
+		return []byte{}
+	}
+	// golang big.Int use big-endian
+	bs = ReverseBytes(bs)
+	// bs now is little-endian
+	if data.Sign() < 0 {
+		for i, b := range bs {
+			bs[i] = ^b
+		}
+		for i := 0; i < len(bs); i++ {
+			if bs[i] == 255 {
+				bs[i] = 0
+			} else {
+				bs[i] += 1
+				break
+			}
+		}
+		if bs[len(bs)-1] < 128 {
+			bs = append(bs, 255)
+		}
+	} else {
+		if bs[len(bs)-1] >= 128 {
+			bs = append(bs, 0)
+		}
+	}
+	return bs
+}
+
+var bigOne = big.NewInt(1)
+
+func BigIntFromNeoBytes(ba []byte) *big.Int {
+	res := big.NewInt(0)
+	l := len(ba)
+	if l == 0 {
+		return res
+	}
+
+	bytes := make([]byte, 0, l)
+	bytes = append(bytes, ba...)
+	bytes = ReverseBytes(bytes)
+
+	if bytes[0]>>7 == 1 {
+		for i, b := range bytes {
+			bytes[i] = ^b
+		}
+
+		temp := big.NewInt(0)
+		temp.SetBytes(bytes)
+		temp.Add(temp, bigOne)
+		bytes = temp.Bytes()
+		res.SetBytes(bytes)
+		return res.Neg(res)
+	}
+
+	res.SetBytes(bytes)
+	return res
 }
 
 //func HashToInt(hash []byte) *big.Int {

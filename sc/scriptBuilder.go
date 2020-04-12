@@ -92,8 +92,8 @@ func (sb *ScriptBuilder) EmitPushBigInt(number big.Int) error {
 		return sb.Emit(PUSH1 - 1 + OpCode(b))
 	}
 	// need little endian
-	reversed := helper.ReverseBytes(number.Bytes()) // Bytes() returns big-endian
-	return sb.EmitPushBytes(reversed)
+	b := helper.BigIntToNeoBytes(&number)
+	return sb.EmitPushBytes(b)
 }
 
 func (sb *ScriptBuilder) EmitPushInt(number int) error {
