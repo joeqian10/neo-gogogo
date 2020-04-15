@@ -116,3 +116,9 @@ func (bh *BlockHeader) HashString() string {
 	bh._hash, _ = helper.UInt256FromBytes(hash)
 	return hex.EncodeToString(helper.ReverseBytes(hash)) // reverse to big endian
 }
+
+func (bh *BlockHeader) Hash() helper.UInt256 {
+	hash := crypto.Hash256(bh.GetHashData())
+	bh._hash, _ = helper.UInt256FromBytes(hash)
+	return bh._hash
+}
