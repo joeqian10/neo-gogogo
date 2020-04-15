@@ -7,7 +7,7 @@ import (
 
 //StateRoot truct of StateRoot message
 type StateRoot struct {
-	Version   uint32 `json:"version"`
+	Version   byte   `json:"version"`
 	Index     uint32 `json:"index"`
 	PreHash   string `json:"prehash"`
 	StateRoot string `json:"stateroot"`
