@@ -14,11 +14,11 @@ type Storagekey struct {
 //Deserialize deserialize from byte array
 func (sk *Storagekey) Deserialize(reader *io.BinaryReader) {
 	reader.ReadLE(&sk.ScriptHash)
-	sk.Key, _ = readBytesWithGrouping(reader)
+	sk.Key, _ = reader.ReadBytesWithGrouping()
 }
 
 //Serialize serialize to byte array
 func (sk *Storagekey) Serialize(writer *io.BinaryWriter) {
 	writer.WriteLE(sk.ScriptHash)
-	writeBytesWithGrouping(writer, sk.Key)
+	writer.WriteBytesWithGrouping(sk.Key)
 }
