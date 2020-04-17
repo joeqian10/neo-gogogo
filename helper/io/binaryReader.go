@@ -3,6 +3,7 @@ package io
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 )
 
@@ -95,4 +96,22 @@ func (r *BinaryReader) ReadVarBytes() []byte {
 func (r *BinaryReader) ReadVarString() string {
 	b := r.ReadVarBytes()
 	return string(b)
+}
+
+//ReadBytesWithGrouping ...
+func (reader *BinaryReader) ReadBytesWithGrouping() (key []byte, err error) {
+	padding := byte(0)
+	for padding == 0 {
+		group := [16]byte{}
+		reader.ReadLE(&group)
+		reader.ReadLE(&padding)
+		if 16 < padding {
+			return key, errors.New("padding error")
+		}
+		count := 16 - padding
+		if count > 0 {
+			key = append(key, group[:count]...)
+		}
+	}
+	return key, nil
 }
