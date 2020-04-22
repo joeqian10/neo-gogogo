@@ -26,11 +26,7 @@ func decodeNode(data []byte) (node, error) {
 	case shortNodeType:
 		return decodeShortNode(reader)
 	case valueNodeType:
-		val, err := reader.ReadBytesWithGrouping()
-		if err != nil {
-			return nil, err
-		}
-		return valueNode(val), reader.Err
+		return valueNode(reader.ReadVarBytes()), reader.Err
 	}
 	return nil, errors.New("invalid node type to decode")
 }
