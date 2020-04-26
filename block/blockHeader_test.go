@@ -41,9 +41,7 @@ func TestBlockHeader_Deserialize(t *testing.T) {
 		1, 0, 1, 81} // Witness
 
 	br := io.NewBinaryReaderFromBuf(rawBlock)
-	bh := &BlockHeader{
-		Witness: &tx.Witness{},
-	}
+	bh := &BlockHeader{}
 	bh.Deserialize(br)
 	assert.Nil(t, br.Err)
 	assert.Equal(t, uint32(0), bh.Version)
@@ -63,9 +61,7 @@ func TestBlockHeader_DeserializeUnsigned(t *testing.T) {
 		1, 0, 1, 81} // Witness
 
 	br := io.NewBinaryReaderFromBuf(rawBlock)
-	bh := &BlockHeader{
-		Witness: &tx.Witness{},
-	}
+	bh := &BlockHeader{}
 	bh.DeserializeUnsigned(br)
 	assert.Equal(t, uint32(0), bh.Version)
 	assert.Equal(t, uint32(4244941696), bh.Timestamp)

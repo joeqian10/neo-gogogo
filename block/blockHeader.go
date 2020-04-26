@@ -71,6 +71,9 @@ func (bh *BlockHeader) Deserialize(br *io.BinaryReader) {
 	if b != byte(1) {
 		br.Err = fmt.Errorf("format error: padding must equal 1 got %d", b)
 	}
+	if bh.Witness == nil {
+		bh.Witness = &tx.Witness{}
+	}
 	bh.Witness.Deserialize(br)
 }
 
