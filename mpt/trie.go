@@ -92,6 +92,9 @@ func VerifyProof(root []byte, scriptHash helper.UInt160, key []byte, proof [][]b
 		return nil, err
 	}
 	value, err := trie.Get(vkey)
+	if err != nil {
+		return nil, err
+	}
 	return resolveValue(value)
 }
 
