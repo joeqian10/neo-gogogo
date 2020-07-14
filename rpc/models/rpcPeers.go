@@ -8,5 +8,5 @@ type RpcPeers struct {
 
 type Peer struct {
 	Address string `json:"address"`
-	Port    int `json:"port"`
+	Port    int    `json:"port"`
 }

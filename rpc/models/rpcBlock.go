@@ -1,21 +1,18 @@
 package models
 
 type RpcBlockHeader struct {
-	Hash              string `json:"hash"`
-	Size              int    `json:"size"`
-	Version           int    `json:"version"`
-	PreviousBlockHash string `json:"previousblockhash"`
-	MerkleRoot        string `json:"merkleroot"`
-	Time              int    `json:"time"`
-	Index             int    `json:"index"`
-	Nonce             string `json:"nonce"`         //ulong = uint64
-	NextConsensus     string `json:"nextconsensus"` //address
-	Witness           struct {
-		InvocationScript   string `json:"invocation"`
-		VerificationScript string `json:"verification"`
-	} `json:"witness"`
-	Confirmations int    `json:"confirmations"`
-	NextBlockHash string `json:"nextblockhash"`
+	Hash              string     `json:"hash"`
+	Size              int        `json:"size"`
+	Version           int        `json:"version"`
+	PreviousBlockHash string     `json:"previousblockhash"`
+	MerkleRoot        string     `json:"merkleroot"`
+	Time              int        `json:"time"`
+	Index             int        `json:"index"`
+	Nonce             string     `json:"nonce"`         //ulong = uint64
+	NextConsensus     string     `json:"nextconsensus"` //address
+	Witness           RpcWitness `json:"script"`
+	Confirmations     int        `json:"confirmations"`
+	NextBlockHash     string     `json:"nextblockhash"`
 }
 
 type RpcBlock struct {

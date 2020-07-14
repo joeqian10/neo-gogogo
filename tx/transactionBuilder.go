@@ -5,6 +5,8 @@ import (
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
+	"github.com/joeqian10/neo-gogogo/sc"
+	"math/big"
 	"sort"
 )
 
@@ -154,12 +156,15 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 	if err != nil {
 		return nil, err
 	}
-	fee = fee.Add(*gas)
+	newGas := *gas
+	newGas = newGas.Add(helper.Fixed8FromInt64(1))
+	fee = fee.Add(newGas)
+	fee = fee.Add(helper.Fixed8FromInt64(1))
 	itx := NewInvocationTransaction(script)
 	if attributes != nil {
 		itx.Attributes = attributes
 	}
-	itx.Gas = *gas
+	itx.Gas = newGas
 	if itx.Size() > 1024 {
 		fee = fee.Add(helper.Fixed8FromFloat64(0.001))
 		fee = fee.Add(helper.Fixed8FromFloat64(float64(itx.Size()) * 0.00001))
@@ -247,4 +252,67 @@ func (tb *TransactionBuilder) GetClaimables(from helper.UInt160) ([]*CoinReferen
 		total = total.Add(helper.Fixed8FromFloat64(claimables[i].Unclaimed))
 	}
 	return claims, &total, nil
+}
+
+func (tb *TransactionBuilder) LoadScriptTransaction(script []byte,
+	paramTypes string, returnTypeHexString string,
+	hasStorage bool, hasDynamicInvoke bool, isPayable bool,
+	contractName string, contractVersion string, contractAuthor string, contractEmail string, contractDescription string) (tx *InvocationTransaction, scriptHash helper.UInt160, err error) {
+	scriptHash, err = helper.BytesToScriptHash(script)
+	if err != nil {
+		return nil, scriptHash, err
+	}
+	parameterList := helper.HexToBytes(paramTypes)                                    // 0710
+	returnType := sc.ContractParameterType(helper.HexToBytes(returnTypeHexString)[0]) // 05
+	property := sc.NoProperty
+	if hasStorage {
+		property |= sc.HasStorage
+	}
+	if hasDynamicInvoke {
+		property |= sc.HasDynamicInvoke
+	}
+	if isPayable {
+		property |= sc.Payable
+	}
+	p1 := sc.ContractParameter{
+		Type:  sc.ByteArray,
+		Value: script,
+	}
+	p2 := sc.ContractParameter{
+		Type:  sc.ByteArray,
+		Value: parameterList,
+	}
+	p3 := sc.ContractParameter{
+		Type:  sc.Integer,
+		Value: *big.NewInt(int64(returnType)),
+	}
+	p4 := sc.ContractParameter{
+		Type:  sc.Integer,
+		Value: *big.NewInt(int64(property)),
+	}
+	p5 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractName,
+	}
+	p6 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractVersion,
+	}
+	p7 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractAuthor,
+	}
+	p8 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractEmail,
+	}
+	p9 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractDescription,
+	}
+	sb := sc.NewScriptBuilder()
+	sb.EmitSysCall("Neo.Contract.Create", []sc.ContractParameter{p1, p2, p3, p4, p5, p6, p7, p8, p9})
+	newScript := sb.ToArray()
+	tx = NewInvocationTransaction(newScript)
+	return tx, scriptHash, nil
 }

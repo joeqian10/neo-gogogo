@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"github.com/joeqian10/neo-gogogo/crypto"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,6 +24,14 @@ func TestReverseBytes(t *testing.T) {
 	r = ReverseBytes(b)
 	assert.Equal(t, []byte{1, 2, 3}, b)
 	assert.Equal(t, []byte{3, 2, 1}, r)
+}
+
+func TestBytesToScriptHash(t *testing.T) {
+	script := []byte{ 0x01, 0x02, 0x03, 0x04 }
+	hash := crypto.Hash160(script)
+	scriptHash, _ := BytesToScriptHash(script)
+	assert.Equal(t, "ecd2cbd8262d2c361b93bf89c4f0a78d76a16e70", BytesToHex(hash))
+	assert.Equal(t, "706ea1768da7f0c489bf931b362c2d26d8cbd2ec", scriptHash.String())
 }
 
 //func Test(t *testing.T)  {

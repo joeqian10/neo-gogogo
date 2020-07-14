@@ -217,3 +217,29 @@ func TestTransactionBuilder_GetTransactionInputs(t *testing.T) {
 	assert.Equal(t, 1, len(inputs))
 	assert.Equal(t, int64(1125000000000), payTotal.Value)
 }
+
+func TestTransactionBuilder_LoadScriptTransaction(t *testing.T) {
+	var clientMock = new(rpc.RpcClientMock)
+	var tb = TransactionBuilder{
+		EndPoint: "",
+		Client:   clientMock,
+	}
+
+	script := []byte{ 0x01, 0x02, 0x03, 0x04 }
+	paramList := "0710"
+	returnType := "05"
+	hasStorage := true
+	hasDynamicInvoke := true
+	isPayable := true
+	var contractName = "test"
+	var contractVersion = "1.0"
+	var contractAuthor = "ngd"
+	var contractEmail = "test@ngd.neo.org"
+	var contractDescription = "cd"
+
+	itx, scriptHash, err := tb.LoadScriptTransaction(script, paramList, returnType, hasStorage, hasDynamicInvoke, isPayable, contractName, contractVersion, contractAuthor, contractEmail, contractDescription)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "706ea1768da7f0c489bf931b362c2d26d8cbd2ec", scriptHash.String())
+	assert.Equal(t, "0263641074657374406e67642e6e656f2e6f7267036e676403312e300474657374575502071004010203046804f66ca56e", helper.BytesToHex(itx.Script))
+}

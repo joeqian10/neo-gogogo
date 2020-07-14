@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/sc"
@@ -43,7 +42,7 @@ func (w *Witness) MarshalJSON() ([]byte, error) {
 
 // this method is a getter of scriptHash
 func (w *Witness) GetScriptHash() helper.UInt160 {
-	w.scriptHash, _ = helper.UInt160FromBytes(crypto.Hash160(w.VerificationScript))
+	w.scriptHash, _ = helper.BytesToScriptHash(w.VerificationScript)
 	return w.scriptHash
 }
 
@@ -53,7 +52,7 @@ func CreateWitness(invocationScript []byte, verificationScript []byte) (witness 
 		return nil, fmt.Errorf("verificationScript should not be empty")
 	}
 	witness = &Witness{InvocationScript: invocationScript, VerificationScript: verificationScript}
-	witness.scriptHash, err = helper.UInt160FromBytes(crypto.Hash160(witness.VerificationScript))
+	witness.scriptHash, err = helper.BytesToScriptHash(witness.VerificationScript)
 	return
 }
 

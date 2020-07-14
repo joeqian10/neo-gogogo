@@ -1,23 +1,23 @@
 package models
 
 type RpcTransaction struct {
-	Txid          string                    `json:"txid"`
-	Size          int                    `json:"size"`
-	Type          string                    `json:"type"`
-	Version       int                    `json:"version"`
+	Txid          string                     `json:"txid"`
+	Size          int                        `json:"size"`
+	Type          string                     `json:"type"`
+	Version       int                        `json:"version"`
 	Attributes    []RpcTransactionAttribute `json:"attributes"`
 	Vin           []RpcTransactionInput     `json:"vin"`
 	Vout          []RpcTransactionOutput    `json:"vout"`
-	SysFee        string                    `json:"sys_fee"`
-	NetFee        string                    `json:"net_fee"`
+	SysFee        string                     `json:"sys_fee"`
+	NetFee        string                     `json:"net_fee"`
 	Scripts       []RpcWitness              `json:"scripts"`
-	Nonce         int                    `json:"nonce"`
-	BlockHash     string                    `json:"blockhash"`
-	Confirmations int                    `json:"confirmations"`
-	Blocktime     int                    `json:"blocktime"`
-	Script        string                    `json:"script"`
-	Gas           string                    `json:"gas"`
-	Claims        []RpcClaim                `json:"claims"`
+	Nonce         int                        `json:"nonce"`
+	BlockHash     string                     `json:"blockhash"`
+	Confirmations int                        `json:"confirmations"`
+	Blocktime     int                        `json:"blocktime"`
+	Script        string                     `json:"script"`
+	Gas           string                     `json:"gas"`
+	Claims        []RpcClaim                 `json:"claims"`
 }
 
 type RpcTransactionAttribute struct {
@@ -35,11 +35,6 @@ type RpcTransactionOutput struct {
 	Asset   string `json:"asset"`
 	Value   string `json:"value"`
 	Address string `json:"address"`
-}
-
-type RpcWitness struct {
-	Invocation   string `json:"invocation"`
-	Verification string `json:"verification"`
 }
 
 type RpcClaim struct {

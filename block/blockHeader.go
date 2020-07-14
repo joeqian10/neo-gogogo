@@ -43,8 +43,8 @@ func NewBlockHeaderFromRPC(header *models.RpcBlockHeader) (*BlockHeader, error) 
 		return nil, err
 	}
 	witness := &tx.Witness{
-		InvocationScript:   helper.HexToBytes(header.Witness.InvocationScript),
-		VerificationScript: helper.HexToBytes(header.Witness.VerificationScript),
+		InvocationScript:   helper.HexToBytes(header.Witness.Invocation),
+		VerificationScript: helper.HexToBytes(header.Witness.Verification),
 	}
 	hash, err := helper.UInt256FromString(header.Hash)
 	if err != nil {
@@ -75,6 +75,10 @@ func (bh *BlockHeader) Deserialize(br *io.BinaryReader) {
 		bh.Witness = &tx.Witness{}
 	}
 	bh.Witness.Deserialize(br)
+	br.ReadLE(&b)
+	if b != byte(0) {
+		br.Err = fmt.Errorf("format error: check byte must equal 0 got %d", b)
+	}
 }
 
 //DeserializeUnsigned deserialize blockheader without witness
@@ -92,6 +96,7 @@ func (bh *BlockHeader) Serialize(bw *io.BinaryWriter) {
 	bh.SerializeUnsigned(bw)
 	bw.WriteLE(byte(1))
 	bh.Witness.Serialize(bw)
+	bw.WriteLE(byte(0))
 }
 
 //SerializeUnsigned serialize blockheader without witness

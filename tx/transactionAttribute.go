@@ -4,13 +4,22 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
+	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"unsafe"
 )
 
 type TransactionAttribute struct {
 	Usage TransactionAttributeUsage
 	Data  []byte
+}
+
+func NewTransactionAttributeFromRPC(attr models.RpcTransactionAttribute) *TransactionAttribute {
+	return &TransactionAttribute{
+		Usage: NewTransactionAttributeUsageFromString(attr.Usage),
+		Data:  helper.HexToBytes(attr.Data),
+	}
 }
 
 func (attr *TransactionAttribute) Size() int {

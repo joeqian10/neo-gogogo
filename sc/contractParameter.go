@@ -25,4 +25,3 @@ type ContractParameter struct {
 	Type  ContractParameterType
 	Value interface{}
 }
-

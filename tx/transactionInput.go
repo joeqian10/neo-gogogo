@@ -12,6 +12,17 @@ type CoinReference struct {
 	PrevIndex uint16
 }
 
+func NewCoinReferenceFromRPC(input models.RpcTransactionInput) (*CoinReference, error) {
+	hash, err := helper.UInt256FromString(input.Txid)
+	if err != nil {
+		return nil, err
+	}
+	return &CoinReference{
+		PrevHash:  hash,
+		PrevIndex: uint16(input.Vout),
+	}, nil
+}
+
 // Deserialize implements Serializable interface.
 func (in *CoinReference) Deserialize(br *io.BinaryReader) {
 	br.ReadLE(&in.PrevHash)
@@ -25,7 +36,7 @@ func (in *CoinReference) Serialize(bw *io.BinaryWriter) {
 }
 
 func ToCoinReference(u models.Unspent) *CoinReference {
-	h, _:= helper.UInt256FromString(u.Txid)
+	h, _ := helper.UInt256FromString(u.Txid)
 	return &CoinReference{
 		PrevHash:  h,
 		PrevIndex: uint16(u.N),

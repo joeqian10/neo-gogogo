@@ -2,7 +2,6 @@ package tx
 
 import (
 	"bytes"
-	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
@@ -34,6 +33,10 @@ func NewTransaction() *Transaction {
 		Outputs:    []*TransactionOutput{},
 		Witnesses:  []*Witness{},
 	}
+}
+
+func NewTransactionFromRPC()  {
+
 }
 
 func (t *Transaction) DeserializeUnsigned1(br *io.BinaryReader) {
@@ -168,7 +171,7 @@ func AddMultiSignature(transaction ITransaction, pairs []*keys.KeyPair, m int, p
 		return err
 	}
 
-	scriptHash, err := helper.UInt160FromBytes(crypto.Hash160(script))
+	scriptHash, err := helper.BytesToScriptHash(script)
 	if err != nil {
 		return err
 	}

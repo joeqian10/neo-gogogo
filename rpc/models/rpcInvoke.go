@@ -5,7 +5,7 @@ type InvokeResult struct {
 	State       string              `json:"state"`
 	GasConsumed string              `json:"gas_consumed"`
 	Stack       []InvokeStackResult `json:"stack"`
-	Tx          string				`json:"tx"`
+	Tx          string              `json:"tx"`
 }
 
 type InvokeStackResult struct {

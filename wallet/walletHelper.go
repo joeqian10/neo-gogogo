@@ -5,6 +5,7 @@ import (
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
+	"math/big"
 	"strconv"
 )
 
@@ -119,7 +120,7 @@ func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to stri
 	}
 	cp3 := sc.ContractParameter{
 		Type:  sc.Integer,
-		Value: a.Value,
+		Value: *big.NewInt(a.Value),
 	}
 	sb.MakeInvocationScript(assetId.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()

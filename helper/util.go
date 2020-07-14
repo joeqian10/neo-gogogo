@@ -39,6 +39,10 @@ func ReverseBytes(data []byte) []byte {
 	return b
 }
 
+func BytesToScriptHash(bs []byte) (UInt160, error) {
+	return UInt160FromBytes(crypto.Hash160(bs))
+}
+
 //ToNibbles ..
 func ToNibbles(data []byte) []byte {
 	r := make([]byte, len(data)*2)

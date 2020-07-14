@@ -78,3 +78,63 @@ func (u TransactionAttributeUsage) String() string {
 		return "TransactionAttributeUsage=" + strconv.FormatUint(uint64(u), 10)
 	}
 }
+
+func NewTransactionAttributeUsageFromString(s string) TransactionAttributeUsage {
+	switch s {
+	case "ContractHash":
+		return ContractHash
+	case "ECDH02":
+		return ECDH02
+	case "ECDH03":
+		return ECDH03
+	case "Script":
+		return Script
+	case "Vote":
+		return Vote
+	case "DescriptionUrl":
+		return DescriptionUrl
+	case "Description":
+		return Description
+	case "Hash1":
+	case "Hash2":
+	case "Hash3":
+	case "Hash4":
+	case "Hash5":
+	case "Hash6":
+	case "Hash7":
+	case "Hash8":
+	case "Hash9":
+	case "Hash10":
+	case "Hash11":
+	case "Hash12":
+	case "Hash13":
+	case "Hash14":
+	case "Hash15":
+		sub := s[4:]
+		n, _ := strconv.Atoi(sub)
+		return TransactionAttributeUsage(byte(n + 160))
+	case "Remark":
+		return Remark
+	case "Remark1":
+	case "Remark2":
+	case "Remark3":
+	case "Remark4":
+	case "Remark5":
+	case "Remark6":
+	case "Remark7":
+	case "Remark8":
+	case "Remark9":
+	case "Remark10":
+	case "Remark11":
+	case "Remark12":
+	case "Remark13":
+	case "Remark14":
+	case "Remark15":
+		sub := s[6:]
+		n, _ := strconv.Atoi(sub)
+		return TransactionAttributeUsage(byte(n + 240))
+	default:
+		return Remark
+	}
+	return Remark
+}

@@ -2,15 +2,15 @@ package models
 
 type RpcUnspent struct {
 	Balances []UnspentBalance `json:"balance"`
-	Address string `json:"address"`
+	Address  string            `json:"address"`
 }
 
 type UnspentBalance struct {
-	Unspents     []Unspent `json:"unspent"`
-	AssetHash   string    `json:"asset_hash"`
-	Asset       string    `json:"asset"`
-	AssetSymbol string    `json:"asset_symbol"`
-	Amount      float64   `json:"amount"`
+	Unspents    []Unspent `json:"unspent"`
+	AssetHash   string     `json:"asset_hash"`
+	Asset       string     `json:"asset"`
+	AssetSymbol string     `json:"asset_symbol"`
+	Amount      float64    `json:"amount"`
 }
 
 type UnspentSlice []Unspent
@@ -42,4 +42,3 @@ type Unspent struct {
 	N     int     `json:"n"`
 	Value float64 `json:"value"`
 }
-

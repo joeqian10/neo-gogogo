@@ -98,7 +98,7 @@ type GetConnectionCountResponse struct {
 type GetContractStateResponse struct {
 	RpcResponse
 	ErrorResponse
-	Result models.ContractState `json:"result"`
+	Result models.RpcContractState `json:"result"`
 }
 
 type GetNep5BalancesResponse struct {
