@@ -140,3 +140,103 @@ func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to stri
 	}
 	return itx.HashString(), nil
 }
+
+func (w *WalletHelper) DeployContract(script []byte,
+	paramTypes string, returnTypeHexString string,
+	hasStorage bool, hasDynamicInvoke bool, isPayable bool,
+	contractName string, contractVersion string, contractAuthor string, contractEmail string, contractDescription string) (*helper.UInt160, error) {
+	scriptHash, err := helper.BytesToScriptHash(script)
+	if err != nil {
+		return nil, err
+	}
+	parameterList := helper.HexToBytes(paramTypes)                                    // 0710
+	returnType := sc.ContractParameterType(helper.HexToBytes(returnTypeHexString)[0]) // 05
+	property := sc.NoProperty
+	if hasStorage {
+		property |= sc.HasStorage
+	}
+	if hasDynamicInvoke {
+		property |= sc.HasDynamicInvoke
+	}
+	if isPayable {
+		property |= sc.Payable
+	}
+	p1 := sc.ContractParameter{
+		Type:  sc.ByteArray,
+		Value: script,
+	}
+	p2 := sc.ContractParameter{
+		Type:  sc.ByteArray,
+		Value: parameterList,
+	}
+	p3 := sc.ContractParameter{
+		Type:  sc.Integer,
+		Value: *big.NewInt(int64(returnType)),
+	}
+	p4 := sc.ContractParameter{
+		Type:  sc.Integer,
+		Value: *big.NewInt(int64(property)),
+	}
+	p5 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractName,
+	}
+	p6 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractVersion,
+	}
+	p7 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractAuthor,
+	}
+	p8 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractEmail,
+	}
+	p9 := sc.ContractParameter{
+		Type:  sc.String,
+		Value: contractDescription,
+	}
+	sb := sc.NewScriptBuilder()
+	sb.EmitSysCall("Neo.Contract.Create", []sc.ContractParameter{p1, p2, p3, p4, p5, p6, p7, p8, p9})
+	newScript := sb.ToArray()
+
+	from, err := helper.AddressToScriptHash(w.Account.Address)
+	if err != nil {
+		return nil, err
+	}
+	itx, err := w.TxBuilder.MakeInvocationTransaction(newScript, from, nil, helper.UInt160{}, helper.Zero)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.AddSignature(itx, w.Account.KeyPair)
+	if err != nil {
+		return nil, err
+	}
+	response := w.TxBuilder.Client.SendRawTransaction(itx.RawTransactionString())
+	if response.HasError() {
+		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
+	}
+
+	return &scriptHash, nil
+}
+
+func (w *WalletHelper) InvokeContract(scriptHash helper.UInt160, method string, args []sc.ContractParameter) (*helper.UInt256, error) {
+	sb := sc.NewScriptBuilder()
+	sb.MakeInvocationScript(scriptHash.Bytes(), method, args)
+	script := sb.ToArray()
+
+	from, err := helper.AddressToScriptHash(w.Account.Address)
+	if err != nil {
+		return nil, err
+	}
+	itx, err := w.TxBuilder.MakeInvocationTransaction(script, from, nil, helper.UInt160{}, helper.Zero)
+	if err != nil {
+		return nil, err
+	}
+	response := w.TxBuilder.Client.SendRawTransaction(itx.RawTransactionString())
+	if response.HasError() {
+		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
+	}
+	return &itx.Hash, nil
+}
