@@ -102,6 +102,11 @@ func BytesToUInt64(bs []byte) uint64 {
 	return binary.LittleEndian.Uint64(bs)
 }
 
+func BytesToUInt32(bs []byte) uint32 {
+	bs = PadRight(bs, 4)
+	return binary.LittleEndian.Uint32(bs)
+}
+
 func PadRight(data []byte, length int) []byte {
 	if len(data) >= length {
 		return data[:length] // return the most left bytes of length
