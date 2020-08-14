@@ -99,6 +99,9 @@ func (tb *TransactionBuilder) MakeContractTransaction(from helper.UInt160, to he
 
 // get transaction inputs according to the amount, and return UTXOs and their total amount
 func (tb *TransactionBuilder) GetTransactionInputs(from helper.UInt160, assetId helper.UInt256, amount helper.Fixed8) ([]*CoinReference, helper.Fixed8, error) {
+	if amount.Equal(helper.Zero) {
+		return nil, helper.Zero, nil
+	}
 	unspentBalance, available, err := tb.GetBalance(from, assetId)
 	if err != nil {
 		return nil, helper.Zero, err
@@ -157,9 +160,9 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 		return nil, err
 	}
 	newGas := *gas
-	newGas = newGas.Add(helper.Fixed8FromInt64(1))
+	//newGas = newGas.Add(helper.Fixed8FromInt64(1))
 	fee = fee.Add(newGas)
-	fee = fee.Add(helper.Fixed8FromInt64(1))
+	//fee = fee.Add(helper.Fixed8FromInt64(1))
 	itx := NewInvocationTransaction(script)
 	if attributes != nil {
 		itx.Attributes = attributes
