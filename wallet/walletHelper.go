@@ -124,7 +124,7 @@ func (w *WalletHelper) TransferNep5(assetId helper.UInt160, from string, to stri
 	}
 	sb.MakeInvocationScript(assetId.Bytes(), "transfer", []sc.ContractParameter{cp1, cp2, cp3})
 	script := sb.ToArray()
-	itx, err := w.TxBuilder.MakeInvocationTransaction(script, f, nil, helper.UInt160{}, helper.Zero)
+	itx, err := w.TxBuilder.MakeInvocationTransaction(script, f, nil, helper.UInt160{}, helper.Zero, helper.Zero)
 	if err != nil {
 		return "", err
 	}
@@ -205,7 +205,7 @@ func (w *WalletHelper) DeployContract(script []byte,
 	if err != nil {
 		return nil, err
 	}
-	itx, err := w.TxBuilder.MakeInvocationTransaction(newScript, from, nil, helper.UInt160{}, helper.Zero)
+	itx, err := w.TxBuilder.MakeInvocationTransaction(newScript, from, nil, helper.UInt160{}, helper.Zero, helper.Zero)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,11 @@ func (w *WalletHelper) InvokeContract(scriptHash helper.UInt160, method string, 
 	if err != nil {
 		return nil, err
 	}
-	itx, err := w.TxBuilder.MakeInvocationTransaction(script, from, nil, helper.UInt160{}, helper.Zero)
+	itx, err := w.TxBuilder.MakeInvocationTransaction(script, from, nil, helper.UInt160{}, helper.Zero, helper.Zero)
+	if err != nil {
+		return nil, err
+	}
+	err = tx.AddSignature(itx, w.Account.KeyPair)
 	if err != nil {
 		return nil, err
 	}
