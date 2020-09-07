@@ -18,7 +18,7 @@ var GasToken, _ = helper.UInt256FromString(GasTokenId)
 
 type TransactionBuilder struct {
 	EndPoint string
-	Client   rpc.IRpcClient
+	Client   rpc.IRpcClient // new node
 }
 
 func NewTransactionBuilder(endPoint string) *TransactionBuilder {
@@ -150,24 +150,21 @@ func (tb *TransactionBuilder) GetBalance(account helper.UInt160, assetId helper.
 }
 
 // this is a general api for invoking smart contract and creating an invocation transaction, including transferring nep-5 assets
-func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from helper.UInt160, attributes []*TransactionAttribute, changeAddress helper.UInt160, fee helper.Fixed8) (*InvocationTransaction, error) {
+func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from helper.UInt160, attributes []*TransactionAttribute, changeAddress helper.UInt160, sysFee helper.Fixed8, netFee helper.Fixed8) (*InvocationTransaction, error) {
 	if changeAddress.String() == "0000000000000000000000000000000000000000" {
 		changeAddress = from
 	}
 	// use rpc to get gas consumed
-	gas, err := tb.GetGasConsumed(script)
+	gasConsumed, err := tb.GetGasConsumed(script)
 	if err != nil {
 		return nil, err
 	}
-	newGas := *gas
-	//newGas = newGas.Add(helper.Fixed8FromInt64(1))
-	fee = fee.Add(newGas)
-	//fee = fee.Add(helper.Fixed8FromInt64(1))
 	itx := NewInvocationTransaction(script)
 	if attributes != nil {
 		itx.Attributes = attributes
 	}
-	itx.Gas = newGas
+	itx.Gas = gasConsumed.Add(sysFee) // add sys fee
+	fee := itx.Gas.Add(netFee) // add net fee
 	if itx.Size() > 1024 {
 		fee = fee.Add(helper.Fixed8FromFloat64(0.001))
 		fee = fee.Add(helper.Fixed8FromFloat64(float64(itx.Size()) * 0.00001))
@@ -186,7 +183,7 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 
 func (tb *TransactionBuilder) GetGasConsumed(script []byte) (*helper.Fixed8, error) {
 	response := tb.Client.InvokeScript(helper.BytesToHex(script))
-	if response.HasError() {
+	if response.HasError() || response.Result.State == "FAULT"{
 		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
 	// transfer script will return "FAULT" when checking witness, so comment error for this issue https://github.com/neo-project/neo/pull/335
