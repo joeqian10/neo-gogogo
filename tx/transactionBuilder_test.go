@@ -79,7 +79,7 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 		EndPoint: "",
 		Client:   clientMock,
 	}
-	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
+	clientMock.On("InvokeScript", mock.Anything, mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse:   rpc.RpcResponse{
 			JsonRpc: "2.0",
 			ID: 1,

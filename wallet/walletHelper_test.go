@@ -246,7 +246,7 @@ func TestWalletHelper_TransferNep5(t *testing.T) {
 			Address: "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
 		},
 	})
-	clientMock.On("InvokeScript", mock.Anything).Return(rpc.InvokeScriptResponse{
+	clientMock.On("InvokeScript", mock.Anything, mock.Anything).Return(rpc.InvokeScriptResponse{
 		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
 			ID:      1,
