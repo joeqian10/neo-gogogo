@@ -32,8 +32,8 @@ type IRpcClient interface {
 	GetVersion() GetVersionResponse
 	GetWalletHeight() GetWalletHeightResponse
 	ImportPrivKey(s string) ImportPrivKeyResponse
-	InvokeFunction(s1 string, s2 string, args ...interface{}) InvokeFunctionResponse
-	InvokeScript(s string) InvokeScriptResponse
+	InvokeFunction(s1 string, s2 string, s3 string, args ...interface{}) InvokeFunctionResponse
+	InvokeScript(s1 string, s2 string) InvokeScriptResponse
 	ListPlugins() ListPluginsResponse
 	ListAddress() ListAddressResponse
 	SendFrom(assetId string, from string, to string, amount uint32, fee float32, changeAddress string) SendFromResponse

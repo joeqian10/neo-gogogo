@@ -103,7 +103,7 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 		},
 	})
 
-	f, e := tb.GetGasConsumed([]byte{})
+	f, e := tb.GetGasConsumed([]byte{}, helper.ZeroScriptHashString)
 	assert.Nil(t, e)
 	assert.Equal(t, helper.Fixed8FromFloat64(0).Value, f.Value) // 10 gas free limit
 }

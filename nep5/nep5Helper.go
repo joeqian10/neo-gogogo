@@ -33,7 +33,7 @@ func (n *Nep5Helper) TotalSupply() (uint64, error) {
 	sb := sc.NewScriptBuilder()
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "totalSupply", []sc.ContractParameter{})
 	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
+	response := n.Client.InvokeScript(helper.BytesToHex(script), helper.ZeroScriptHashString)
 	if response.HasError() {
 		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
@@ -56,7 +56,7 @@ func (n *Nep5Helper) Name() (string, error) {
 	sb := sc.NewScriptBuilder()
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "name", []sc.ContractParameter{})
 	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
+	response := n.Client.InvokeScript(helper.BytesToHex(script), helper.ZeroScriptHashString)
 	if response.HasError() {
 		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
@@ -75,7 +75,7 @@ func (n *Nep5Helper) Symbol() (string, error) {
 	sb := sc.NewScriptBuilder()
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "symbol", []sc.ContractParameter{})
 	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
+	response := n.Client.InvokeScript(helper.BytesToHex(script), helper.ZeroScriptHashString)
 	if response.HasError() {
 		return "", fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
@@ -94,7 +94,7 @@ func (n *Nep5Helper) Decimals() (uint8, error) {
 	sb := sc.NewScriptBuilder()
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "decimals", []sc.ContractParameter{})
 	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
+	response := n.Client.InvokeScript(helper.BytesToHex(script), helper.ZeroScriptHashString)
 	if response.HasError() {
 		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}
@@ -120,7 +120,7 @@ func (n *Nep5Helper) BalanceOf(address helper.UInt160) (uint64, error) {
 	}
 	sb.MakeInvocationScript(n.scriptHash.Bytes(), "balanceOf", []sc.ContractParameter{cp})
 	script := sb.ToArray()
-	response := n.Client.InvokeScript(helper.BytesToHex(script))
+	response := n.Client.InvokeScript(helper.BytesToHex(script), helper.ZeroScriptHashString)
 	if response.HasError() {
 		return 0, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}

@@ -131,12 +131,12 @@ func (r *RpcClientMock) ImportPrivKey(s string) ImportPrivKeyResponse {
 	args := r.Called(s)
 	return args.Get(0).(ImportPrivKeyResponse)
 }
-func (r *RpcClientMock) InvokeFunction(s1 string, s2 string, a ...interface{}) InvokeFunctionResponse {
-	args := r.Called(s1, s2, a)
+func (r *RpcClientMock) InvokeFunction(s1 string, s2 string, s3 string, a ...interface{}) InvokeFunctionResponse {
+	args := r.Called(s1, s2, a, s3)
 	return args.Get(0).(InvokeFunctionResponse)
 }
-func (r *RpcClientMock) InvokeScript(s string) InvokeScriptResponse {
-	args := r.Called(s)
+func (r *RpcClientMock) InvokeScript(s1 string, s2 string) InvokeScriptResponse {
+	args := r.Called(s1, s2)
 	return args.Get(0).(InvokeScriptResponse)
 }
 func (r *RpcClientMock) ListPlugins() ListPluginsResponse {

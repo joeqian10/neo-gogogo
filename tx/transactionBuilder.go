@@ -155,7 +155,7 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 		changeAddress = from
 	}
 	// use rpc to get gas consumed
-	gasConsumed, err := tb.GetGasConsumed(script)
+	gasConsumed, err := tb.GetGasConsumed(script, from.String())
 	if err != nil {
 		return nil, err
 	}
@@ -181,8 +181,8 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 	return itx, nil
 }
 
-func (tb *TransactionBuilder) GetGasConsumed(script []byte) (*helper.Fixed8, error) {
-	response := tb.Client.InvokeScript(helper.BytesToHex(script))
+func (tb *TransactionBuilder) GetGasConsumed(script []byte, checkWitnessHashes string) (*helper.Fixed8, error) {
+	response := tb.Client.InvokeScript(helper.BytesToHex(script), checkWitnessHashes)
 	if response.HasError() || response.Result.State == "FAULT"{
 		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
 	}

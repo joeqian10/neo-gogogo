@@ -8,6 +8,7 @@ import (
 )
 
 const uint160Size = 20
+const ZeroScriptHashString = "0000000000000000000000000000000000000000"
 
 // UInt160 is a 20 byte long unsigned integer. little endian
 type UInt160 [uint160Size]uint8

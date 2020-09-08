@@ -1270,7 +1270,7 @@ func TestRpcClient_InvokeFunction(t *testing.T) {
 		}`))),
 	}, nil)
 
-	response := rpc.InvokeFunction("", "")
+	response := rpc.InvokeFunction("", "", "")
 	r := response.Result
 	assert.Equal(t, "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9", r.Script)
 	assert.Equal(t, "HALT", r.State)
@@ -1298,7 +1298,7 @@ func TestRpcClient_InvokeScript(t *testing.T) {
 		}`))),
 	}, nil)
 
-	response := rpc.InvokeScript("")
+	response := rpc.InvokeScript("", "")
 	r := response.Result
 	assert.Equal(t, "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9", r.Script)
 	assert.Equal(t, "HALT", r.State)

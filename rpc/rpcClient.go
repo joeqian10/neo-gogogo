@@ -272,21 +272,21 @@ func (n *RpcClient) ImportPrivKey(wif string) ImportPrivKeyResponse {
 	return response
 }
 
-func (n *RpcClient) InvokeFunction(scriptHash string, method string, args ...interface{}) InvokeFunctionResponse {
+func (n *RpcClient) InvokeFunction(scriptHash string, method string, checkWitnessHashes string, args ...interface{}) InvokeFunctionResponse {
 	response := InvokeFunctionResponse{}
 	var params []interface{}
 	if args != nil {
-		params = []interface{}{scriptHash, method, args}
+		params = []interface{}{scriptHash, method, args, checkWitnessHashes}
 	} else {
-		params = []interface{}{scriptHash, method}
+		params = []interface{}{scriptHash, method, checkWitnessHashes}
 	}
 	_ = n.makeRequest("invokefunction", params, &response)
 	return response
 }
 
-func (n *RpcClient) InvokeScript(scriptInHex string) InvokeScriptResponse {
+func (n *RpcClient) InvokeScript(scriptInHex string, checkWitnessHashes string) InvokeScriptResponse {
 	response := InvokeScriptResponse{}
-	params := []interface{}{scriptInHex}
+	params := []interface{}{scriptInHex, checkWitnessHashes}
 	_ = n.makeRequest("invokescript", params, &response)
 	return response
 }
