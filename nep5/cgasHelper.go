@@ -40,7 +40,7 @@ func (c *CgasHelper) MintTokens(from *wallet.Account, amount float64) (string, e
 
 	// Second, instantiate an object of InvocationTransaction
 	tb := tx.NewTransactionBuilder(c.EndPoint)
-	gas, err := tb.GetGasConsumed(script)
+	gas, err := tb.GetGasConsumed(script, f.String())
 	if err != nil {
 		return "", err
 	}
