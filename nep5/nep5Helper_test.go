@@ -38,7 +38,7 @@ func TestNep5Helper_BalanceOf(t *testing.T) {
 			Script:      "148f6c5be89c0cb6579e44a8bf9bfd2ecbcc11dfdc51c10962616c616e63654f666763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.383",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "ByteArray",
 					Value: "004eaca7902c",
@@ -75,7 +75,7 @@ func TestNep5Helper_Decimals(t *testing.T) {
 			Script:      "00c108646563696d616c736763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.246",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "Integer",
 					Value: "8",
@@ -111,7 +111,7 @@ func TestNep5Helper_Name(t *testing.T) {
 			Script:      "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.126",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "ByteArray",
 					Value: "516c696e6b20546f6b656e",
@@ -148,7 +148,7 @@ func TestNep5Helper_Symbol(t *testing.T) {
 			Script:      "00c10673796d626f6c6763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.141",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "ByteArray",
 					Value: "514c43",
@@ -182,7 +182,7 @@ func TestNep5Helper_TotalSupply(t *testing.T) {
 			Script:      "00c10b746f74616c537570706c796763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.223",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "ByteArray",
 					Value: "00803dafbe50d300",

@@ -261,7 +261,7 @@ func TestWalletHelper_TransferNep5(t *testing.T) {
 			Script:      "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
 			State:       "HALT",
 			GasConsumed: "0.126",
-			Stack: []models.InvokeStackResult{
+			Stack: []models.InvokeStack{
 				{
 					Type:  "Boolean",
 					Value: "True",

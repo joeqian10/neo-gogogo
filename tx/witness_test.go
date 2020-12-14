@@ -1,6 +1,7 @@
 package tx
 
 import (
+	"log"
 	"testing"
 
 	"github.com/joeqian10/neo-gogogo/helper"
@@ -38,6 +39,17 @@ func TestWitness_Serialize(t *testing.T) {
 	b := bbw.Bytes()
 	assert.Equal(t, "41"+"40915467ecd359684b2dc358024ca750609591aa731a0b309c7fb3cab5cd0836ad3992aa0a24da431f43b68883ea5651d548feb6bd3c8e16376e6e426f91f84c58"+
 		"23"+"2103322f35c7819267e721335948d385fae5be66e7ba8c748ac15467dcca0693692dac", helper.BytesToHex(b))
+}
+
+func TestWitness_Serialize2(t *testing.T) {
+	w := Witness{
+		InvocationScript:   helper.HexToBytes("520131"),
+		VerificationScript: helper.HexToBytes(""),
+	}
+	bbw := io.NewBufBinaryWriter()
+	w.Serialize(bbw.BinaryWriter)
+	b := bbw.Bytes()
+	log.Printf(":%s", helper.BytesToHex(b))
 }
 
 func TestCreateSignatureWitness(t *testing.T) {

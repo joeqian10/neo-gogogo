@@ -1,27 +1,34 @@
 package models
 
 type InvokeResult struct {
-	Script      string              `json:"script"`
-	State       string              `json:"state"`
-	GasConsumed string              `json:"gas_consumed"`
-	Stack       []InvokeStackResult `json:"stack"`
-	Tx          string              `json:"tx"`
+	Script      string        `json:"script"`
+	State       string        `json:"state"`
+	GasConsumed string        `json:"gas_consumed"`
+	Stack       []InvokeStack `json:"stack"`
+	Tx          string        `json:"tx"`
 }
 
-type InvokeStackResult struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
+type InvokeStack struct {
+	Type  string      `json:"type"`
+	Value interface{} `json:"value"`
 }
 
-type InvokeFunctionStackArg struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
-}
-
-func NewInvokeFunctionStackArg(t string, v string) InvokeFunctionStackArg {
-	return InvokeFunctionStackArg{Type: t, Value: v}
-}
-
-func NewInvokeFunctionStackByteArray(value string) InvokeFunctionStackArg {
-	return InvokeFunctionStackArg{Type: "ByteArray", Value: value}
+// Convert converts interface{} "Value" to string or []InvokeStack depending on the "Type"
+func (s *InvokeStack) Convert()  {
+	if s.Type != "Array" {
+		s.Value = s.Value.(string)
+	} else {
+		vs := s.Value.([]interface{})
+		result := make([]InvokeStack, len(vs))
+		for i, v := range vs {
+			m := v.(map[string]interface{})
+			s2 := InvokeStack{
+				Type:  m["type"].(string),
+				Value: m["value"],
+			}
+			s2.Convert()
+			result[i] = s2
+		}
+		s.Value = result
+	}
 }
