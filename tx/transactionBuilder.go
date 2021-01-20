@@ -183,8 +183,12 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 
 func (tb *TransactionBuilder) GetGasConsumed(script []byte, checkWitnessHashes string) (*helper.Fixed8, error) {
 	response := tb.Client.InvokeScript(helper.BytesToHex(script), checkWitnessHashes)
-	if response.HasError() || response.Result.State == "FAULT"{
+	if response.HasError() {
 		return nil, fmt.Errorf(response.ErrorResponse.Error.Message)
+	}
+	if response.Result.State == "FAULT" { // use ScriptContainer in contract will cause engine fault
+		result := helper.Fixed8FromInt64(0)
+		return &result, nil
 	}
 	// transfer script will return "FAULT" when checking witness, so comment error for this issue https://github.com/neo-project/neo/pull/335
 	//if response.Result.State == "FAULT" {
@@ -203,7 +207,6 @@ func (tb *TransactionBuilder) GetGasConsumed(script []byte, checkWitnessHashes s
 	}
 }
 
-//
 func (tb *TransactionBuilder) MakeClaimTransaction(from helper.UInt160, changeAddress helper.UInt160, attributes []*TransactionAttribute) (*ClaimTransaction, error) {
 	// use rpc to get claimable gas from the address
 	claims, total, err := tb.GetClaimables(from)
