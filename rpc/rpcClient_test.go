@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -27,6 +28,14 @@ func TestNewClient(t *testing.T) {
 	assert.NotNil(t, endpoint)
 	assert.Equal(t, "seed1.ngd.network:20332", endpoint.Host)
 	assert.Equal(t, "http", endpoint.Scheme)
+}
+
+func TestRpcClient_NetError(t *testing.T)  {
+	c := NewClient("http://nemo:12345")
+	response := c.ClaimGas("")
+	assert.True(t, response.HasError())
+	s := response.GetErrorInfo()
+	assert.True(t, strings.Contains(s, "no such host"))
 }
 
 func TestRpcClient_ClaimGas(t *testing.T) {

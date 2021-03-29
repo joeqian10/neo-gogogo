@@ -9,13 +9,21 @@ type RpcResponse struct {
 
 type ErrorResponse struct {
 	Error RpcError `json:"error"`
+	NetError error
 }
 
 func (r *ErrorResponse) HasError() bool {
-	if len(r.Error.Message) == 0 {
+	if len(r.Error.Message) == 0 && r.NetError == nil {
 		return false
 	}
 	return true
+}
+
+func (r *ErrorResponse) GetErrorInfo() string {
+	if r.NetError != nil {
+		return r.NetError.Error()
+	}
+	return r.Error.Message
 }
 
 type RpcError struct {

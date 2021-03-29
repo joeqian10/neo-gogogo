@@ -21,7 +21,7 @@ func NewWalletHelper(txBuilder *tx.TransactionBuilder, account *Account) *Wallet
 	}
 }
 
-// GetBalance is used to transfer neo or gas or other utxo asset, single signature
+// GetBalance is used to get neo and gas balance of an address
 func (w *WalletHelper) GetBalance(address string) (neoBalance int, gasBalance float64, err error) {
 	response := w.TxBuilder.Client.GetAccountState(address)
 	if response.HasError() {
