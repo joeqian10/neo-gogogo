@@ -15,11 +15,6 @@ type RpcExecution struct {
 }
 
 type RpcNotification struct {
-	Contract string   `json:"contract"`
-	State    RpcState `json:"state"`
-}
-
-type RpcState struct {
-	Type  string        `json:"type"`
-	Value []InvokeStack `json:"value"`
+	Contract string      `json:"contract"`
+	State    InvokeStack `json:"state"`
 }
