@@ -198,7 +198,7 @@ func (tb *TransactionBuilder) GetGasConsumed(script []byte, checkWitnessHashes s
 	if err != nil {
 		return nil, err
 	}
-	gas := gasConsumed.Sub(helper.Fixed8FromInt64(10))
+	gas := gasConsumed.Sub(helper.Fixed8FromInt64(50)) // now gas free limit is 50
 	if gas.LessThan(helper.Zero) || gas.Equal(helper.Zero) {
 		return &helper.Zero, nil
 	} else {
