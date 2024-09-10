@@ -6,16 +6,17 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"math/big"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
-	"math/big"
 )
 
 type KeyPairSlice []*KeyPair
 
-func (kps KeyPairSlice) Len() int { return len(kps)}
-func (kps KeyPairSlice) Less(i, j int) bool { return kps[i].PublicKey.Compare(kps[j].PublicKey) == -1}
-func (kps KeyPairSlice) Swap(i, j int) { kps[i], kps[j] = kps[j], kps[i]}
+func (kps KeyPairSlice) Len() int           { return len(kps) }
+func (kps KeyPairSlice) Less(i, j int) bool { return kps[i].PublicKey.Compare(kps[j].PublicKey) == -1 }
+func (kps KeyPairSlice) Swap(i, j int)      { kps[i], kps[j] = kps[j], kps[i] }
 
 type KeyPair struct {
 	PrivateKey []byte
@@ -140,12 +141,18 @@ func VerifySignature(message []byte, signature []byte, p *PublicKey) bool {
 func VerifyMultiSig(message []byte, signatures [][]byte, pubKeys []*PublicKey) bool {
 	m := len(signatures)
 	n := len(pubKeys)
-	if m==0 || n==0 || m>n {return false}
+	if m == 0 || n == 0 || m > n {
+		return false
+	}
 	var success bool = true
 	for i, j := 0, 0; success && i < m && j < n; {
-		if VerifySignature(message, signatures[i], pubKeys[j]) {i++}
+		if VerifySignature(message, signatures[i], pubKeys[j]) {
+			i++
+		}
 		j++
-		if m-i > n-j {success=false}
+		if m-i > n-j {
+			success = false
+		}
 	}
 	return success
 }

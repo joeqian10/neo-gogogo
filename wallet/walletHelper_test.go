@@ -1,13 +1,15 @@
 package wallet
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/tx"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestNewWalletHelper(t *testing.T) {

@@ -2,8 +2,9 @@ package keys
 
 import (
 	"encoding/hex"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestString(t *testing.T) {
@@ -24,7 +25,6 @@ func TestCreateMultiSigRedeemScript(t *testing.T) {
 	privateKey2, _ := hex.DecodeString(KeyCases[1].PrivateKey)
 	privateKey3, _ := hex.DecodeString(KeyCases[2].PrivateKey)
 	privateKey4, _ := hex.DecodeString(KeyCases[3].PrivateKey)
-
 
 	keyPair1, _ := NewKeyPair(privateKey1)
 	keyPair2, _ := NewKeyPair(privateKey2)
