@@ -2,10 +2,11 @@ package tx
 
 import (
 	"bytes"
+	"sort"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"sort"
 )
 
 const (
@@ -35,7 +36,7 @@ func NewTransaction() *Transaction {
 	}
 }
 
-func NewTransactionFromRPC()  {
+func NewTransactionFromRPC() {
 
 }
 

@@ -10,7 +10,7 @@ import (
 	"github.com/joeqian10/neo-gogogo/sc"
 )
 
-// nep5 wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
+// Nep5Helper wrapper class, api reference: https://github.com/neo-project/proposals/blob/master/nep-5.mediawiki#name
 type Nep5Helper struct {
 	scriptHash helper.UInt160 // the script hash of the nep5 token
 	EndPoint   string

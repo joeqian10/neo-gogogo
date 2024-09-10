@@ -1,12 +1,15 @@
+//go:build integration
 // +build integration
 
 package tx_integration
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var LocalEndPoint = "http://localhost:50003" // change to yours when using this SDK

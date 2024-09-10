@@ -1,12 +1,14 @@
 package tx
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestNewTransactionBuilder(t *testing.T) {
@@ -26,7 +28,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 	clientMock.On("GetUnspents", mock.Anything).Return(rpc.GetUnspentsResponse{
 		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -37,7 +39,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 		Result: models.RpcUnspent{
 			Balances: []models.UnspentBalance{
 				{
-					Unspents:    []models.Unspent{
+					Unspents: []models.Unspent{
 						{
 							Txid:  "4ee4af75d5aa60598fbae40ce86fb9a23ffec5a75dfa8b59d259d15f9e304319",
 							N:     0,
@@ -50,7 +52,7 @@ func TestTransactionBuilder_GetBalance(t *testing.T) {
 					Amount:      27844.821,
 				},
 				{
-					Unspents:    []models.Unspent{
+					Unspents: []models.Unspent{
 						{
 							Txid:  "c3182952855314b3f4b1ecf01a03b891d4627d19426ce841275f6d4c186e729a",
 							N:     0,
@@ -80,9 +82,9 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 		Client:   clientMock,
 	}
 	clientMock.On("InvokeScript", mock.Anything, mock.Anything).Return(rpc.InvokeScriptResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -90,10 +92,10 @@ func TestTransactionBuilder_GetGasConsumed(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.InvokeResult{
-			Script:"00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
-			State:"HALT",
-			GasConsumed:"0.126",
+		Result: models.InvokeResult{
+			Script:      "00c1046e616d656763d26113bac4208254d98a3eebaee66230ead7b9",
+			State:       "HALT",
+			GasConsumed: "0.126",
 			Stack: []models.InvokeStack{
 				{
 					Type:  "ByteArray",
@@ -115,9 +117,9 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 		Client:   clientMock,
 	}
 	clientMock.On("GetClaimable", mock.Anything).Return(rpc.GetClaimableResponse{
-		RpcResponse:   rpc.RpcResponse{
+		RpcResponse: rpc.RpcResponse{
 			JsonRpc: "2.0",
-			ID: 1,
+			ID:      1,
 		},
 		ErrorResponse: rpc.ErrorResponse{
 			Error: rpc.RpcError{
@@ -125,7 +127,7 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 				Message: "",
 			},
 		},
-		Result:        models.RpcClaimable{
+		Result: models.RpcClaimable{
 			Claimables: []models.Claimable{
 				{
 					TxId:        "52ba70ef18e879785572c917795cd81422c3820b8cf44c24846a30ee7376fd77",
@@ -138,8 +140,8 @@ func TestTransactionBuilder_GetClaimables(t *testing.T) {
 					Unclaimed:   750.032,
 				},
 			},
-			Address:"AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
-			Unclaimed:750.032,
+			Address:   "AGofsxAUDwt52KjaB664GYsqVAkULYvKNt",
+			Unclaimed: 750.032,
 		},
 	})
 
@@ -225,7 +227,7 @@ func TestTransactionBuilder_LoadScriptTransaction(t *testing.T) {
 		Client:   clientMock,
 	}
 
-	script := []byte{ 0x01, 0x02, 0x03, 0x04 }
+	script := []byte{0x01, 0x02, 0x03, 0x04}
 	paramList := "0710"
 	returnType := "05"
 	hasStorage := true

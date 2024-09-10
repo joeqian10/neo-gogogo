@@ -2,15 +2,17 @@ package tx
 
 import (
 	"encoding/hex"
-	"github.com/joeqian10/neo-gogogo/helper/io"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/joeqian10/neo-gogogo/helper/io"
 )
 
 func TestMinerTransaction(t *testing.T) {
 	rawTx := "0000fcd30e22000001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60c8000000000000001f72e68b4e39602912106d53b229378a082784b200"
 	mtx := &MinerTransaction{
-		Transaction:NewTransaction(),
+		Transaction: NewTransaction(),
 	}
 	// Deserialize
 	mtx, err := mtx.FromHexString(rawTx)

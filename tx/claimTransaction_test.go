@@ -2,10 +2,12 @@ package tx
 
 import (
 	"encoding/hex"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestClaimTransaction(t *testing.T) {

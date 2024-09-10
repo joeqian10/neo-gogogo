@@ -4,11 +4,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"sort"
 )
 
 // Witness
@@ -105,7 +106,6 @@ func CreateMultiSignatureWitness(msg []byte, pairs []*keys.KeyPair, least int, p
 	return CreateWitness(invocationScript, verificationScript)
 }
 
-
 func VerifySignatureWitness(msg []byte, witness *Witness) bool {
 	invocationScript := witness.InvocationScript
 	length := invocationScript[0]
@@ -121,7 +121,6 @@ func VerifySignatureWitness(msg []byte, witness *Witness) bool {
 	publicKey, _ := keys.NewPublicKey(data[1:])
 	return keys.VerifySignature(msg, signature, publicKey)
 }
-
 
 func VerifyMultiSignatureWitness(msg []byte, witness *Witness) bool {
 	invocationScript := witness.InvocationScript

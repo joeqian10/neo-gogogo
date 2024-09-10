@@ -2,6 +2,7 @@ package tx
 
 import (
 	"encoding/hex"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
@@ -88,13 +89,12 @@ func (mtx *MinerTransaction) Serialize(bw *io.BinaryWriter) {
 	mtx.SerializeWitnesses(bw)
 }
 
-func (mtx *MinerTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
+func (mtx *MinerTransaction) SerializeUnsigned(bw *io.BinaryWriter) {
 	mtx.Transaction.SerializeUnsigned1(bw)
 	mtx.SerializeExclusiveData(bw)
 	mtx.SerializeUnsigned2(bw)
 }
 
-func (mtx *MinerTransaction) SerializeExclusiveData(bw *io.BinaryWriter)  {
+func (mtx *MinerTransaction) SerializeExclusiveData(bw *io.BinaryWriter) {
 	bw.WriteLE(mtx.Nonce)
 }
-
