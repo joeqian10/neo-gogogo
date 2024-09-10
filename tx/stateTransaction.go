@@ -2,6 +2,7 @@ package tx
 
 import (
 	"encoding/hex"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
@@ -16,7 +17,7 @@ type StateTransaction struct {
 // NewStateTransaction creates a StateTransaction
 func NewStateTransaction(script []byte) *StateTransaction {
 	tx := &StateTransaction{
-		Transaction:NewTransaction(),
+		Transaction: NewTransaction(),
 	}
 	tx.Type = State_Transaction
 	return tx
@@ -92,16 +93,15 @@ func (tx *StateTransaction) Serialize(bw *io.BinaryWriter) {
 	tx.SerializeWitnesses(bw)
 }
 
-func (tx *StateTransaction) SerializeUnsigned(bw *io.BinaryWriter)  {
+func (tx *StateTransaction) SerializeUnsigned(bw *io.BinaryWriter) {
 	tx.Transaction.SerializeUnsigned1(bw)
 	tx.SerializeExclusiveData(bw)
 	tx.SerializeUnsigned2(bw)
 }
 
-func (tx *StateTransaction) SerializeExclusiveData(bw *io.BinaryWriter)  {
+func (tx *StateTransaction) SerializeExclusiveData(bw *io.BinaryWriter) {
 	bw.WriteVarUint(uint64(len(tx.Descriptors)))
 	for _, desc := range tx.Descriptors {
 		desc.Serialize(bw)
 	}
 }
-

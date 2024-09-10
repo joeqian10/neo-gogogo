@@ -2,12 +2,13 @@ package tx
 
 import (
 	"fmt"
+	"math/big"
+	"sort"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/rpc"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/sc"
-	"math/big"
-	"sort"
 )
 
 const NeoTokenId = "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
@@ -164,7 +165,7 @@ func (tb *TransactionBuilder) MakeInvocationTransaction(script []byte, from help
 		itx.Attributes = attributes
 	}
 	itx.Gas = gasConsumed.Add(sysFee) // add sys fee
-	fee := itx.Gas.Add(netFee) // add net fee
+	fee := itx.Gas.Add(netFee)        // add net fee
 	if itx.Size() > 1024 {
 		fee = fee.Add(helper.Fixed8FromFloat64(0.001))
 		fee = fee.Add(helper.Fixed8FromFloat64(float64(itx.Size()) * 0.00001))

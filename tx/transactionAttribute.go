@@ -4,10 +4,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"unsafe"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
-	"unsafe"
 )
 
 type TransactionAttribute struct {

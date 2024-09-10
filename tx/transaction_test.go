@@ -1,10 +1,12 @@
 package tx
 
 import (
-	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/joeqian10/neo-gogogo/wallet/keys"
 )
 
 func TestAddSignature(t *testing.T) {

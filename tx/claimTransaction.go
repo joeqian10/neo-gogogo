@@ -2,6 +2,7 @@ package tx
 
 import (
 	"encoding/hex"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"

@@ -4,10 +4,11 @@ import (
 	"log"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestWitness_Deserialize(t *testing.T) {
