@@ -2,11 +2,12 @@ package wallet
 
 import (
 	"fmt"
+	"math/big"
+	"strconv"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
-	"math/big"
-	"strconv"
 )
 
 type WalletHelper struct {

@@ -1,9 +1,11 @@
 package wallet
 
 import (
-	"github.com/joeqian10/neo-gogogo/wallet/keys"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/joeqian10/neo-gogogo/wallet/keys"
 )
 
 func TestNewAccount(t *testing.T) {

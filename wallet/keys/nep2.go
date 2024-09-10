@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	. "github.com/joeqian10/neo-gogogo/crypto"
+
 	"golang.org/x/crypto/scrypt"
 	"golang.org/x/text/unicode/norm"
+
+	. "github.com/joeqian10/neo-gogogo/crypto"
 )
 
 // NEP-2 standard implementation for encrypting and decrypting private keys.
