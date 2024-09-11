@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewFixed8(t *testing.T) {
@@ -12,7 +13,7 @@ func TestNewFixed8(t *testing.T) {
 
 func TestFixed8FromInt64(t *testing.T) {
 	f := Fixed8FromInt64(100000000)
-	assert.Equal(t, int64(100000000 * D), f.Value)
+	assert.Equal(t, int64(100000000*D), f.Value)
 }
 
 func TestFixed8FromFloat64(t *testing.T) {

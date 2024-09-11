@@ -1,13 +1,15 @@
 package block
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
 	"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func SetupBlockHeaderWithValues() *BlockHeader {
@@ -59,7 +61,7 @@ func TestBlockHeader_DeserializeUnsigned(t *testing.T) {
 		0, 0, 0, 0, // Index
 		30, 0, 0, 0, 0, 0, 0, 0, // ConsensusData
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // NextConsensus
-    }
+	}
 
 	br := io.NewBinaryReaderFromBuf(rawBlock)
 	bh := &BlockHeader{}

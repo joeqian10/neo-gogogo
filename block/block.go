@@ -1,7 +1,6 @@
 package block
 
 import (
-	//"github.com/joeqian10/neo-gogogo/rpc/models"
 	"github.com/joeqian10/neo-gogogo/tx"
 )
 

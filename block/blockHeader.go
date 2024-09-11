@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/helper/io"
@@ -81,7 +82,7 @@ func (bh *BlockHeader) Deserialize(br *io.BinaryReader) {
 	}
 }
 
-//DeserializeUnsigned deserialize blockheader without witness
+// DeserializeUnsigned deserialize blockheader without witness
 func (bh *BlockHeader) DeserializeUnsigned(br *io.BinaryReader) {
 	br.ReadLE(&bh.Version)
 	br.ReadLE(&bh.PrevHash)
@@ -99,7 +100,7 @@ func (bh *BlockHeader) Serialize(bw *io.BinaryWriter) {
 	bw.WriteLE(byte(0))
 }
 
-//SerializeUnsigned serialize blockheader without witness
+// SerializeUnsigned serialize blockheader without witness
 func (bh *BlockHeader) SerializeUnsigned(bw *io.BinaryWriter) {
 	bw.WriteLE(bh.Version)
 	bw.WriteLE(bh.PrevHash)

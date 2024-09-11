@@ -1,9 +1,11 @@
 package io
 
 import (
-	"github.com/joeqian10/neo-gogogo/helper"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/joeqian10/neo-gogogo/helper"
 )
 
 type TestSerializable struct {

@@ -1,10 +1,12 @@
 package sc
 
 import (
-	"github.com/joeqian10/neo-gogogo/helper"
-	"github.com/stretchr/testify/assert"
 	"math/big"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/joeqian10/neo-gogogo/helper"
 )
 
 func TestScriptBuilder_Emit(t *testing.T) {
@@ -105,7 +107,7 @@ func TestScriptBuilder_EmitVmSysCall(t *testing.T) {
 }
 
 func TestScriptBuilder_EmitSysCall(t *testing.T) {
-	script := []byte{ 0x01, 0x02, 0x03, 0x04 }
+	script := []byte{0x01, 0x02, 0x03, 0x04}
 	paramTypes := "0710"
 	returnTypeHexString := "05"
 	hasStorage := true
@@ -117,7 +119,7 @@ func TestScriptBuilder_EmitSysCall(t *testing.T) {
 	var contractEmail = "test@ngd.neo.org"
 	var contractDescription = "cd"
 
-	parameterList := helper.HexToBytes(paramTypes)                                    // 0710
+	parameterList := helper.HexToBytes(paramTypes)                                 // 0710
 	returnType := ContractParameterType(helper.HexToBytes(returnTypeHexString)[0]) // 05
 	property := NoProperty
 	if hasStorage {

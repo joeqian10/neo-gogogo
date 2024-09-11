@@ -2,13 +2,15 @@ package rpc
 
 import (
 	"bytes"
-	"github.com/joeqian10/neo-gogogo/rpc/models"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/joeqian10/neo-gogogo/rpc/models"
 )
 
 type HttpClientMock struct {
@@ -29,7 +31,7 @@ func TestNewClient(t *testing.T) {
 	assert.Equal(t, "http", endpoint.Scheme)
 }
 
-func TestRpcClient_NetError(t *testing.T)  {
+func TestRpcClient_NetError(t *testing.T) {
 	c := NewClient("http://nemo:12345")
 	response := c.ClaimGas("")
 	assert.True(t, response.HasError())
