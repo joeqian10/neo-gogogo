@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math/big"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
-	"math/big"
 )
 
 type ScriptBuilder struct {
@@ -17,7 +18,6 @@ func NewScriptBuilder() ScriptBuilder {
 	return ScriptBuilder{buff: new(bytes.Buffer)}
 }
 
-//
 func (sb *ScriptBuilder) ToArray() []byte {
 	return sb.buff.Bytes()
 }
@@ -193,7 +193,7 @@ func (sb *ScriptBuilder) EmitPushParameter(data ContractParameter) error {
 func (sb *ScriptBuilder) EmitSysCall(api string, args []ContractParameter) error {
 	var err error
 	l := len(args)
-	for i := l-1; i >= 0; i-- {
+	for i := l - 1; i >= 0; i-- {
 		err = sb.EmitPushParameter(args[i])
 	}
 	if err != nil {
@@ -218,5 +218,3 @@ func (sb *ScriptBuilder) EmitVmSysCall(api string, compress bool) error {
 	arg := append([]byte{byte(len(b))}, b...)
 	return sb.Emit(SYSCALL, arg...)
 }
-
-

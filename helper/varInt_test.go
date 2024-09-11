@@ -1,8 +1,9 @@
 package helper
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestVarIntFromUInt64(t *testing.T) {

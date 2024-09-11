@@ -5,20 +5,20 @@ import (
 	"github.com/joeqian10/neo-gogogo/helper/io"
 )
 
-//Storagekey key use to store StorageItem on blockchain
-type Storagekey struct {
+// StorageKey key use to store StorageItem on blockchain
+type StorageKey struct {
 	ScriptHash helper.UInt160
 	Key        []byte
 }
 
-//Deserialize deserialize from byte array
-func (sk *Storagekey) Deserialize(reader *io.BinaryReader) {
+// Deserialize deserializes from byte array
+func (sk *StorageKey) Deserialize(reader *io.BinaryReader) {
 	reader.ReadLE(&sk.ScriptHash)
 	sk.Key, _ = reader.ReadBytesWithGrouping()
 }
 
-//Serialize serialize to byte array
-func (sk *Storagekey) Serialize(writer *io.BinaryWriter) {
+// Serialize serializes to byte array
+func (sk *StorageKey) Serialize(writer *io.BinaryWriter) {
 	writer.WriteLE(sk.ScriptHash)
 	writer.WriteBytesWithGrouping(sk.Key)
 }

@@ -5,16 +5,17 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/joeqian10/neo-gogogo/crypto"
 	"math/big"
+
+	"github.com/joeqian10/neo-gogogo/crypto"
 )
 
-//BytesToHex bytes to hex string
+// BytesToHex bytes to hex string
 func BytesToHex(b []byte) string {
 	return hex.EncodeToString(b)
 }
 
-//HexToBytes Simple hex string to bytes
+// HexToBytes Simple hex string to bytes
 func HexToBytes(hexstring string) (b []byte) {
 	b, _ = hex.DecodeString(hexstring)
 	return b
@@ -43,7 +44,7 @@ func BytesToScriptHash(bs []byte) (UInt160, error) {
 	return UInt160FromBytes(crypto.Hash160(bs))
 }
 
-//ToNibbles ..
+// ToNibbles ..
 func ToNibbles(data []byte) []byte {
 	r := make([]byte, len(data)*2)
 	for i := 0; i < len(data); i++ {

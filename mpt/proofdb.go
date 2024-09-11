@@ -7,15 +7,15 @@ import (
 	"github.com/joeqian10/neo-gogogo/helper"
 )
 
-//ProofDb a db to use for verify
+// ProofDb a db to use for verify
 type ProofDb struct {
-	nodes map[string]([]byte)
+	nodes map[string][]byte
 }
 
-//NewProofDb new instance of ProofDb from a string list
+// NewProofDb new instance of ProofDb from a string list
 func NewProofDb(proof [][]byte) *ProofDb {
 	p := &ProofDb{}
-	p.nodes = make(map[string]([]byte), len(proof))
+	p.nodes = make(map[string][]byte, len(proof))
 	for _, v := range proof {
 		data := v
 		hashstr := helper.BytesToHex(crypto.Hash256(data))
@@ -24,7 +24,7 @@ func NewProofDb(proof [][]byte) *ProofDb {
 	return p
 }
 
-//Get for TrieDb
+// Get for TrieDb
 func (pd *ProofDb) Get(key []byte) ([]byte, error) {
 	keystr := helper.BytesToHex(key)
 	if v, ok := pd.nodes[keystr]; ok {

@@ -10,13 +10,13 @@ import (
 	nio "github.com/joeqian10/neo-gogogo/helper/io"
 )
 
-//Trie mpt tree
+// Trie mpt tree
 type Trie struct {
 	db   *trieDb
 	root node
 }
 
-//NewTrie new a trie instance
+// NewTrie new a trie instance
 func NewTrie(root []byte, db IKVReadOnlyDb) (*Trie, error) {
 	if db == nil {
 		return nil, errors.New("failed initialize Trie, invalid db")
@@ -36,7 +36,7 @@ func (t *Trie) resolve(hash hashNode) (node, error) {
 	return t.db.node(hash)
 }
 
-//Get try get value
+// Get try get value
 func (t *Trie) Get(path []byte) ([]byte, error) {
 	path = helper.ToNibbles(path)
 	vn, err := t.get(t.root, path)
@@ -76,9 +76,9 @@ func (t *Trie) get(n node, path []byte) (node, error) {
 	return nil, errors.New("trie cant find the path")
 }
 
-//VerifyProof directly verify proof
+// VerifyProof directly verify proof
 func VerifyProof(root []byte, scriptHash helper.UInt160, key []byte, proof [][]byte) ([]byte, error) {
-	sKey := blockchain.Storagekey{
+	sKey := blockchain.StorageKey{
 		ScriptHash: scriptHash,
 		Key:        key,
 	}
@@ -98,7 +98,7 @@ func VerifyProof(root []byte, scriptHash helper.UInt160, key []byte, proof [][]b
 	return resolveValue(value)
 }
 
-//ResolveProof get key and proofs from proofdata
+// ResolveProof get key and proofs from proofdata
 func ResolveProof(proofBytes []byte) (scriptHash helper.UInt160, key []byte, proof [][]byte, err error) {
 	buffer := bytes.NewBuffer(proofBytes)
 	reader := nio.NewBinaryReaderFromIO(io.Reader(buffer))
@@ -122,7 +122,7 @@ func resolveValue(value []byte) ([]byte, error) {
 }
 
 func resolveKey(key []byte) (scriptHash helper.UInt160, kk []byte, err error) {
-	sKey := blockchain.Storagekey{}
+	sKey := blockchain.StorageKey{}
 	err = nio.AsSerializable(&sKey, key)
 	return sKey.ScriptHash, sKey.Key, err
 }

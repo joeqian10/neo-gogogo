@@ -1,24 +1,25 @@
+//go:build integration
 // +build integration
 
 package rpc_integration
 
 import (
+	"crypto/rand"
+	"log"
+	"net/rpc"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/joeqian10/neo-gogogo/crypto"
 	"github.com/joeqian10/neo-gogogo/helper"
 	"github.com/joeqian10/neo-gogogo/sc"
 	"github.com/joeqian10/neo-gogogo/tx"
-	"github.com/stretchr/testify/assert"
-	"log"
-	"net/rpc"
-
-	//"math/rand"
-	"crypto/rand"
-	"testing"
 )
 
 /*
 If you want to run all the tests, you'd better have a private net prepared for testing,
-since a private net is more flexible and you will have plenty of neo and gas to spend.
+since a private net is more flexible, and you will have plenty of neo and gas to spend.
 You need to change the LocalEndPoint to your node, and install all required plugins.
 */
 
